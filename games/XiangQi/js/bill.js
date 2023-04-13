@@ -20,7 +20,7 @@ bill.setBillList = function (map){
 	var list=com.get("billList")
 	for (var i=0; i < com.store.length ; i++){
 		var option = document.createElement('option');
-		 option.text='ÆåÆ×'+(i+1);
+		 option.text='map'+(i+1);
 		 option.value=i;
 		list.add(option , null);
 	}

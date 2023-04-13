@@ -66,7 +66,7 @@ window.onload = function(){
 	com.get("bnBox").style.display = "block";
 	//play.init();
 	com.get("billBn").addEventListener("click", function(e) {
-		if (confirm("是否结束对局，开始棋局研究？")){
+		if (confirm("End the game and start to research?")){
 			com.init();
 			com.get("chessRight").style.display = "block";
 			com.get("moveInfo").style.display = "none";
@@ -74,7 +74,7 @@ window.onload = function(){
 		}
 	})
 	com.get("superPlay").addEventListener("click", function(e) {
-		if (confirm("确认开始大师级对弈？")){
+		if (confirm("Begin with Amateur?")){
 			play.isPlay=true ;	
 			com.get("chessRight").style.display = "none";
 			com.get("moveInfo").style.display = "block";
@@ -84,7 +84,7 @@ window.onload = function(){
 		}
 	})
 	com.get("tyroPlay").addEventListener("click", function(e) {
-		if (confirm("确认开始新手级对弈？")){
+		if (confirm("Begin with Rookie?")){
 			play.isPlay=true ;	
 			com.get("chessRight").style.display = "none";
 			com.get("moveInfo").style.display = "block";
@@ -260,46 +260,46 @@ com.createMove = function (map,x,y,newX,newY){
 	map[newY][newX] = map[y][x];
 	delete map[y][x];
 	if (man.my===1){
-		var mumTo=["一","二","三","四","五","六","七","八","九","十"];	
+		var mumTo=["1","2","3","4","5","6","7","8","9","10"];	
 		newX=8-newX;
 		h+= mumTo[8-x];
 		if (newY > y) {
-			h+= "退";
+			h+= "Back";
 			if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
 				h+= mumTo[newX];
 			}else {
 				h+= mumTo[newY - y -1];
 			}
 		}else if (newY < y) {
-			h+= "进";
+			h+= "Forward";
 			if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
 				h+= mumTo[newX];
 			}else {
 				h+= mumTo[y - newY -1];
 			}
 		}else {
-			h+= "平";
+			h+= "Push";
 			h+= mumTo[newX];
 		}
 	}else{
 		var mumTo=["１","２","３","４","５","６","７","８","９","10"];
 		h+= mumTo[x];
 		if (newY > y) {
-			h+= "进";
+			h+= "Back";
 			if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
 				h+= mumTo[newX];
 			}else {
 				h+= mumTo[newY - y-1];
 			}
 		}else if (newY < y) {
-			h+= "退";
+			h+= "Forward";
 			if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
 				h+= mumTo[newX];
 			}else {
 				h+= mumTo[y - newY-1];
 			}
 		}else {
-			h+= "平";
+			h+= "Push";
 			h+= mumTo[newX];
 		}
 	}

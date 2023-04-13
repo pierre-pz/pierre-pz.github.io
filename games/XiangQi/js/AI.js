@@ -44,13 +44,13 @@ AI.init = function(pace){
 	if (val&&val.value!=-8888) {
 		var man = play.mans[val.key];
 		var nowTime= new Date().getTime();
-		com.get("moveInfo").innerHTML='<h3>AI搜索结果：</h3>最佳着法：'+
+		com.get("moveInfo").innerHTML='<h3>AI Search result：</h3>The best way：'+
 										com.createMove(com.arr2Clone(play.map),man.x,man.y,val.x,val.y)+
-										'<br />搜索深度：'+AI.treeDepth+'<br />搜索分支：'+
-										AI.number+'个 <br />最佳着法评估：'+
-										val.value+'分'+
-										' <br />搜索用时：'+
-										(nowTime-initTime)+'毫秒'
+										'<br />Search Depth: '+AI.treeDepth+'<br />Search：'+
+										AI.number+'个 <br />The best step evaluation: '+
+										val.value+'Mins'+
+										' <br />Searching time：'+
+										(nowTime-initTime)+'ms'
 		return [man.x,man.y,val.x,val.y]
 	}else {
 		return false;	
