@@ -56,6 +56,7 @@
     rel="stylesheet">
 
 
+
 </head>
 
 <body>
@@ -73,6 +74,7 @@
             <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span>
             <span class="icon-bar"></span> </button>
         </div>
+
         <!--/.navbar-header-->
         <div id="main-nav" class="collapse navbar-collapse">
           <ul class="nav navbar-nav" id="mainNav">
@@ -80,6 +82,15 @@
             <li><a href="#Categories" class="scroll-link" style="color: yellow;">Categories</a></li>
             <li><a href="#WorldMap" class="scroll-link" style="color: yellow;">World Map</a></li>
           </ul>
+          <div class="ignore">
+            <ul class="nav navbar-nav" id="mainNav">
+              <li><a href="javascript:translate.changeLanguage('english');">English</a></li>
+              <li><a href="javascript:translate.changeLanguage('french');">Français</a></li>
+              <li><a href="javascript:translate.changeLanguage('chinese_simplified');">简体中文</a></li>
+              <li><a href="javascript:translate.changeLanguage('chinese_traditional');">繁體中文</a></li>
+            </ul>
+          </div>
+
         </div>
         <!--/.navbar-collapse-->
       </nav>
@@ -91,16 +102,15 @@
 
   <div id="#top"></div>
   <section id="home">
-    <div class="banner-container"> <img src="images/banner-bg.jpg" alt="banner" />
+    <div class="banner-container">
+      <img src="images/banner-bg.jpg" alt="banner" />
       <div class="container banner-content">
         <div class="row">
           <header class="centered">
-            <h1 style="font-size: 100px; text-shadow: 0 0 15px #0077ff, 0 0 5px #b700ff;">Pierre
-              Zhang
-            </h1>
-
-            <p align="center" , style="font-size: 40px; text-shadow: -1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000,
-          -1px -1px 0 #000">Student at University of Toronto</p>
+            <h1 style="font-size: 100px; text-shadow: 0 0 15px #0077ff, 0 0 5px #b700ff;">Pierre Zhang</h1>
+            <p align="center"
+              style="font-size: 40px; text-shadow: -1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000">
+              Student at University of Toronto</p>
           </header>
           <div class="social-icons">
             <a href="https://www.facebook.com/pierre.zhang.1004/"><i class="fa fa-facebook"></i></a>
@@ -111,34 +121,33 @@
           </div>
           <br />
           <br />
-          <a href="Resume.pdf"><button style="display:block;margin:0 auto" , class="button btn"><span>
-                Resume</span></button></a>
+          <a href="Resume.pdf">
+            <button style="display:block;margin:0 auto" class="button btn">
+              <span>Resume</span>
+            </button>
+          </a>
         </div>
         <br />
         <br />
       </div>
     </div>
-  </section>
 
-
-  <section id="introText">
-    <div class="container">
-      <div>
+    <section id="introText">
+      <div class="container">
         <br />
         <br />
-        <h1>As a <span style="color:yellow">2nd</span> year Math & Stats student in UofT </h1>
-        <p>I'm passionate about NEITHER Math NOR Stats... Just joking, Math
-          modelling, Big Data and IOT has been a inseparable part of our world. I'm a
-          fan of designing and innovation, also High-Tech. Sketching reveals how beautiful is the world to me. Coding
-          always show magic to me: they can make my hair disappear. Driving is a lot of fun, click the button here to
-          donate me a Lamborghini~</p>
+        <h1>As a <span style="color:yellow">2nd</span> year Math &amp; Stats student in UofT</h1>
+        <p>I'm passionate about NEITHER Math NOR Stats... Just joking, Math modelling, Big Data and IOT has been an
+          inseparable part of our world. I'm a fan of designing and innovation, also High-Tech. Sketching reveals how
+          beautiful is the world to me. Coding always show magic to me: they can make my hair disappear. Driving is a
+          lot
+          of fun, click the button here to donate me a Lamborghini~</p>
+        <a href="https://www.autotrader.ca/a/lamborghini/urus/north%20york/ontario/5_55346554_20111115101047209"
+          class="Donate">Donate Something For Me</a>
       </div>
-      <a href="https://www.autotrader.ca/a/lamborghini/urus/north%20york/ontario/5_55346554_20111115101047209"
-        class="Donate">Donate Something For Me</a>
-    </div>
+    </section>
   </section>
-  </div>
-  </section>
+
 
   <!--Quote-->
   <section id="quote" class="bg-parlex">
@@ -508,6 +517,11 @@
 </body>
 
 
-
+<script src="js/language.js"></script>
+<script>
+  translate.setUseVersion2(); //设置使用v2.x 版本
+  translate.language.setLocal('english'); //设置本地语种（当前网页的语种）。如果不设置，默认就是 'chinese_simplified' 简体中文。 可填写如 'english'、'chinese_simplified' 等，具体参见文档下方关于此的说明。
+  translate.execute();//进行翻译 
+</script>
 
 </html>
