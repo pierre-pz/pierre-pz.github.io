@@ -775,6 +775,7 @@
       image: canvas
     }
     var results = [];
+    /*因为性能原因去掉了刷新
     function update(threshold, levels) {
       context.clearRect(0, 0, canvas.width, canvas.height);
       var thresholds = [];
@@ -797,17 +798,11 @@
       });
       opt.onupdate();
     }
-
-    function animate() {
-      var t = performance.now();
+    d3.timer(function (t) {
       var threshold = (t % 10000) / 10000;
       update(threshold, 1);
-      setTimeout(function () {
-        requestAnimationFrame(animate); // 使用 requestAnimationFrame 进行动画循环
-      }, 100); // 限制帧率为10帧每秒
-    }
-
-    requestAnimationFrame(animate); // 启动动画
+    });
+    */
     initCharts(opt);
     update(config.threshold, config.levels);
   });
@@ -851,7 +846,7 @@
         displacementScale: 0.03,
         displacementQuality: 'high',
         shading: 'realistic',
-        environment: '/images/starfield.jpg',
+        environment: 'black',
         realisticMaterial: {
           roughness: 0.2,
           metalness: 0
