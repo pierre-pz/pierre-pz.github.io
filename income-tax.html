@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Canada Income & Tax Planner (2025)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--accent:#ffd100;--carbon:#0a0a0a}
+    body{background:var(--carbon);color:#e5e7eb}
+    .text-accent{color:var(--accent)} .bg-accent{background:var(--accent)} .text-carbon{color:var(--carbon)}
+    .focus\:ring-accent:focus{outline:2px solid var(--accent);outline-offset:2px}
+  </style>
+</head>
+<body>
+  <header class="px-6 py-4">
+    <nav class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="text-sm text-zinc-400 hover:underline">← 返回首页</a>
+      <span class="text-sm text-zinc-400">Canada Income &amp; Tax Planner</span>
+    </nav>
+  </header>
+
+  <main>
+    <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
+      <h2 class="mb-2 text-center text-3xl sm:text-4xl font-bold tracking-wider">Canada Income &amp; Tax Planner</h2>
+      <p class="mb-10 text-center text-zinc-400">基于 2025 税率 · 实时计算 · 适配加拿大 13 省区</p>
+
+      <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10">
+        <h3 class="text-xl font-semibold mb-4">🧩 模块 1：收入计算（含福利）</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm text-zinc-400 mb-1">薪资输入方式</label>
+              <div class="flex gap-4">
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="hourly" class="accent-[#ffd100]" checked><span>时薪</span></label>
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="annual" class="accent-[#ffd100]"><span>年薪</span></label>
+              </div>
+            </div>
+            <div id="hourlyFields" class="grid sm:grid-cols-3 gap-3">
+              <div><label class="block text-sm text-zinc-400 mb-1">时薪（$/h）</label><input id="hourlyRate" type="number" min="0" step="0.01" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="30"></div>
+              <div><label class="block text-sm text-zinc-400 mb-1">每周工时</label><input id="hoursPerWeek" type="number" min="0" step="0.5" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="40"></div>
+              <div><label class="block text-sm text-zinc-400 mb-1">每年工作周数</label><input id="weeksPerYear" type="number" min="0" max="52" step="1" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="52"></div>
+            </div>
+            <div id="annualField" class="hidden">
+              <label class="block text-sm text-zinc-400 mb-1">年薪（$）</label>
+              <input id="annualSalary" type="number" min="0" step="1000" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="70000">
+              <p class="mt-1 text-xs text-zinc-500">提示：若在此输入正数，将自动切换到“年薪”模式。</p>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm text-zinc-400 mb-1">带薪假期（周）</label>
+                <div class="flex gap-2">
+                  <select id="paidVacationPreset" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="0">无</option><option value="2">2 周</option><option value="3">3 周</option><option value="4">4 周</option><option value="custom">自定义</option>
+                  </select>
+                  <input id="paidVacationCustom" type="number" min="0" step="0.5" placeholder="自定义" class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+                </div>
+                <p class="mt-1 text-xs text-zinc-500">工作周为“实际工作周”，带薪假期另行折算工资；总周数&gt;52会提示校验。</p>
+              </div>
+              <div>
+                <label class="block text-sm text-zinc-400 mb-1">Vacation Pay（%）</label>
+                <div class="flex gap-2">
+                  <select id="vacPayPreset" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="0">无（0%）</option><option value="4">4%</option><option value="6">6%</option><option value="8">8%</option><option value="custom">其他</option>
+                  </select>
+                  <input id="vacPayCustom" type="number" min="0" step="0.1" placeholder="%" class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+                </div>
+                <p class="mt-1 text-xs text-zinc-500">Vacation Pay 计入应税收入（CRA 规定）。</p>
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-3">
+              <label class="flex items-center gap-2"><input id="chkBonus" type="checkbox" class="accent-[#ffd100]"><span>奖金</span></label>
+              <label class="flex items-center gap-2"><input id="chkAllowance" type="checkbox" class="accent-[#ffd100]"><span>津贴</span></label>
+              <label class="flex items-center gap-2"><input id="chkCommission" type="checkbox" class="accent-[#ffd100]"><span>提成</span></label>
+              <input id="bonusVal" type="number" min="0" step="100" placeholder="奖金（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <input id="allowanceVal" type="number" min="0" step="100" placeholder="津贴（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <input id="commissionVal" type="number" min="0" step="100" placeholder="提成（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+            </div>
+          </div>
+          <div class="grid gap-3 content-start">
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">年度总收入（含福利）</div><div id="outAnnualGross" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">每月税前</div><div id="outMonthlyGross" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">每周税前</div><div id="outWeeklyGross" class="text-2xl font-bold mt-1">—</div></div>
+            </div>
+            <p id="weeksCheck" class="text-xs text-red-400 hidden">⚠️ “工作周 + 带薪假期周” 超过 52，请检查输入避免重复计入。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10">
+        <h3 class="text-xl font-semibold mb-4">🧩 模块 2：税收计算（2025 最新税率）</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm text-zinc-400 mb-1">所在省/地区</label>
+              <select id="province" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                <option>Ontario</option><option>British Columbia</option><option>Alberta</option><option>Saskatchewan</option><option>Manitoba</option><option>Quebec</option><option>New Brunswick</option><option>Nova Scotia</option><option>Prince Edward Island</option><option>Newfoundland and Labrador</option><option>Yukon</option><option>Northwest Territories</option><option>Nunavut</option>
+              </select>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">应缴 联邦税</div><div id="outFedTax" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">应缴 省/地区税</div><div id="outProvTax" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">总税额</div><div id="outTotalTax" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">税后收入（年）</div><div id="outAfterTax" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">平均税率</div><div id="outAvgRate" class="text-xl font-semibold mt-1">—</div></div>
+            <p class="text-xs text-zinc-500">已含 Ontario 附加税与 Quebec 联邦税 16.5% 退税；未纳入抵免等。</p>
+          </div>
+          <div class="md:col-span-2">
+  <canvas id="taxDonut" height="200" class="!max-h-[360px]"></canvas>
+  <div class="mt-6">
+            <div class="text-sm text-zinc-400 mb-2">按税阶分段：绿色为到手，红色为该段税款</div>
+            <canvas id="bracketBar" height="160" class="!max-h-[260px]"></canvas>
+          </div>
+</div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8">
+        <h3 class="text-xl font-semibold mb-4">🧩 模块 3：支出与剩余收入分析</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <label class="text-sm text-zinc-400 self-center">房贷/租金（月）</label><input id="expRent" type="number" min="0" step="10" value="1800" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">车险（月）</label><input id="expCarIns" type="number" min="0" step="10" value="180" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">通勤交通（月）</label><input id="expTransit" type="number" min="0" step="10" value="150" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">网络/电话（月）</label><input id="expInternet" type="number" min="0" step="5" value="120" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">食品杂货（月）</label><input id="expGrocery" type="number" min="0" step="10" value="500" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">保险/贷款（月）</label><input id="expLoan" type="number" min="0" step="10" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+            </div>
+            <div class="mt-3"><button id="btnAddCustom" class="rounded-lg bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">+ 自定义支出项</button><div id="customList" class="mt-2 space-y-2"></div></div>
+          </div>
+          <div class="space-y-3">
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">月度税后可支配收入</div><div id="outMonthlyNet" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">每月支出合计</div><div id="outMonthlyExp" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">实际“剩余”（月）</div><div id="outMonthlyLeft" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">剩余比例</div><div id="outLeftPct" class="text-xl font-semibold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">实际“剩余”（周）</div><div id="outWeeklyLeft" class="text-xl font-semibold mt-1">—</div></div>
+          </div>
+          <div><canvas id="expDonut" height="200" class="!max-h-[360px]"></canvas></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="px-6 py-10 text-center text-xs text-zinc-500">© 2025 · Your Name</footer>
+  <script src="js/income-calc.js"></script>
+</body>
+</html>
