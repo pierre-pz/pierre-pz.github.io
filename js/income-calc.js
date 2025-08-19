@@ -111,6 +111,56 @@
     onSurtax: { t1: 5710, r1: 0.20, t2: 7307, r2: 0.36 },
     qcFedAbatement: 0.165
   };
+  // ===== 基本个人免税额（BPA）2025 —— 只用于修正低收入时不应缴纳联邦/省税 =====
+  // 这里给出一个保守的默认值：联邦按 ~15.7k，加拿大多数省份 ≥10k。
+  // 目标：确保在年收入很低（例如 $2,000）时显示为 0 联邦税与 0 省税。
+  // 注意：这些数值可按需要进一步精修；本改动不调整 UI，仅修正计算逻辑。
+  const BPA_2025 = {
+    federal: 15705,
+    // 如需更精确，可把各省数字补齐；此处仅为保守默认，足以避免低收入误算。
+    provinces: {
+      "Ontario": 11865
+    },
+    defaultProvince: 12000
+  };
+  function _getProvinceBPA(province){
+    return (BPA_2025.provinces && BPA_2025.provinces[province]) || BPA_2025.defaultProvince;
+  }
+
+
+  // ===== 2025 CPP/QPP/EI & RRSP 限额（参考 CRA / Retraite Québec 公告） =====
+  const CPP_2025 = {
+    ympe: 71300, // Year's Maximum Pensionable Earnings
+    yampe: 81200, // Second ceiling
+    ybe: 3500,    // Year's Basic Exemption
+    rateEmp: 0.0595,       // Employee rate (CPP1)
+    rateSE: 0.119,         // Self-employed (both shares)
+    maxEmp: 4034.10,       // Maximum employee CPP1
+    cpp2RateEmp: 0.04,     // CPP2 employee
+    cpp2RateSE: 0.08,      // CPP2 self-employed
+    maxCPP2Emp: 396.00     // Maximum employee CPP2
+  };
+  const QPP_2025 = {
+    mpe: 71300,
+    yampe: 81200,
+    ybe: 3500,
+    baseRateEmp: 0.054,  // 5.4%
+    addRateEmp: 0.01,    // +1% additional (合计 6.4%)
+    baseRateSE: 0.108,   // 10.8%
+    addRateSE: 0.02,     // +2% (合计 12.8%)
+    add2RateEmp: 0.04,   // 4% on [MPE, YAMPE]
+    add2RateSE: 0.08     // 8% self-employed
+  };
+  const EI_2025 = {
+    mie: 65700,                // Maximum Insurable Earnings
+    rate: { default: 0.0164, quebec: 0.0131 }, // employee
+    maxEmp: { default: 1077.48, quebec: 860.67 }
+  };
+  const RRSP_2025 = {
+    dollarLimit: 32490,  // 2025 RRSP dollar limit
+    earnedPct: 0.18
+  };
+
 
   function calcTaxByBrackets(income, brackets) {
     let tax = 0, lastCap = 0;
@@ -125,21 +175,33 @@
     return Math.max(0, tax);
   }
 
+  
   function computeTaxes(annualIncome, province) {
+    // annualIncome 此处为“应税收入”（已考虑 RRSP 抵扣）。
     if (!annualIncome || annualIncome <= 0) {
       return { federal: 0, provincial: 0, total: 0, after: 0, avgRate: 0 };
     }
-    let fed = calcTaxByBrackets(annualIncome, TAX_2025.federal);
-    if (province === 'Quebec') {
-      fed = fed * (1 - TAX_2025.qcFedAbatement);
-    }
-    const provTaxBeforeSurtax = calcTaxByBrackets(annualIncome, TAX_2025.provinces[province] || []);
-    let prov = provTaxBeforeSurtax;
+    // —— 联邦：先按税阶算出“基本税”，再减去基本个人免税额（按最低档税率乘以 BPA）。
+    const fedRaw = calcTaxByBrackets(annualIncome, TAX_2025.federal);
+    const fedCredit = (TAX_2025.federal[0]?.rate || 0) * (BPA_2025.federal || 0);
+    const fedAfterCredit = Math.max(0, fedRaw - fedCredit);
+    // 魁省联邦退税：对“抵免后”的联邦税再做 16.5% 抵扣。
+    const fed = (province === 'Quebec') ? (fedAfterCredit * (1 - TAX_2025.qcFedAbatement)) : fedAfterCredit;
+
+    // —— 省税：先按税阶算“基本省税”，再减去省 BPA（按该省最低档税率）。
+    const provBr = TAX_2025.provinces[province] || [];
+    const provRaw = calcTaxByBrackets(annualIncome, provBr);
+    const provCredit = (provBr[0]?.rate || 0) * _getProvinceBPA(province);
+    const provBase = Math.max(0, provRaw - provCredit);
+
+    // 安省附加税基于“省基本税（抵免后）”计算。
+    let prov = provBase;
     if (province === 'Ontario') {
       const { t1, r1, t2, r2 } = TAX_2025.onSurtax;
-      if (provTaxBeforeSurtax > t1) prov += (provTaxBeforeSurtax - t1) * r1;
-      if (provTaxBeforeSurtax > t2) prov += (provTaxBeforeSurtax - t2) * r2;
+      if (provBase > t1) prov += (provBase - t1) * r1;
+      if (provBase > t2) prov += (provBase - t2) * r2;
     }
+
     const total = fed + prov;
     const after = Math.max(0, annualIncome - total);
     const avgRate = total / annualIncome;
@@ -147,23 +209,30 @@
   }
 
   // ===== 税阶分段可视化（横向堆叠条） =====
+  
   function taxAtIncome(income, province, wantBeforeSurtax=false) {
     // 返回 {fedRaw, fedAdj, provBeforeSurtax, provTotal}
-    // fedRaw: 联邦未做魁省退税的税额；fedAdj: 若魁省则扣除16.5%后的联邦税，其它省等于fedRaw
+    // fedAdj 已考虑联邦 BPA 抵免与（如魁省）联邦退税；provTotal 已考虑省 BPA 与（如安省）附加税。
     const fedRaw = calcTaxByBrackets(income, TAX_2025.federal);
-    const fedAdj = (province === 'Quebec') ? fedRaw * (1 - TAX_2025.qcFedAbatement) : fedRaw;
-    const provBefore = calcTaxByBrackets(income, TAX_2025.provinces[province] || []);
-    let provTotal = provBefore;
+    const fedCredit = (TAX_2025.federal[0]?.rate || 0) * (BPA_2025.federal || 0);
+    const fedAfterCredit = Math.max(0, fedRaw - fedCredit);
+    const fedAdj = (province === 'Quebec') ? (fedAfterCredit * (1 - TAX_2025.qcFedAbatement)) : fedAfterCredit;
+
+    const provBr = TAX_2025.provinces[province] || [];
+    const provBefore = calcTaxByBrackets(income, provBr);
+    const provCredit = (provBr[0]?.rate || 0) * _getProvinceBPA(province);
+    const provBase = Math.max(0, provBefore - provCredit);
+    let provTotal = provBase;
     if (province === 'Ontario') {
       const { t1, r1, t2, r2 } = TAX_2025.onSurtax;
-      if (provBefore > t1) provTotal += (provBefore - t1) * r1;
-      if (provBefore > t2) provTotal += (provBefore - t2) * r2;
+      if (provBase > t1) provTotal += (provBase - t1) * r1;
+      if (provBase > t2) provTotal += (provBase - t2) * r2;
     }
     return { fedRaw, fedAdj, provBeforeSurtax: provBefore, provTotal };
   }
 
+  
   function computeBracketSegments(annualIncome, province) {
-    // 合并联邦与省级上限，生成 0->income 的分段；每段计算该段税额（含安省附加税、魁省退税按比例分摊）
     const provBr = TAX_2025.provinces[province] || [];
     const breakpoints = new Set([0]);
     TAX_2025.federal.forEach(b => breakpoints.add(Math.min(b.upTo, annualIncome)));
@@ -171,32 +240,57 @@
     breakpoints.add(annualIncome);
     const pts = Array.from(breakpoints).filter(x => !isNaN(x)).sort((a,b)=>a-b);
 
-    // 预先计算总省税（附加税前后）和联邦税（退税前后），用于按比例分配
-    const total0 = taxAtIncome(annualIncome, province);
-    const fedRawTotal = total0.fedRaw;
-    const fedAdjTotal = total0.fedAdj;
-    const fedAbate = Math.max(0, fedRawTotal - fedAdjTotal);
-    const provBeforeTotal = total0.provBeforeSurtax;
-    const provSurtax = Math.max(0, total0.provTotal - provBeforeTotal);
+    // —— 计算总额：联邦/省基本税、BPA 抵免、魁省联邦退税、安省附加税 ——
+    const fedRawTotal = calcTaxByBrackets(annualIncome, TAX_2025.federal);
+    const fedCreditTotalCap = (TAX_2025.federal[0]?.rate || 0) * (BPA_2025.federal || 0);
+    const fedCreditTotal = Math.min(fedRawTotal, fedCreditTotalCap);
+    const fedAfterCreditTotal = Math.max(0, fedRawTotal - fedCreditTotal);
+    const fedAbateTotal = (province === 'Quebec') ? (fedAfterCreditTotal * TAX_2025.qcFedAbatement) : 0;
+    const fedNetTotal = Math.max(0, fedAfterCreditTotal - fedAbateTotal);
+
+    const provBeforeTotal = calcTaxByBrackets(annualIncome, provBr);
+    const provCreditCap = (provBr[0]?.rate || 0) * _getProvinceBPA(province);
+    const provCreditTotal = Math.min(provBeforeTotal, provCreditCap);
+    const provBaseTotal = Math.max(0, provBeforeTotal - provCreditTotal);
+    let provSurtaxTotal = 0;
+    if (province === 'Ontario') {
+      const { t1, r1, t2, r2 } = TAX_2025.onSurtax;
+      if (provBaseTotal > t1) provSurtaxTotal += (provBaseTotal - t1) * r1;
+      if (provBaseTotal > t2) provSurtaxTotal += (provBaseTotal - t2) * r2;
+    }
+    const provNetTotal = provBaseTotal + provSurtaxTotal;
 
     const segments = [];
     for (let i=0;i<pts.length-1;i++) {
       const a = pts[i], b = pts[i+1];
       if (b <= a) continue;
       const w = Math.min(b, annualIncome) - a;
-      const taxA = taxAtIncome(a, province);
-      const taxB = taxAtIncome(b, province);
 
-      // 该段联邦税（未退税）与省税（附加税前）——使用差分
-      const fedRawSeg = taxB.fedRaw - taxA.fedRaw;
-      const provBeforeSeg = taxB.provBeforeSurtax - taxA.provBeforeSurtax;
+      // 差分法：先取“基本税”的段额，再按总额占比分摊抵免/退税/附加税。
+      const fedRawA = calcTaxByBrackets(a, TAX_2025.federal);
+      const fedRawB = calcTaxByBrackets(b, TAX_2025.federal);
+      const fedRawSeg = fedRawB - fedRawA;
 
-      // 退税和附加税按比例分摊到各段
-      const fedAbateSeg = fedRawTotal>0 ? fedAbate * (fedRawSeg / fedRawTotal) : 0;
-      const provSurtaxSeg = provBeforeTotal>0 ? provSurtax * (provBeforeSeg / provBeforeTotal) : 0;
+      const provBeforeA = calcTaxByBrackets(a, provBr);
+      const provBeforeB = calcTaxByBrackets(b, provBr);
+      const provBeforeSeg = provBeforeB - provBeforeA;
 
-      const fedSeg = fedRawSeg - fedAbateSeg;
-      const provSeg = provBeforeSeg + provSurtaxSeg;
+      const fedCreditSeg = (fedRawTotal > 0) ? (fedCreditTotal * (fedRawSeg / fedRawTotal)) : 0;
+      const fedAfterCreditSeg = Math.max(0, fedRawSeg - fedCreditSeg);
+      const fedAbateSeg = (fedAfterCreditTotal > 0 && province === 'Quebec')
+        ? (fedAbateTotal * (fedAfterCreditSeg / fedAfterCreditTotal))
+        : 0;
+      const fedSeg = Math.max(0, fedAfterCreditSeg - fedAbateSeg);
+
+      const provCreditSeg = (provBeforeTotal > 0) ? (provCreditTotal * (provBeforeSeg / provBeforeTotal)) : 0;
+      const provBaseSeg = Math.max(0, provBeforeSeg - provCreditSeg);
+      let provSurtaxSeg = 0;
+      if (province === 'Ontario' && provBaseTotal > 0) {
+        // 将附加税按“抵免后的基本省税”占比分摊
+        provSurtaxSeg = provSurtaxTotal * (provBaseSeg / provBaseTotal);
+      }
+      const provSeg = provBaseSeg + provSurtaxSeg;
+
       const segTax = Math.max(0, fedSeg + provSeg);
       segments.push({
         label: `${fmt.format(a)}–${fmt.format(b)}`,
@@ -267,6 +361,11 @@
     bonusVal: $('#bonusVal'),
     allowanceVal: $('#allowanceVal'),
     commissionVal: $('#commissionVal'),
+    chkRRSP: $('#chkRRSP'), rrspVal: $('#rrspVal'),
+    chkStock: $('#chkStock'), stockVal: $('#stockVal'),
+    chkOther: $('#chkOther'), otherVal: $('#otherVal'),
+    chkSelfEmp: $('#chkSelfEmp'),
+    outCPPQPP: $('#outCPPQPP'), outEI: $('#outEI'),
     outAnnualGross: $('#outAnnualGross'),
     outMonthlyGross: $('#outMonthlyGross'),
     outWeeklyGross: $('#outWeeklyGross'),
@@ -291,6 +390,47 @@
     outLeftPct: $('#outLeftPct'),
     outWeeklyLeft: $('#outWeeklyLeft'),
   };
+  // ===== 第二份工作（可选）逻辑 =====
+  function el2(id){ return document.getElementById(id); }
+  function isJob2Enabled(){ return !el2('job2Wrap')?.classList.contains('hidden'); }
+
+  function getPaidVacationWeeks2() {
+    const sel = el2('paidVacationPreset2');
+    if (!sel) return 0;
+    const v = sel.value;
+    if (v === 'custom') return Number(el2('paidVacationCustom2')?.value || 0);
+    return Number(v || 0);
+  }
+  function getVacPayPct2() {
+    const sel = el2('vacPayPreset2');
+    if (!sel) return 0;
+    const v = sel.value;
+    if (v === 'custom') return Number(el2('vacPayCustom2')?.value || 0);
+    return Number(v || 0);
+  }
+
+  function computeJobGross2() {
+    if (!isJob2Enabled()) return 0;
+    const mode2 = Array.from(document.querySelectorAll('input[name="mode2"]')).find(r=>r.checked)?.value || 'hourly';
+    let base = 0;
+    if (mode2 === 'annual') {
+      base = Number(el2('annualSalary2')?.value || 0);
+    } else {
+      const hr = Number(el2('hourlyRate2')?.value || 0);
+      const hpw = Number(el2('hoursPerWeek2')?.value || 0);
+      const wpy = Number(el2('weeksPerYear2')?.value || 0);
+      const vacWeeks = getPaidVacationWeeks2();
+      const totalWeeks = wpy + vacWeeks;
+      el2('weeksCheck2')?.classList.toggle('hidden', totalWeeks <= 52);
+      base = hr * hpw * wpy + hr * hpw * vacWeeks;
+    }
+    const vacPay = base * (getVacPayPct2() / 100);
+    const bonus = el2('chkBonus2')?.checked ? Number(el2('bonusVal2')?.value || 0) : 0;
+    const allow = el2('chkAllowance2')?.checked ? Number(el2('allowanceVal2')?.value || 0) : 0;
+    const comm = el2('chkCommission2')?.checked ? Number(el2('commissionVal2')?.value || 0) : 0;
+    return Math.max(0, base + vacPay + bonus + allow + comm);
+  }
+
 
   function getPaidVacationWeeks() {
     const v = els.paidVacationPreset.value;
@@ -303,7 +443,88 @@
     return Number(v || 0);
   }
 
+  
+
+  function clampRRSP(earnedIncome, inputRRSP) {
+    const limit = Math.min(RRSP_2025.dollarLimit, earnedIncome * RRSP_2025.earnedPct);
+    return Math.max(0, Math.min(Number(inputRRSP||0), limit));
+  }
+
+  function computeIncomeBreakdown() {
+    // Employment components from job1 + job2
+    const mode = els.mode.find(r => r.checked)?.value || 'hourly';
+    let base = 0;
+    if (mode === 'annual') {
+      base = Number(els.annualSalary.value || 0);
+    } else {
+      const hr = Number(els.hourlyRate.value || 0);
+      const hpw = Number(els.hoursPerWeek.value || 0);
+      const wpy = Number(els.weeksPerYear.value || 0);
+      const vacWeeks = getPaidVacationWeeks();
+      base = hr * hpw * (wpy + vacWeeks);
+    }
+    const vacPay = base * (getVacPayPct() / 100);
+    const bonus = els.chkBonus.checked ? Number(els.bonusVal.value || 0) : 0;
+    const allow = els.chkAllowance.checked ? Number(els.allowanceVal.value || 0) : 0;
+    const comm = els.chkCommission.checked ? Number(els.commissionVal.value || 0) : 0;
+    const job1Employment = Math.max(0, base + vacPay + bonus + allow + comm);
+
+    const job2 = computeJobGross2(); // job2 already includes its bonus/allowance/commission
+    const employmentIncome = job1Employment + job2;
+
+    const stock = els.chkStock?.checked ? Number(els.stockVal?.value || 0) : 0;
+    const other = els.chkOther?.checked ? Number(els.otherVal?.value || 0) : 0;
+    const rrspIn = els.chkRRSP?.checked ? Number(els.rrspVal?.value || 0) : 0;
+
+    const totalGross = employmentIncome + stock + other;
+    const rrspDed = clampRRSP(employmentIncome, rrspIn);
+    const taxableIncome = Math.max(0, totalGross - rrspDed);
+    return { totalGross, employmentIncome, stock, other, rrspDed, taxableIncome };
+  }
+
+  function computeCPP_QPP_EI(employmentIncome, province, selfEmp) {
+    // CPP/QPP: only on employment income
+    const isQC = (province === 'Quebec');
+    let cppqpp = 0;
+    if (!isQC) {
+      // CPP
+      const earnings1 = Math.max(0, Math.min(CPP_2025.ympe, employmentIncome) - CPP_2025.ybe);
+      const rate1 = selfEmp ? CPP_2025.rateSE : CPP_2025.rateEmp;
+      let part1 = earnings1 * rate1;
+      if (!selfEmp) part1 = Math.min(part1, CPP_2025.maxEmp);
+      // CPP2
+      const earnings2 = Math.max(0, Math.min(CPP_2025.yampe, employmentIncome) - CPP_2025.ympe);
+      const rate2 = selfEmp ? CPP_2025.cpp2RateSE : CPP_2025.cpp2RateEmp;
+      let part2 = earnings2 * rate2;
+      if (!selfEmp) part2 = Math.min(part2, CPP_2025.maxCPP2Emp);
+      cppqpp = part1 + part2;
+    } else {
+      // QPP
+      const earnings1 = Math.max(0, Math.min(QPP_2025.mpe, employmentIncome) - QPP_2025.ybe);
+      const rate1 = selfEmp ? (QPP_2025.baseRateSE + QPP_2025.addRateSE) : (QPP_2025.baseRateEmp + QPP_2025.addRateEmp);
+      let part1 = earnings1 * rate1;
+      // Official maximums (derived by formula) are respected via earnings caps
+
+      const earnings2 = Math.max(0, Math.min(QPP_2025.yampe, employmentIncome) - QPP_2025.mpe);
+      const rate2 = selfEmp ? QPP_2025.add2RateSE : QPP_2025.add2RateEmp;
+      let part2 = earnings2 * rate2;
+      cppqpp = part1 + part2;
+    }
+
+    // EI (employees only by default; self-employed not covered unless opted-in -> treat as 0)
+    let ei = 0;
+    if (!selfEmp) {
+      const mie = EI_2025.mie;
+      const rate = isQC ? EI_2025.rate.quebec : EI_2025.rate.default;
+      const cap = isQC ? EI_2025.maxEmp.quebec : EI_2025.maxEmp.default;
+      ei = Math.min((Math.min(employmentIncome, mie)) * rate, cap);
+    }
+    const planLabel = isQC ? 'QPP' : 'CPP';
+    return { cppqpp, ei, planLabel };
+  }
+
   function computeAnnualGross() {
+    // job1（原始）+ job2（可选）
     const mode = els.mode.find(r => r.checked)?.value || 'hourly';
     let base = 0;
     if (mode === 'annual') {
@@ -321,8 +542,12 @@
     const bonus = els.chkBonus.checked ? Number(els.bonusVal.value || 0) : 0;
     const allow = els.chkAllowance.checked ? Number(els.allowanceVal.value || 0) : 0;
     const comm = els.chkCommission.checked ? Number(els.commissionVal.value || 0) : 0;
-    return Math.max(0, base + vacPay + bonus + allow + comm);
+
+    const job1 = Math.max(0, base + vacPay + bonus + allow + comm);
+    const job2 = computeJobGross2();
+    return job1 + job2;
   }
+
 
   function renderIncomeOutputs(annual) {
     els.outAnnualGross.textContent = fmt.format(annual);
@@ -343,6 +568,12 @@
     els.bonusVal.classList.toggle('hidden', !els.chkBonus.checked);
     els.allowanceVal.classList.toggle('hidden', !els.chkAllowance.checked);
     els.commissionVal.classList.toggle('hidden', !els.chkCommission.checked);
+    els.rrspVal?.classList.toggle('hidden', !els.chkRRSP?.checked);
+    els.stockVal?.classList.toggle('hidden', !els.chkStock?.checked);
+    els.otherVal?.classList.toggle('hidden', !els.chkOther?.checked);
+    els.rrspVal?.classList.toggle('hidden', !els.chkRRSP?.checked);
+    els.stockVal?.classList.toggle('hidden', !els.chkStock?.checked);
+    els.otherVal?.classList.toggle('hidden', !els.chkOther?.checked);
   }
 
   const PercentLabels = {
@@ -394,16 +625,13 @@
     Chart.register(PercentLabels, CenterText);
   }
 
-  let taxChart, expChart, bracketChart;
+  let taxChart, expChart, bracketChart, leftChart;
 
   function ensureTaxChart() {
     const ctx = document.getElementById('taxDonut');
     if (!ctx) return;
     if (!taxChart) {
-      taxChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: ['联邦税','省/地区税','税后收入'], datasets: [{ data: [0,0,1], borderWidth: 0 }] },
-        options: {
+      taxChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['联邦税','省/地区税','CPP/QPP','EI','税后收入'], datasets: [{ data: [0,0,0,0,1], borderWidth: 0 }] }, options: {
           plugins: {
             legend: { labels: { color: '#e5e7eb' } },
             tooltip: { callbacks: { label: (c) => `${c.label}: ${fmt2.format(c.parsed)}` } },
@@ -415,7 +643,33 @@
     }
   }
 
-  function ensureExpChart() {
+  
+  function ensureLeftChart() {
+    const ctx = document.getElementById('leftDonut');
+    if (!ctx) return;
+    if (!leftChart) {
+      leftChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['剩余', '支出'],
+          datasets: [{
+            data: [0, 0],
+            borderWidth: 0,
+            backgroundColor: ['#22c55e', '#ef4444']
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { labels: { color: '#e5e7eb' } },
+            tooltip: { callbacks: { label: (c) => `${c.label}: ${fmt2.format(c.parsed)}` } },
+            centerText: { text: '' }
+          },
+          cutout: '60%'
+        }
+      });
+    }
+  }
+function ensureExpChart() {
     const ctx = document.getElementById('expDonut');
     if (!ctx) return;
     if (!expChart) {
@@ -434,22 +688,36 @@
     }
   }
 
+
   function renderTax(province, annualGross) {
-    const { federal, provincial, total, after, avgRate } = computeTaxes(annualGross, province);
+    // Use breakdown: RRSP deduction reduces taxable income; CPP/QPP & EI reduce net cash but not taxable income
+    const selfEmp = !!els.chkSelfEmp?.checked;
+    const br = computeIncomeBreakdown();
+    const taxable = Math.max(0, br.taxableIncome);
+    const { federal, provincial, total, after, avgRate } = computeTaxes(taxable, province);
+    const { cppqpp, ei, planLabel } = computeCPP_QPP_EI(br.employmentIncome, province, selfEmp);
+
     els.outFedTax.textContent = fmt.format(federal);
     els.outProvTax.textContent = fmt.format(provincial);
     els.outTotalTax.textContent = fmt.format(total);
-    els.outAfterTax.textContent = fmt.format(after);
-    els.outAvgRate.textContent = (avgRate * 100).toFixed(1) + '%';
+    els.outCPPQPP && (els.outCPPQPP.textContent = fmt.format(cppqpp));
+    els.outEI && (els.outEI.textContent = fmt.format(ei));
+
+    const afterAll = Math.max(0, annualGross - total - cppqpp - ei);
+    els.outAfterTax.textContent = fmt.format(afterAll);
+    els.outAvgRate.textContent = ( (total + cppqpp + ei) / (annualGross||1) * 100 ).toFixed(1) + '%';
+
     ensureTaxChart();
     if (taxChart) {
-      taxChart.data.datasets[0].data = [federal, provincial, Math.max(0, after)];
-      const afterPct = annualGross > 0 ? Math.round((after / annualGross) * 100) : 0;
+      taxChart.data.labels = ['联邦税','省/地区税', planLabel, 'EI','税后收入'];
+      taxChart.data.datasets[0].data = [federal, provincial, cppqpp, ei, Math.max(0, afterAll)];
+      const afterPct = annualGross > 0 ? Math.round((afterAll / annualGross) * 100) : 0;
       taxChart.options.plugins.centerText.text = `${afterPct}% 税后`;
       taxChart.update();
     }
-    renderBracketBar(province, annualGross);
-    return { afterAnnual: after };
+    // 税阶分段基于 taxable（已扣 RRSP）
+    renderBracketBar(province, taxable);
+    return { afterAnnual: afterAll };
   }
 
   function getMonthlyExpenses() {
@@ -500,6 +768,13 @@
     els.outMonthlyLeft.textContent = fmt2.format(monthlyLeft);
     els.outWeeklyLeft.textContent = fmt2.format(monthlyLeft / 4.345);
     els.outLeftPct.textContent = (leftPct * 100).toFixed(1) + '%';
+    ensureLeftChart();
+    if (leftChart) {
+      leftChart.data.labels = ['剩余','支出'];
+      leftChart.data.datasets[0].data = [monthlyLeft, monthlyExp];
+      leftChart.options.plugins.centerText.text = '剩余占比';
+      leftChart.update();
+    }
     ensureExpChart();
     if (expChart) {
       const parts = getExpenseBreakdown();
@@ -515,7 +790,7 @@
         colors.push(`hsl(${hue} 70% 55%)`);
       }
       expChart.data.datasets[0].backgroundColor = colors;
-      expChart.options.plugins.centerText.text = `${Math.round(leftPct * 100)}% 剩余`;
+      expChart.options.plugins.centerText.text = '支出构成';
       expChart.update();
     }
   }
@@ -556,8 +831,22 @@
     els.bonusVal.classList.toggle('hidden', !els.chkBonus.checked);
     els.allowanceVal.classList.toggle('hidden', !els.chkAllowance.checked);
     els.commissionVal.classList.toggle('hidden', !els.chkCommission.checked);
+    els.rrspVal?.classList.toggle('hidden', !els.chkRRSP?.checked);
+    els.stockVal?.classList.toggle('hidden', !els.chkStock?.checked);
+    els.otherVal?.classList.toggle('hidden', !els.chkOther?.checked);
 
-    const annualGross = computeAnnualGross();
+    
+    // --- job2 UI sync ---
+    const mode2 = Array.from(document.querySelectorAll('input[name="mode2"]')).find(r=>r.checked)?.value || 'hourly';
+    el2('hourlyFields2')?.classList.toggle('hidden', mode2 !== 'hourly');
+    el2('annualField2')?.classList.toggle('hidden', mode2 !== 'annual');
+    el2('paidVacationCustom2')?.classList.toggle('hidden', el2('paidVacationPreset2')?.value !== 'custom');
+    el2('vacPayCustom2')?.classList.toggle('hidden', el2('vacPayPreset2')?.value !== 'custom');
+    el2('bonusVal2')?.classList.toggle('hidden', !el2('chkBonus2')?.checked);
+    el2('allowanceVal2')?.classList.toggle('hidden', !el2('chkAllowance2')?.checked);
+    el2('commissionVal2')?.classList.toggle('hidden', !el2('chkCommission2')?.checked);
+    const br = computeIncomeBreakdown();
+    const annualGross = br.totalGross;
     els.outAnnualGross.textContent = fmt.format(annualGross);
     els.outMonthlyGross.textContent = fmt2.format(annualGross / 12);
     els.outWeeklyGross.textContent = fmt2.format(annualGross / 52);
@@ -579,21 +868,75 @@
 
   [
     'hourlyRate','hoursPerWeek','weeksPerYear','paidVacationPreset','paidVacationCustom','vacPayPreset','vacPayCustom',
-    'bonusVal','allowanceVal','commissionVal','province',
+    'bonusVal','allowanceVal','commissionVal','rrspVal','stockVal','otherVal','province',
     'expRent','expCarIns','expTransit','expInternet','expGrocery','expLoan'
   ].forEach(id => document.getElementById(id)?.addEventListener('input', scheduleUpdate));
 
   document.getElementById('chkBonus').addEventListener('change', scheduleUpdate);
   document.getElementById('chkAllowance').addEventListener('change', scheduleUpdate);
   document.getElementById('chkCommission').addEventListener('change', scheduleUpdate);
+  document.getElementById('chkRRSP')?.addEventListener('change', scheduleUpdate);
+  document.getElementById('chkStock')?.addEventListener('change', scheduleUpdate);
+  document.getElementById('chkOther')?.addEventListener('change', scheduleUpdate);
+  document.getElementById('chkSelfEmp')?.addEventListener('change', scheduleUpdate);
 
-  document.getElementById('btnAddCustom')?.addEventListener('click', (e) => {
+  
+  // Toggle second job
+  document.getElementById('btnToggleJob2')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const wrap = el2('job2Wrap');
+    if (!wrap) return;
+    const willShow = wrap.classList.contains('hidden');
+    wrap.classList.toggle('hidden', !willShow);
+    const btn = document.getElementById('btnToggleJob2');
+    if (btn) btn.textContent = willShow ? '✓ 已添加第二份工作' : '+ 添加第二份工作';
+    scheduleUpdate();
+  });
+  el2('btnRemoveJob2')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    el2('job2Wrap')?.classList.add('hidden');
+    const btn = document.getElementById('btnToggleJob2');
+    if (btn) btn.textContent = '+ 添加第二份工作';
+    scheduleUpdate();
+  });
+
+  // job2 inputs
+  Array.from(document.querySelectorAll('input[name="mode2"]')).forEach(r=>r.addEventListener('change', scheduleUpdate));
+  el2('annualSalary2')?.addEventListener('input', () => {
+    const v = Number(el2('annualSalary2')?.value || 0);
+    if (v > 0) {
+      const annualRadio2 = Array.from(document.querySelectorAll('input[name="mode2"]')).find(m=>m.value==='annual');
+      if (annualRadio2 && !annualRadio2.checked) annualRadio2.checked = true;
+    }
+    scheduleUpdate();
+  });
+
+  ;[
+    'hourlyRate2','hoursPerWeek2','weeksPerYear2','paidVacationPreset2','paidVacationCustom2','vacPayPreset2','vacPayCustom2',
+    'bonusVal2','allowanceVal2','commissionVal2'
+  ].forEach(id => el2(id)?.addEventListener('input', scheduleUpdate));
+
+  el2('chkBonus2')?.addEventListener('change', scheduleUpdate);
+  el2('chkAllowance2')?.addEventListener('change', scheduleUpdate);
+  el2('chkCommission2')?.addEventListener('change', scheduleUpdate);
+
+  // Info tooltip for custom expenses
+  const hintBtn = document.getElementById('btnCustomHint');
+  const hintPop = document.getElementById('customHintPop');
+  const hintWrap = document.getElementById('customHintWrap');
+  function showHint(){ hintPop && hintPop.classList.remove('hidden'); }
+  function hideHint(){ hintPop && hintPop.classList.add('hidden'); }
+  hintBtn?.addEventListener('click', (e)=>{ e.preventDefault(); if (hintPop) hintPop.classList.toggle('hidden'); });
+  hintBtn?.addEventListener('mouseenter', showHint);
+  hintWrap?.addEventListener('mouseleave', hideHint);
+  document.addEventListener('click', (e)=>{ if (hintPop && !hintWrap.contains(e.target) && e.target !== hintBtn) hideHint(); });
+document.getElementById('btnAddCustom')?.addEventListener('click', (e) => {
     e.preventDefault();
     addCustomRow();
   });
 
   window.addEventListener('DOMContentLoaded', () => {
-    ensureTaxChart(); ensureExpChart();
+    ensureTaxChart(); ensureExpChart(); ensureLeftChart();
     scheduleUpdate();
   });
 })();
