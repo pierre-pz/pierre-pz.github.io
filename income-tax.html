@@ -1,24 +1,49 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Canada Income & Tax Planner (2025)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous">
   <style>
-    :root{--accent:#ffd100;--carbon:#0a0a0a}
-    body{background:var(--carbon);color:#e5e7eb}
-    .text-accent{color:var(--accent)} .bg-accent{background:var(--accent)} .text-carbon{color:var(--carbon)}
-    .focus\:ring-accent:focus{outline:2px solid var(--accent);outline-offset:2px}
+    :root {
+      --accent: #ffd100;
+      --carbon: #0a0a0a
+    }
+
+    body {
+      background: var(--carbon);
+      color: #e5e7eb
+    }
+
+    .text-accent {
+      color: var(--accent)
+    }
+
+    .bg-accent {
+      background: var(--accent)
+    }
+
+    .text-carbon {
+      color: var(--carbon)
+    }
+
+    .focus\:ring-accent:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px
+    }
   </style>
 </head>
+
 <body>
   <!-- Scroll progress -->
   <div id="progress" class="fixed inset-x-0 top-0 z-[60] h-1 w-0 bg-accent"></div>
 
-  
+
   <header class="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur supports-backdrop-blur:bg-[#0a0a0a]/60">
     <nav aria-label="Primary" class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
       <a class="text-sm font-black tracking-widest text-accent" href="index.html">Pierre's Website</a>
@@ -26,18 +51,29 @@
         class="md:hidden rounded px-3 py-2 text-accent ring-accent focus:outline-none focus:ring-2" id="nav-toggle">
         <i class="fa-solid fa-bars"></i>
       </button>
-      <ul class="hidden items-center gap-6 text-xs font-semibold tracking-widest uppercase text-accent md:flex" id="nav-menu">
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href="#" data-lang="zh-CN">中文</a></li>
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href="#" data-lang="en">English</a></li>
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href="#" data-lang="fr">Français</a></li>
+      <ul class="hidden items-center gap-6 text-xs font-semibold tracking-widest uppercase text-accent md:flex"
+        id="nav-menu">
+        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="zh-CN">中文</a></li>
+        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="en">English</a></li>
+        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="fr">Français</a></li>
+        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="hi">हिन्दी</a></li>
       </ul>
     </nav>
     <!-- mobile language drawer -->
     <div class="hidden border-t border-white/5 bg-[#0a0a0a] md:hidden" id="nav-drawer">
       <ul class="mx-auto grid max-w-6xl gap-2 px-4 py-3 text-sm font-medium tracking-wider text-accent">
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href="#" data-lang="zh-CN">中文</a></li>
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href="#" data-lang="en">English</a></li>
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" href="#" data-lang="fr">Français</a></li>
+        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="zh-CN">中文</a></li>
+        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="en">English</a></li>
+        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="fr">Français</a></li>
+        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            href="#" data-lang="hi">हिन्दी</a></li>
       </ul>
     </div>
   </header>
@@ -46,211 +82,402 @@
   <main class="pt-14">
     <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
       <h2 class="mb-2 text-center text-3xl sm:text-4xl font-bold tracking-wider">Canada Income &amp; Tax Planner</h2>
-      <p class="mb-10 text-center text-zinc-400">基于 2025 税率 · 实时计算 · 适配加拿大 13 省区</p>
+      <p class="mb-10 text-center text-zinc-400">Based on 2025 tax rates · Real-time calculation · Covers all 13
+        provinces/territories</p>
 
       <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10">
-        <h3 class="text-xl font-semibold mb-4">🧩 模块 1：收入计算（含福利）</h3>
+        <h3 class="text-xl font-semibold mb-4">🧩 Module 1: Income (incl. benefits)</h3>
         <div class="grid md:grid-cols-2 gap-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm text-zinc-400 mb-1">薪资输入方式</label>
+              <label class="block text-sm text-zinc-400 mb-1">Pay input method</label>
               <div class="flex gap-4">
-                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="hourly" class="accent-[#ffd100]" checked><span>时薪</span></label>
-                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="annual" class="accent-[#ffd100]"><span>年薪</span></label>
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="hourly"
+                    class="accent-[#ffd100]" checked><span>Hourly</span></label>
+                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="annual"
+                    class="accent-[#ffd100]"><span>Annual</span></label>
               </div>
             </div>
             <div id="hourlyFields" class="grid sm:grid-cols-3 gap-3">
-              <div><label class="block text-sm text-zinc-400 mb-1">时薪（$/h）</label><input id="hourlyRate" type="number" min="0" step="0.01" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="30"></div>
-              <div><label class="block text-sm text-zinc-400 mb-1">每周工时</label><input id="hoursPerWeek" type="number" min="0" step="0.5" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="40"></div>
-              <div><label class="block text-sm text-zinc-400 mb-1">每年工作周数</label><input id="weeksPerYear" type="number" min="0" max="52" step="1" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="52"></div>
+              <div><label class="block text-sm text-zinc-400 mb-1">Hourly($/h)</label><input id="hourlyRate"
+                  type="number" min="0" step="0.01"
+                  class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                  value="30"></div>
+              <div><label class="block text-sm text-zinc-400 mb-1">Hours per week</label><input id="hoursPerWeek"
+                  type="number" min="0" max="168" step="0.5"
+                  class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                  value="40"></div>
+              <div><label class="block text-sm text-zinc-400 mb-1">Weeks per year</label><input id="weeksPerYear"
+                  type="number" min="0" max="52" step="1"
+                  class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                  value="52"></div>
             </div>
             <div id="annualField" class="hidden">
-              <label class="block text-sm text-zinc-400 mb-1">年薪（$）</label>
-              <input id="annualSalary" type="number" min="0" step="1000" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="70000">
-              <p class="mt-1 text-xs text-zinc-500">提示：若在此输入正数，将自动切换到“年薪”模式。</p>
+              <label class="block text-sm text-zinc-400 mb-1">annual($)</label>
+              <input id="annualSalary" type="number" min="0" step="1000"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                value="70000">
+              <p class="mt-1 text-xs text-zinc-500">Hint: Entering a positive value here will switch to Annual mode
+                automatically.</p>
             </div>
             <div class="grid sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-sm text-zinc-400 mb-1">带薪假期（周）</label>
+                <label class="block text-sm text-zinc-400 mb-1">Paid vacation (weeks)</label>
                 <div class="flex gap-2">
-                  <select id="paidVacationPreset" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="0">无</option><option value="2">2 周</option><option value="3">3 周</option><option value="4">4 周</option><option value="custom">自定义</option>
+                  <select id="paidVacationPreset"
+                    class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="0">None</option>
+                    <option value="2">2 weeks</option>
+                    <option value="3">3 weeks</option>
+                    <option value="4">4 weeks</option>
+                    <option value="custom">Custom</option>
                   </select>
-                  <input id="paidVacationCustom" type="number" min="0" step="0.5" placeholder="自定义" class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+                  <input id="paidVacationCustom" type="number" min="0" step="0.5" placeholder="Custom"
+                    class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
                 </div>
-                <p class="mt-1 text-xs text-zinc-500">工作周为“实际工作周”，带薪假期另行折算工资；总周数&gt;52会提示校验。</p>
+                <p class="mt-1 text-xs text-zinc-500">Work weeks are actual working weeks; paid vacation is added on
+                  top. A warning appears if total weeks exceed 52.</p>
               </div>
               <div>
-                <label class="block text-sm text-zinc-400 mb-1">Vacation Pay（%）</label>
+                <label class="block text-sm text-zinc-400 mb-1">Vacation Pay(%)</label>
                 <div class="flex gap-2">
-                  <select id="vacPayPreset" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="0">无（0%）</option><option value="4">4%</option><option value="6">6%</option><option value="8">8%</option><option value="custom">其他</option>
+                  <select id="vacPayPreset"
+                    class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="0">None (0%)</option>
+                    <option value="4">4%</option>
+                    <option value="6">6%</option>
+                    <option value="8">8%</option>
+                    <option value="custom">Custom</option>
                   </select>
-                  <input id="vacPayCustom" type="number" min="0" step="0.1" placeholder="%" class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+                  <input id="vacPayCustom" type="number" min="0" step="0.1" placeholder="%"
+                    class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
                 </div>
-                <p class="mt-1 text-xs text-zinc-500">Vacation Pay 计入应税收入（CRA 规定）。</p>
+                <p class="mt-1 text-xs text-zinc-500">Vacation pay is taxable (per CRA).</p>
               </div>
             </div>
             <div class="grid sm:grid-cols-3 gap-3">
-              <label class="flex items-center gap-2"><input id="chkBonus" type="checkbox" class="accent-[#ffd100]"><span>奖金</span></label>
-              <label class="flex items-center gap-2"><input id="chkAllowance" type="checkbox" class="accent-[#ffd100]"><span>津贴</span></label>
-              <label class="flex items-center gap-2"><input id="chkCommission" type="checkbox" class="accent-[#ffd100]"><span>提成</span></label>
-              <input id="bonusVal" type="number" min="0" step="100" placeholder="奖金（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <input id="allowanceVal" type="number" min="0" step="100" placeholder="津贴（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <input id="commissionVal" type="number" min="0" step="100" placeholder="提成（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-    <div class="sm:col-span-3 grid sm:grid-cols-3 gap-3 mt-2">
-      <label class="flex items-center gap-2"><input id="chkRRSP" type="checkbox" class="accent-[#ffd100]"><span>RRSP 供款</span></label>
-      <label class="flex items-center gap-2"><input id="chkStock" type="checkbox" class="accent-[#ffd100]"><span>股票（应税）</span></label>
-      <label class="flex items-center gap-2"><input id="chkOther" type="checkbox" class="accent-[#ffd100]"><span>其他（应税）</span></label>
+              <label class="flex items-center gap-2"><input id="chkBonus" type="checkbox"
+                  class="accent-[#ffd100]"><span>Bonus</span></label>
+              <label class="flex items-center gap-2"><input id="chkAllowance" type="checkbox"
+                  class="accent-[#ffd100]"><span>Allowance</span></label>
+              <label class="flex items-center gap-2"><input id="chkCommission" type="checkbox"
+                  class="accent-[#ffd100]"><span>Commission</span></label>
+              <input id="bonusVal" type="number" min="0" step="100" placeholder="Bonus (annual) $"
+                class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <input id="allowanceVal" type="number" min="0" step="100" placeholder="Allowance (annual) $"
+                class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <input id="commissionVal" type="number" min="0" step="100" placeholder="Commission (annual) $"
+                class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <div class="sm:col-span-3 grid sm:grid-cols-3 gap-3 mt-2">
+                <label class="flex items-center gap-2"><input id="chkRRSP" type="checkbox"
+                    class="accent-[#ffd100]"><span>RRSP Contribution</span></label>
+                <label class="flex items-center gap-2"><input id="chkStock" type="checkbox"
+                    class="accent-[#ffd100]"><span>Stock (taxable)</span></label>
+                <label class="flex items-center gap-2"><input id="chkOther" type="checkbox"
+                    class="accent-[#ffd100]"><span>Other (taxable)</span></label>
 
-      <input id="rrspVal" type="number" min="0" step="100" placeholder="RRSP 供款（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-      <input id="stockVal" type="number" min="0" step="100" placeholder="股票（年，应税）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-      <input id="otherVal" type="number" min="0" step="100" placeholder="其他（年，应税）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-      <p class="sm:col-span-3 text-xs text-zinc-500">RRSP 作为抵扣不计入“税前总收入”，但会减少应税收入（自动按 2025 年限额校验）。股票/其他按应税收入处理（股息/资本利得的特殊规则未在此细分）。</p>
-    </div>
+                <div id="rrspModeWrap" class="sm:col-span-3 hidden flex items-center gap-2">
+                  <label for="rrspMode" class="text-sm text-zinc-400">RRSP input mode</label>
+                  <select id="rrspMode"
+                    class="rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="amount" selected>Amount ($)</option>
+                    <option value="percent">Percentage (%)</option>
+                  </select>
+                </div>
+
+
+                <input id="rrspVal" type="number" min="0" step="100" placeholder="RRSP contribution (annual) $"
+                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+
+
+
+                <input id="rrspPct" type="number" min="0" max="100" step="0.1"
+                  placeholder="RRSP contribution (% of pay)"
+                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"><input
+                  id="stockVal" type="number" min="0" step="100" placeholder="Stock (taxable, annual) $"
+                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                <input id="otherVal" type="number" min="0" step="100" placeholder="Other (taxable, annual) $"
+                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                <p class="sm:col-span-3 text-xs text-zinc-500">RRSP is a deduction (not part of gross pay) and reduces
+                  taxable income (auto-checked against 2025 limits). Stock/Other are treated as taxable income
+                  (dividend/capital gains rules not detailed here).</p>
+              </div>
 
             </div>
-          
-<!-- Toggle for second job -->
-<div class="pt-2">
-<div class="pt-2">
-  <label class="inline-flex items-center gap-2"><input id="chkSelfEmp" type="checkbox" class="accent-[#ffd100]"><span>我是自雇者</span></label>
-  <span class="ml-2 text-xs text-zinc-500">自雇者需自行承担雇主+雇员份额（CPP/QPP 双倍），EI 默认不适用。</span>
-</div>
 
-  <button id="btnToggleJob2" class="rounded-md bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">
-    + 添加第二份工作
-  </button>
-  <span class="ml-2 text-xs text-zinc-500">可选：用于兼职 / 额外收入</span>
-</div>
+            <!-- Toggle for second job -->
+            <div class="pt-2">
+              <div class="pt-2">
+                <label class="inline-flex items-center gap-2"><input id="chkSelfEmp" type="checkbox"
+                    class="accent-[#ffd100]"><span>I'm self-employed</span></label>
+                <span class="ml-2 text-xs text-zinc-500">Self-employed pay both the employee and employer shares
+                  (CPP/QPP doubled); EI not applicable by default.</span>
+              </div>
 
-<!-- 第二份工作（隐藏，点击上面的按钮展开） -->
-<div id="job2Wrap" class="hidden mt-4 rounded-xl border border-white/10 bg-zinc-800/40 p-4">
-  <h4 class="text-sm font-semibold mb-3">第二份工作</h4>
-  <div class="space-y-4">
-    <div>
-      <label class="block text-sm text-zinc-400 mb-1">薪资输入方式</label>
-      <div class="flex gap-4">
-        <label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="hourly" class="accent-[#ffd100]" checked><span>时薪</span></label>
-        <label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="annual" class="accent-[#ffd100]"><span>年薪</span></label>
-      </div>
-    </div>
+              <button id="btnToggleJob2"
+                class="rounded-md bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">
+                + Add a second job
+              </button>
+              <span class="ml-2 text-xs text-zinc-500">Optional: for part-time/extra income</span>
+            </div>
 
-    <div id="hourlyFields2" class="grid sm:grid-cols-3 gap-3">
-      <div><label class="block text-sm text-zinc-400 mb-1">时薪（$/h）</label><input id="hourlyRate2" type="number" min="0" step="0.01" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="28"></div>
-      <div><label class="block text-sm text-zinc-400 mb-1">每周工时</label><input id="hoursPerWeek2" type="number" min="0" step="0.5" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="10"></div>
-      <div><label class="block text-sm text-zinc-400 mb-1">每年工作周数</label><input id="weeksPerYear2" type="number" min="0" max="52" step="1" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="52"></div>
-    </div>
+            <!-- Second Job (hidden by default; click the button above to expand) -->
+            <div id="job2Wrap" class="hidden mt-4 rounded-xl border border-white/10 bg-zinc-800/40 p-4">
+              <h4 class="text-sm font-semibold mb-3">Second Job</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm text-zinc-400 mb-1">Pay input method</label>
+                  <div class="flex gap-4">
+                    <label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="hourly"
+                        class="accent-[#ffd100]" checked><span>Hourly</span></label>
+                    <label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="annual"
+                        class="accent-[#ffd100]"><span>Annual</span></label>
+                  </div>
+                </div>
 
-    <div id="annualField2" class="hidden">
-      <label class="block text-sm text-zinc-400 mb-1">年薪（$）</label>
-      <input id="annualSalary2" type="number" min="0" step="1000" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="12000">
-      <p class="mt-1 text-xs text-zinc-500">提示：若在此输入正数，将自动切换到“年薪”模式。</p>
-    </div>
+                <div id="hourlyFields2" class="grid sm:grid-cols-3 gap-3">
+                  <div><label class="block text-sm text-zinc-400 mb-1">Hourly($/h)</label><input id="hourlyRate2"
+                      type="number" min="0" step="0.01"
+                      class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                      value="28"></div>
+                  <div><label class="block text-sm text-zinc-400 mb-1">Hours per week</label><input id="hoursPerWeek2"
+                      type="number" min="0" max="168" step="0.5"
+                      class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                      value="10"></div>
+                  <div><label class="block text-sm text-zinc-400 mb-1">Weeks per year</label><input id="weeksPerYear2"
+                      type="number" min="0" max="52" step="1"
+                      class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                      value="52"></div>
+                </div>
 
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div>
-        <label class="block text-sm text-zinc-400 mb-1">带薪假期（周）</label>
-        <div class="flex gap-2">
-          <select id="paidVacationPreset2" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-            <option value="0">无</option><option value="2">2 周</option><option value="3">3 周</option><option value="4">4 周</option><option value="custom">自定义</option>
-          </select>
-          <input id="paidVacationCustom2" type="number" min="0" step="0.5" placeholder="自定义" class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
-        </div>
-      </div>
-      <div>
-        <label class="block text-sm text-zinc-400 mb-1">Vacation Pay（%）</label>
-        <div class="flex gap-2">
-          <select id="vacPayPreset2" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-            <option value="0">无（0%）</option><option value="4">4%</option><option value="6">6%</option><option value="8">8%</option><option value="custom">其他</option>
-          </select>
-          <input id="vacPayCustom2" type="number" min="0" step="0.1" placeholder="%" class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
-        </div>
-      </div>
-    </div>
+                <div id="annualField2" class="hidden">
+                  <label class="block text-sm text-zinc-400 mb-1">annual($)</label>
+                  <input id="annualSalary2" type="number" min="0" step="1000"
+                    class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                    value="12000">
+                  <p class="mt-1 text-xs text-zinc-500">Hint: Entering a positive value here will switch to Annual mode
+                    automatically.</p>
+                </div>
 
-    <div class="grid sm:grid-cols-3 gap-3">
-      <label class="flex items-center gap-2"><input id="chkBonus2" type="checkbox" class="accent-[#ffd100]"><span>奖金</span></label>
-      <label class="flex items-center gap-2"><input id="chkAllowance2" type="checkbox" class="accent-[#ffd100]"><span>津贴</span></label>
-      <label class="flex items-center gap-2"><input id="chkCommission2" type="checkbox" class="accent-[#ffd100]"><span>提成</span></label>
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm text-zinc-400 mb-1">Paid vacation (weeks)</label>
+                    <div class="flex gap-2">
+                      <select id="paidVacationPreset2"
+                        class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                        <option value="0">None</option>
+                        <option value="2">2 weeks</option>
+                        <option value="3">3 weeks</option>
+                        <option value="4">4 weeks</option>
+                        <option value="custom">Custom</option>
+                      </select>
+                      <input id="paidVacationCustom2" type="number" min="0" step="0.5" placeholder="Custom"
+                        class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-zinc-400 mb-1">Vacation Pay(%)</label>
+                    <div class="flex gap-2">
+                      <select id="vacPayPreset2"
+                        class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                        <option value="0">None (0%)</option>
+                        <option value="4">4%</option>
+                        <option value="6">6%</option>
+                        <option value="8">8%</option>
+                        <option value="custom">Custom</option>
+                      </select>
+                      <input id="vacPayCustom2" type="number" min="0" step="0.1" placeholder="%"
+                        class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+                    </div>
+                  </div>
+                </div>
 
-      <input id="bonusVal2" type="number" min="0" step="100" placeholder="奖金（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-      <input id="allowanceVal2" type="number" min="0" step="100" placeholder="津贴（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-      <input id="commissionVal2" type="number" min="0" step="100" placeholder="提成（年）$" class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-    </div>
+                <div class="grid sm:grid-cols-3 gap-3">
+                  <label class="flex items-center gap-2"><input id="chkBonus2" type="checkbox"
+                      class="accent-[#ffd100]"><span>Bonus</span></label>
+                  <label class="flex items-center gap-2"><input id="chkAllowance2" type="checkbox"
+                      class="accent-[#ffd100]"><span>Allowance</span></label>
+                  <label class="flex items-center gap-2"><input id="chkCommission2" type="checkbox"
+                      class="accent-[#ffd100]"><span>Commission</span></label>
 
-    <p id="weeksCheck2" class="text-xs text-red-400 hidden">⚠️ “工作周 + 带薪假期周” 超过 52，请检查输入避免重复计入。</p>
+                  <input id="bonusVal2" type="number" min="0" step="100" placeholder="Bonus (annual) $"
+                    class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                  <input id="allowanceVal2" type="number" min="0" step="100" placeholder="Allowance (annual) $"
+                    class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                  <input id="commissionVal2" type="number" min="0" step="100" placeholder="Commission (annual) $"
+                    class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                </div>
 
-    <div class="flex gap-2 pt-2">
-      <button id="btnRemoveJob2" class="rounded-md bg-white/10 px-3 py-2 text-sm hover:bg-white/20">移除第二份工作</button>
-    </div>
-  </div>
-</div>
-</div>
+                <p id="weeksCheck2" class="text-xs text-red-400 hidden">⚠️ 'Work weeks + paid vacation weeks' exceed 52.
+                  Please check inputs to avoid double-counting.</p>
+
+                <div class="flex gap-2 pt-2">
+                  <button id="btnRemoveJob2" class="rounded-md bg-white/10 px-3 py-2 text-sm hover:bg-white/20">Remove
+                    second job</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="grid gap-3 content-start">
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">年度总收入（含福利）</div><div id="outAnnualGross" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
-            <div class="grid sm:grid-cols-2 gap-3">
-              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">每月税前</div><div id="outMonthlyGross" class="text-2xl font-bold mt-1">—</div></div>
-              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">每周税前</div><div id="outWeeklyGross" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Total annual income (incl. benefits)</div>
+              <div id="outAnnualGross" class="text-3xl font-extrabold text-accent mt-1">—</div>
             </div>
-            <p id="weeksCheck" class="text-xs text-red-400 hidden">⚠️ “工作周 + 带薪假期周” 超过 52，请检查输入避免重复计入。</p>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div class="rounded-xl bg-zinc-800/70 p-4">
+                <div class="text-sm text-zinc-400">Monthly gross</div>
+                <div id="outMonthlyGross" class="text-2xl font-bold mt-1">—</div>
+              </div>
+              <div class="rounded-xl bg-zinc-800/70 p-4">
+                <div class="text-sm text-zinc-400">Weekly gross</div>
+                <div id="outWeeklyGross" class="text-2xl font-bold mt-1">—</div>
+              </div>
+            </div>
+            <p id="weeksCheck" class="text-xs text-red-400 hidden">⚠️ 'Work weeks + paid vacation weeks' exceed 52.
+              Please check inputs to avoid double-counting.</p>
           </div>
         </div>
       </div>
 
       <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10">
-        <h3 class="text-xl font-semibold mb-4">🧩 模块 2：税收计算（2025 最新税率）</h3>
+        <h3 class="text-xl font-semibold mb-4">🧩 Module 2: Taxes (2025 latest rates)</h3>
         <div class="grid md:grid-cols-3 gap-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm text-zinc-400 mb-1">所在省/地区</label>
-              <select id="province" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                <option>Ontario</option><option>British Columbia</option><option>Alberta</option><option>Saskatchewan</option><option>Manitoba</option><option>Quebec</option><option>New Brunswick</option><option>Nova Scotia</option><option>Prince Edward Island</option><option>Newfoundland and Labrador</option><option>Yukon</option><option>Northwest Territories</option><option>Nunavut</option>
+              <label class="block text-sm text-zinc-400 mb-1">Province/Territory</label>
+              <select id="province"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                <option>Ontario</option>
+                <option>British Columbia</option>
+                <option>Alberta</option>
+                <option>Saskatchewan</option>
+                <option>Manitoba</option>
+                <option>Quebec</option>
+                <option>New Brunswick</option>
+                <option>Nova Scotia</option>
+                <option>Prince Edward Island</option>
+                <option>Newfoundland and Labrador</option>
+                <option>Yukon</option>
+                <option>Northwest Territories</option>
+                <option>Nunavut</option>
               </select>
             </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">应缴 联邦税</div><div id="outFedTax" class="text-2xl font-bold mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">应缴 省/地区税</div><div id="outProvTax" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Federal tax</div>
+              <div id="outFedTax" class="text-2xl font-bold mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Provincial/Territorial tax</div>
+              <div id="outProvTax" class="text-2xl font-bold mt-1">—</div>
+            </div>
 
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">CPP / QPP</div><div id="outCPPQPP" class="text-2xl font-bold mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">EI</div><div id="outEI" class="text-2xl font-bold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">CPP / QPP</div>
+              <div id="outCPPQPP" class="text-2xl font-bold mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">EI</div>
+              <div id="outEI" class="text-2xl font-bold mt-1">—</div>
+            </div>
 
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">总税额</div><div id="outTotalTax" class="text-2xl font-bold mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">税后收入（年）</div><div id="outAfterTax" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">平均税率</div><div id="outAvgRate" class="text-xl font-semibold mt-1">—</div></div>
-            <p class="text-xs text-zinc-500">已含 Ontario 附加税与 Quebec 联邦税 16.5% 退税；并单独计算 CPP/QPP 与 EI（按 2025 年标准）；未纳入各类抵免。</p>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Total tax</div>
+              <div id="outTotalTax" class="text-2xl font-bold mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">After-tax income (annual)</div>
+              <div id="outAfterTax" class="text-3xl font-extrabold text-accent mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Average tax rate</div>
+              <div id="outAvgRate" class="text-xl font-semibold mt-1">—</div>
+            </div>
+            <p class="text-xs text-zinc-500">Includes Ontario surtax and Quebec federal tax abatement (16.5%); CPP/QPP
+              and EI computed separately (2025 rules); credits are not included.</p>
           </div>
           <div class="md:col-span-2">
-  <canvas id="taxDonut" height="200" class="!max-h-[360px]"></canvas>
-  <div class="mt-6">
-            <div class="text-sm text-zinc-400 mb-2">按税阶分段：绿色为到手，红色为该段税款</div>
-            <canvas id="bracketBar" height="160" class="!max-h-[260px]"></canvas>
+            <canvas id="taxDonut" height="200" class="!max-h-[360px]"></canvas>
+            <div class="mt-6">
+              <div class="text-sm text-zinc-400 mb-2">By tax bands: green = take-home for that segment; red = taxes for
+                that segment</div>
+              <canvas id="bracketBar" height="160" class="!max-h-[260px]"></canvas>
+            </div>
           </div>
-</div>
         </div>
       </div>
 
       <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8">
-        <h3 class="text-xl font-semibold mb-4">🧩 模块 3：支出与剩余收入分析</h3>
+        <h3 class="text-xl font-semibold mb-4">🧩 Module 3: Expenses & leftover analysis</h3>
         <div class="grid md:grid-cols-3 gap-6">
           <div class="space-y-3">
             <div class="grid grid-cols-2 gap-2">
-              <label class="text-sm text-zinc-400 self-center">房贷/租金（月）</label><input id="expRent" type="number" min="0" step="10" value="1800" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">车险（月）</label><input id="expCarIns" type="number" min="0" step="10" value="180" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">通勤交通（月）</label><input id="expTransit" type="number" min="0" step="10" value="150" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">网络/电话（月）</label><input id="expInternet" type="number" min="0" step="5" value="120" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">食品杂货（月）</label><input id="expGrocery" type="number" min="0" step="10" value="500" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">保险/贷款（月）</label><input id="expLoan" type="number" min="0" step="10" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">Mortgage/Rent (monthly)</label><input id="expRent"
+                type="number" min="0" step="10" value="1800"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">Auto Insurance (monthly)</label><input id="expCarIns"
+                type="number" min="0" step="10" value="180"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">Commuting (monthly)</label><input id="expTransit"
+                type="number" min="0" step="10" value="150"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">Internet/Phone (monthly)</label><input id="expInternet"
+                type="number" min="0" step="5" value="120"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">Groceries (monthly)</label><input id="expGrocery"
+                type="number" min="0" step="10" value="500"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              <label class="text-sm text-zinc-400 self-center">Insurance/Loans (monthly)</label><input id="expLoan"
+                type="number" min="0" step="10" value="0"
+                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
             </div>
-            <div class="mt-3 flex items-center gap-2"><button id="btnAddCustom" class="rounded-lg bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">+ 自定义支出项</button><button id="btnCustomHint" class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/80 hover:bg-white/20 ring-1 ring-white/10" aria-label="使用说明"><span class="text-[11px] font-semibold">i</span></button><div id="customHintWrap" class="relative">  <div id="customHintPop" class="absolute left-0 top-8 z-20 hidden w-80 rounded-lg border border-white/10 bg-zinc-800/95 p-3 text-xs text-zinc-200 shadow-xl">    <p class="leading-5">把一些“花里胡哨”的开支写在这里（豪华车 lease、宠物医疗、兴趣培训……都可以）。比如：兰博基尼 lease 月供 $2,500（纯属示例）——如果真上车，记得带我兜风🚗💨。这些项目会计入月度支出与下方饼图。</p>  </div></div></div><div id="customList" class="mt-2 space-y-2"></div>
+            <div class="mt-3 flex items-center gap-2"><button id="btnAddCustom"
+                class="rounded-lg bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">+ Add custom
+                expense</button><button id="btnCustomHint"
+                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/80 hover:bg-white/20 ring-1 ring-white/10"
+                aria-label="How to use"><span class="text-[11px] font-semibold">i</span></button>
+              <div id="customHintWrap" class="relative">
+                <div id="customHintPop"
+                  class="absolute left-0 top-8 z-20 hidden w-80 rounded-lg border border-white/10 bg-zinc-800/95 p-3 text-xs text-zinc-200 shadow-xl">
+                  <p class="leading-5">Use this area for discretionary or uncommon expenses (e.g., premium car leases,
+                    pet care, lessons, hobbies). Name it and enter a monthly amount. You can add multiple custom rows
+                    and remove them anytime.</p>
+                </div>
+              </div>
+            </div>
+            <div id="customList" class="mt-2 space-y-2"></div>
           </div>
           <div class="space-y-3">
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">月度税后可支配收入</div><div id="outMonthlyNet" class="text-2xl font-bold mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">每月支出合计</div><div id="outMonthlyExp" class="text-2xl font-bold mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">实际“剩余”（月）</div><div id="outMonthlyLeft" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">剩余比例</div><div id="outLeftPct" class="text-xl font-semibold mt-1">—</div></div>
-            <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">实际“剩余”（周）</div><div id="outWeeklyLeft" class="text-xl font-semibold mt-1">—</div></div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Monthly after-tax income</div>
+              <div id="outMonthlyNet" class="text-2xl font-bold mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Monthly expenses</div>
+              <div id="outMonthlyExp" class="text-2xl font-bold mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Monthly leftover</div>
+              <div id="outMonthlyLeft" class="text-3xl font-extrabold text-accent mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Leftover share</div>
+              <div id="outLeftPct" class="text-xl font-semibold mt-1">—</div>
+            </div>
+            <div class="rounded-xl bg-zinc-800/70 p-4">
+              <div class="text-sm text-zinc-400">Weekly leftover</div>
+              <div id="outWeeklyLeft" class="text-xl font-semibold mt-1">—</div>
+            </div>
           </div>
-          <div class="space-y-4">  <div>    <div class="text-sm text-zinc-400 text-center mb-1">剩余 vs 支出（以月度税后为基数）</div>    <canvas id="leftDonut" height="200" class="!max-h-[360px]"></canvas>  </div>  <div>    <div class="text-sm text-zinc-400 text-center mb-1">每月支出构成</div>    <canvas id="expDonut" height="200" class="!max-h-[360px]"></canvas>  </div></div>
+          <div class="space-y-4">
+            <div>
+              <div class="text-sm text-zinc-400 text-center mb-1">Leftover vs Expenses(monthlyAfter-taxas base)</div>
+              <canvas id="leftDonut" height="200" class="!max-h-[360px]"></canvas>
+            </div>
+            <div>
+              <div class="text-sm text-zinc-400 text-center mb-1">Monthly expense breakdown</div> <canvas id="expDonut"
+                height="240" class="!max-h-[360px]"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -261,10 +488,10 @@
 
   <script>
     // Toggle mobile language drawer (simple, no translation yet)
-    (function(){
+    (function () {
       const btn = document.getElementById('nav-toggle');
       const drawer = document.getElementById('nav-drawer');
-      if(btn && drawer){
+      if (btn && drawer) {
         btn.addEventListener('click', () => {
           const shown = !drawer.classList.contains('hidden');
           drawer.classList.toggle('hidden', shown);
@@ -280,23 +507,24 @@
       });
     })();
   </script>
-<script>
-  // Scroll progress bar (same behavior as index)
-  (function(){
-    var bar = document.getElementById('progress');
-    if(!bar) return;
-    function update(){
-      var h = document.documentElement;
-      var max = h.scrollHeight - h.clientHeight;
-      var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
-      bar.style.width = pct + '%';
-    }
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-  })();
-</script>
+  <script>
+    // Scroll progress bar (same behavior as index)
+    (function () {
+      var bar = document.getElementById('progress');
+      if (!bar) return;
+      function update() {
+        var h = document.documentElement;
+        var max = h.scrollHeight - h.clientHeight;
+        var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+        bar.style.width = pct + '%';
+      }
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+    })();
+  </script>
 </body>
+
 </html>
 
 </html>
