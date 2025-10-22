@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Disclosure Cheater</title>
+  <style>
+    :root{--fg:#111;--muted:#666;--bg:#fafafa;--card:#fff;--border:#e5e7eb;--accent:#2563eb}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--fg);background:var(--bg)}
+    header{padding:16px 20px;background:linear-gradient(180deg,#f8fafc,#fff);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .head-left{display:flex;flex-direction:column;gap:6px;min-width:0}
+    h1{margin:0;font-size:20px}
+    main{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;gap:16px;grid-template-columns:1fr}
+    .row{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .card h2{font-size:16px;margin:0;padding:10px 14px;border-bottom:1px solid var(--border);background:#fcfcfd;border-top-left-radius:14px;border-top-right-radius:14px}
+    .card .body{padding:12px}
+    textarea{width:100%;min-height:300px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    button{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
+    button.secondary{background:#f3f4f6;color:#111}
+    /* Back button (link) */
+    a.btn{display:inline-flex;align-items:center;text-decoration:none;border-radius:10px;padding:10px 14px;font-weight:600;background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04);white-space:nowrap}
+    a.btn:hover{opacity:.92}
+    .small{font-size:12px;color:var(--muted)}
+    pre{margin:0;white-space:pre-wrap;word-break:break-word}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    details summary{cursor:pointer;color:#0f172a}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border-bottom:1px dashed var(--border);padding:6px 8px;text-align:left}
+    th{font-weight:700;background:#f9fafb}
+    .pill{display:inline-block;border:1px solid var(--border);padding:2px 6px;border-radius:999px;font-size:11px;background:#f8fafc}
+  </style>
+</head>
+<body>
+<header>
+  <div class="head-left">
+    <h1>Disclosure Cheater</h1>
+    <div class="small">Disclaimer: This tool was created by <strong>Pierre</strong>. No data is uploaded or stored. Please do not paste personal or sensitive information. Outputs are provided “as is,” without warranties or professional advice. Use at your own discretion.</div>
+  </div>
+  <!-- Replace href value with your real website URL. If you prefer a new tab, add target="_blank" rel="noopener". -->
+  <a id="backBtn" href="https://pierrezhang.online/" class="btn" title="Back to my website">Back to my website</a>
+</header>
+<main>
+  <div class="row">
+    <section class="card">
+      <h2>① Paste here</h2>
+      <div class="body">
+        <textarea id="input" placeholder="Paste here……"></textarea>
+        <div class="btns" style="margin-top:10px">
+          <button id="run">Execute!</button>
+          <button id="copy" class="secondary">Copy output</button>
+          <button id="clear" class="secondary">Empty notepad</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>② Result (Sorted)</h2>
+      <div class="body">
+        <pre id="output"> Result will be shown after executing </pre>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+// ----- 根据report顺序按优先级从高到低匹配。 -----
+const LOCATION_MAP = [
+  { id:1,   label:"Keys",                    patterns:[/\bkeys?\b/i] },
+  { id:6,   label:"Glovebox",                patterns:[/\bglove\s?box\b/i] },
+  { id:8,   label:"Armrest",                 patterns:[/\barmrest\b/i, /back of (?:center|centre) console/i, /back of armrest/i] },
+  { id:16,  label:"Driver Seat (Back of front seats)", patterns:[/driver seat/i, /back of front seats?/i] },
+  { id:20,  label:"Passenger Seat",          patterns:[/passenger seat/i] },
+  { id:24,  label:"Rear Seat",               patterns:[/rear seats?/i] },
+  { id:28,  label:"A Pillar",                patterns:[/\bA[-\s]?pillar(s)?\b/i, /all pillars?/i, /dash\b/i] },
+  { id:29,  label:"B Pillar",                patterns:[/\bB[-\s]?pillar(s)?\b/i] },
+  { id:30,  label:"C Pillar",                patterns:[/\bC[-\s]?pillar(s)?\b/i] },
+  { id:31,  label:"Headliner",               patterns:[/headliner/i] },
+  { id:32,  label:"Dashboard",               patterns:[/\bdash(?:board)?\b/i] },
+  { id:33,  label:"Centre Console",          patterns:[/centre console/i, /center console/i, /infotainment/i] },
+  { id:39,  label:"Door Panels (interior)",  patterns:[/door\s*panels?/i] },
+  { id:45,  label:"Trunk Interior",          patterns:[/trunk\s*(interior|inside)/i, /interior trunk/i] },
+  { id:46,  label:"Sun Visors",              patterns:[/sun\s*visors?/i, /\bvisors?\b/i] },
+  { id:64,  label:"Glass / Windows",         patterns:[/windshield/i, /rear\s*glass/i, /\bwindows?\b/i, /\bglass\b/i] },
+  { id:68,  label:"Rims / Wheels",           patterns:[/\brims?\b/i, /\bwheels?\b/i] },
+  { id:71,  label:"Front Bumper / Hood",     patterns:[/front\s*bumper( cover)?/i, /\bhood\b/i] },
+  { id:72,  label:"Front Fender / Wheel Arch",patterns:[/(?:front\s*)?fenders?/i, /wheel\s*arch/i] },
+  { id:73,  label:"Doors & Related",         patterns:[/\bdoors?\b/i, /rocker\s*panel/i, /(?:side\s*)?skirts?/i, /window\s*visors?/i, /door\s*jambs?/i, /\bmirrors?\b/i] },
+  { id:74,  label:"Rear Quarter Panel / Wheel Arch", patterns:[/rear\s*quarter\s*panel/i, /rear.*wheel\s*arch/i, /\bquarter\s*panel\b/i] },
+  { id:75,  label:"Rear Bumper / Trunk",     patterns:[/rear\s*bumper/i, /\btrunk\b/i] },
+  { id:76,  label:"Roof (unibody)",          patterns:[/\broof\b/i, /unibody/i] },
+  { id:100, label:"Gear Shifter",            patterns:[/gear\s*shifter/i, /\bshifter\b/i] },
+  { id:144, label:"Headlight",               patterns:[/headlights?/i] },
+  { id:145, label:"Taillight",               patterns:[/tail\s*lights?/i, /taillights?/i] },
+];
+
+// 常见问题关键字
+const ISSUE_KEYS = [
+  "chips/scratches","scratches","scratch","scuffs","scuff","dents","dent","dings","ding",
+  "chrome peeling","paint peeling","peeling","tree sap","cracks","crack","scrapes","scrape",
+  "stone chips","chips","chipped","rust","stains","stain","gouges","gouge","peel","oxidation"
+].sort((a,b)=>b.length-a.length); // 先匹配更长短语！
+
+const CLEAN_LINE_RX = [
+  /^\s*$/i,                 // 空行
+  /^damage\s*$/i,           // damage
+  /^\d+\s*\/\s*\d+\s*$/ // 形如 0/36
+];
+
+function cleanLines(raw){
+  const lines = raw.split(/\r?\n/)
+    .map(s=>s.trim())
+    .filter(s=>!CLEAN_LINE_RX.some(rx=>rx.test(s)));
+  // 去重（忽略大小写与多余空格）
+  const seen = new Set();
+  return lines.filter(s=>{ const key=s.toLowerCase().replace(/\s+/g,' '); if(seen.has(key)) return false; seen.add(key); return true; });
+}
+
+function findLocationGroup(text){
+  for(const item of LOCATION_MAP){
+    for(const p of item.patterns){ if(p.test(text)) return item; }
+  }
+  return { id:999, label:"Others", patterns:[] };
+}
+
+function splitLocationIssue(phrase){
+  const low = phrase.toLowerCase();
+  for(const key of ISSUE_KEYS){
+    const idx = low.indexOf(key);
+    if(idx>0){
+      const loc = phrase.slice(0, idx).trim().replace(/[\-–—]+\s*$/,'');
+      const issue = phrase.slice(idx).trim();
+      return {location: loc || phrase, issue: issue};
+    }
+  }
+  // 没找到关键字：视为整句是一个条目（无 issue）
+  return {location: phrase, issue: ""};
+}
+
+function process(raw){
+  const cleaned = cleanLines(raw);
+  const buckets = new Map(); // id -> { label, entries: Map<location, Set<issue>> }
+
+  for(const line of cleaned){
+    const {id,label} = findLocationGroup(line);
+    const {location, issue} = splitLocationIssue(line);
+    if(!buckets.has(id)) buckets.set(id,{label, entries:new Map()});
+    const locKey = location.replace(/\s+/g,' ').trim();
+    if(!buckets.get(id).entries.has(locKey)) buckets.get(id).entries.set(locKey,new Set());
+    if(issue){
+      // 归一化常见连接符，如 Chips / Scratches → Chips/Scratches，以便复制粘贴进report
+      const normalizedIssue = issue.replace(/\s*\/\s*/g,'/').replace(/\s{2,}/g,' ').trim();
+      buckets.get(id).entries.get(locKey).add(normalizedIssue);
+    } else {
+      // 空 issue：用空集合占位
+      buckets.get(id).entries.get(locKey).add("");
+    }
+  }
+
+  // 组装输出
+  const ids = Array.from(buckets.keys()).sort((a,b)=>{
+    if(a===999 && b!==999) return 1; // Others 放最后，用于人工处理未能处理的条目
+    if(b===999 && a!==999) return -1;
+    return a-b;
+  });
+
+  const lines = [];
+  for(const id of ids){
+    const {entries} = buckets.get(id);
+    const parts = [];
+    for(const [loc, issues] of entries){
+      const list = Array.from(issues).filter(Boolean);
+      if(list.length===0){
+        parts.push(toTitleCase(loc));
+      } else {
+        // 合并：同位置多问题用“/”连接，且合并相同词
+        const merged = mergeIssues(list);
+        // 如果 issue 本身已包含位置（极端情况），避免重复空格
+        {
+          const text = loc + (merged ? " " + merged : "");
+          parts.push(toTitleCase(text));
+        }
+      }
+    }
+    if(parts.length){
+      lines.push(`${id} ${parts.join('; ')} (Light Imperfections)`);
+    }
+  }
+  return lines.join('\n');
+}
+
+// 将 ["Chips/Scratches", "Scuffs", "Tree Sap"] → "Chips/Scratches/Scuffs/Tree Sap"
+function mergeIssues(issueArr){
+  const seen = new Set();
+  const out = [];
+  for(const it of issueArr){
+    const key = it.toLowerCase().replace(/\s+/g,' ');
+    if(seen.has(key)) continue;
+    seen.add(key);
+    out.push(it);
+  }
+  // 若单个元素类似 "Scratches" 与另一个为 "Chips/Scratches"，避免重复“Scratches”
+  const final = [];
+  for(const cur of out){
+    const curLow = cur.toLowerCase();
+    if(out.some(o=>o!==cur && o.toLowerCase().includes(curLow) && /\//.test(o))) continue;
+    final.push(cur);
+  }
+  return final.join('/');
+}
+
+function toTitleCase(str){
+  if(!str) return str;
+  const lower = str.toLowerCase();
+  const seps = new Set([' ','/','-']);
+  let out = '';
+  let upperNext = true;
+  for (const ch of lower){
+    if (upperNext && ch >= 'a' && ch <= 'z') { out += ch.toUpperCase(); upperNext = false; }
+    else { out += ch; upperNext = seps.has(ch); }
+  }
+  return out;
+}
+
+// --- UI ---
+const $ = sel => document.querySelector(sel);
+$('#run').addEventListener('click',()=>{ $('#output').textContent = process($('#input').value); });
+$('#copy').addEventListener('click',()=>{ navigator.clipboard.writeText($('#output').textContent||''); $('#copy').textContent='Copied!'; setTimeout(()=>$('#copy').textContent='Copy output',1200); });
+$('#clear').addEventListener('click',()=>{ $('#input').value=''; $('#output').textContent=''; });
+</script>
+</body>
+</html>
