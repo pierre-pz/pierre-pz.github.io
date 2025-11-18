@@ -348,6 +348,10 @@
       background: linear-gradient(180deg, #ffffff, #e5f0ff);
     }
 
+    body.theme-daylight .result-row .line {
+      color: #111827;
+    }
+
     body.theme-daylight button.secondary,
     body.theme-daylight .mini-copy {
       background: linear-gradient(180deg, #e5f0ff, #dbeafe);
@@ -481,6 +485,155 @@
       }
     }
 
+
+    /* -------------------- Skyline theme -------------------- */
+
+    body.theme-skyline {
+      --fg: #f9fafb;
+      --muted: #cbd5f5;
+      --bg: #b0b4bc;
+      --card: #111827;
+      --card-2: #020617;
+      --border: rgba(15, 23, 42, .65);
+      --accent: #2563eb;
+      --accent-2: #60a5fa;
+      --shadow: 0 20px 45px rgba(15, 23, 42, .7);
+      --glow: 0 0 18px rgba(37, 99, 235, .55), 0 0 44px rgba(37, 99, 235, .35);
+      color: var(--fg);
+      background:
+        radial-gradient(900px 500px at 10% -200px, rgba(148, 163, 184, .2), transparent 60%),
+        radial-gradient(900px 500px at 90% -200px, rgba(148, 163, 184, .2), transparent 60%),
+        linear-gradient(180deg, #b8c0cc, #dde4f0);
+    }
+
+    body.theme-skyline header {
+      background: rgba(15, 23, 42, .46);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom-color: rgba(15, 23, 42, .4);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, .65);
+    }
+
+    body.theme-skyline h1 {
+      color: #e5f0ff;
+      text-shadow: 0 2px 0 rgba(15, 23, 42, .6), 0 0 22px rgba(191, 219, 254, .85);
+      filter: drop-shadow(0 8px 20px rgba(37, 99, 235, .35));
+    }
+
+    body.theme-skyline .card {
+      background: linear-gradient(180deg, #1f2937, #0b1120);
+      border-color: rgba(15, 23, 42, .6);
+    }
+
+    body.theme-skyline .card h2 {
+      background: linear-gradient(180deg, #111827, #020617);
+      color: #e5e7eb;
+      border-bottom-color: rgba(15, 23, 42, .7);
+    }
+
+    body.theme-skyline textarea {
+      background: #020617;
+      color: #f9fafb;
+      border-color: rgba(15, 23, 42, .7);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .85);
+    }
+
+    body.theme-skyline textarea::placeholder {
+      color: #6b7280;
+    }
+
+    body.theme-skyline textarea:focus {
+      border-color: rgba(37, 99, 235, .8);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, .8);
+    }
+
+    body.theme-skyline .result-row {
+      background: linear-gradient(180deg, #111827, #0b1120);
+      border-color: rgba(15, 23, 42, .65);
+    }
+
+    body.theme-skyline .result-row .line {
+      color: #f9fafb;
+    }
+
+    body.theme-skyline button.secondary,
+    body.theme-skyline .mini-copy {
+      background: linear-gradient(180deg, #111827, #020617);
+      color: #e5e7eb;
+      box-shadow: 0 6px 12px rgba(15, 23, 42, .8), inset 0 0 0 1px rgba(148, 163, 184, .5);
+    }
+
+    body.theme-skyline button.secondary:hover,
+    body.theme-skyline .mini-copy:hover {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .7), 0 10px 18px rgba(15, 23, 42, .9);
+    }
+
+    body.theme-skyline .theme-switcher {
+      background: linear-gradient(180deg, rgba(15, 23, 42, .95), rgba(15, 23, 42, .98));
+      border-color: rgba(148, 163, 184, .8);
+    }
+
+    body.theme-skyline main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .row {
+      position: relative;
+    }
+
+    body.theme-skyline .row::before,
+    body.theme-skyline .row::after {
+      content: "";
+      position: absolute;
+      top: -320px;
+      bottom: -320px;
+      width: calc(50% - 12px);
+      background: linear-gradient(180deg, #1d4ed8, #60a5fa);
+      opacity: 0.97;
+      border-radius: 0;
+      z-index: -1;
+      box-shadow: 0 22px 50px rgba(15, 23, 42, .8);
+    }
+
+    body.theme-skyline .row::before {
+      left: 0;
+    }
+
+    body.theme-skyline .row::after {
+      right: 0;
+    }
+
+    .skyline-art {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      max-height: 60vh;
+      pointer-events: none;
+      opacity: 0.95;
+      filter: drop-shadow(0 22px 40px rgba(0, 0, 0, .8));
+      display: none;
+      z-index: 0;
+    }
+
+    .skyline-art.skyline-left {
+      left: -5%;
+    }
+
+    .skyline-art.skyline-right {
+      right: -5%;
+    }
+
+    body.theme-skyline .skyline-art {
+      display: block;
+    }
+
+    @media (max-width: 1200px) {
+      .skyline-art {
+        display: none !important;
+      }
+    }
+
     /* -------------------- Pierre theme -------------------- */
 
     body.theme-pierre {
@@ -507,7 +660,8 @@
       <div class="small">Disclaimer: This tool was created by <strong class="pierre-name">Pierre</strong>. It runs
         entirely in your browser
         and no data is uploaded to or stored. But still please do not paste personal or sensitive information.
-        <strong>PLEASE DOUBLE CHECK BEFORE PASTING ANYTHING INTO ANY REPORTS</strong>. Use at your own discretion.</div>
+        <strong>PLEASE DOUBLE CHECK BEFORE PASTING ANYTHING INTO ANY REPORTS</strong>. Use at your own discretion.
+      </div>
 
     </div>
     <div class="head-right">
@@ -516,6 +670,7 @@
         <select id="themeSelect">
           <option value="shadow">Shadow</option>
           <option value="daylight">Daylight</option>
+          <option value="skyline">Skyline</option>
           <option value="christmas">Christmas</option>
           <option value="pierre">Pierre</option>
         </select>
@@ -546,6 +701,9 @@
       </section>
     </div>
   </main>
+
+  <img class="skyline-art skyline-left" src="../dep/images/R34Front.png" alt="Skyline front view anime" />
+  <img class="skyline-art skyline-right" src="../dep/images/R34Rear.png" alt="Skyline rear view anime" />
 
   <!-- Snow overlay for Christmas theme -->
   <div id="snow-layer"></div>
@@ -789,7 +947,7 @@
 
     function applyTheme(theme) {
       currentTheme = theme;
-      bodyEl.classList.remove('theme-shadow', 'theme-daylight', 'theme-christmas', 'theme-pierre');
+      bodyEl.classList.remove('theme-shadow', 'theme-daylight', 'theme-christmas', 'theme-pierre', 'theme-skyline');
       bodyEl.classList.add('theme-' + theme);
 
       if (theme === 'pierre') {
