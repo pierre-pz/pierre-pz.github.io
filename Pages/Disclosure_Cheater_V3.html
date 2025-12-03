@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Disclosure Cheater</title>
+  <style>
+    :root {
+      --fg: #e5e7eb;
+      --muted: #9ca3af;
+      --bg: #1C1C1C;
+      --card: #111418;
+      --card-2: #0f1317;
+      --border: rgba(255, 255, 255, .08);
+      --accent: #facc15;
+      /* neon yellow */
+      --accent-2: #ffe25e;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .02);
+      --glow: 0 0 12px rgba(250, 204, 21, .35), 0 0 32px rgba(250, 204, 21, .18);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--fg);
+      background:
+        radial-gradient(1200px 500px at 70% -200px, rgba(250, 204, 21, .08), transparent 60%),
+        radial-gradient(700px 400px at -200px 20%, rgba(56, 189, 248, .06), transparent 60%),
+        linear-gradient(180deg, #0a0d10, #0b0d10);
+      letter-spacing: .2px;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 22px 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(180deg, rgba(12, 15, 18, .85), rgba(12, 15, 18, .65));
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .head-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0
+    }
+
+    .head-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 2.2vw + 6px, 36px);
+      font-weight: 900;
+      letter-spacing: .8px;
+      color: var(--accent);
+      text-shadow: 0 2px 0 rgba(0, 0, 0, .4), var(--glow);
+      filter: drop-shadow(0 8px 18px rgba(250, 204, 21, .12));
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      max-width: 900px
+    }
+
+    .pierre-name {
+      color: var(--accent);
+      font-size: 1.2em;
+    }
+
+
+    .theme-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(0, 0, 0, .35));
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .theme-switcher span {
+      opacity: .9;
+    }
+
+    .theme-switcher select {
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .theme-switcher option {
+      color: #111;
+    }
+
+    /* Layout */
+    main {
+      max-width: 1100px;
+      margin: 26px auto 54px;
+      padding: 0 18px;
+      display: grid;
+      gap: 18px
+    }
+
+    .row {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr 1fr
+    }
+
+    @media (max-width: 920px) {
+      .row {
+        grid-template-columns: 1fr
+      }
+
+      header {
+        align-items: flex-start;
+      }
+
+      .head-right {
+        justify-content: flex-start;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .02), transparent 70%),
+        linear-gradient(180deg, var(--card), var(--card-2));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      margin: 0;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+      color: #cbd5e1;
+    }
+
+    .card .body {
+      padding: 14px
+    }
+
+    /* Textarea / Inputs */
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      padding: 12px 12px;
+      color: #e5e7eb;
+      background: #0c1116;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .01);
+      caret-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: #667085
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: rgba(250, 204, 21, .45);
+      box-shadow: var(--glow)
+    }
+
+    /* Buttons */
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    button,
+    a.btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: #111;
+      box-shadow: var(--glow), 0 6px 14px rgba(0, 0, 0, .35);
+      transition: transform .12s ease, box-shadow .15s ease, opacity .15s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    button:hover,
+    a.btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 4px rgba(250, 204, 21, .18), var(--glow), 0 10px 20px rgba(0, 0, 0, .35);
+    }
+
+    button:active,
+    a.btn:active {
+      transform: translateY(0) scale(.99);
+    }
+
+    button.secondary {
+      background: linear-gradient(180deg, #1a2128, #0f1419);
+      color: #e5e7eb;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .04);
+    }
+
+    button.secondary:hover {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, .06), 0 8px 18px rgba(0, 0, 0, .45);
+    }
+
+    /* Results list */
+    .result-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .result-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, #0e1419, #0c1116);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .02);
+    }
+
+    .result-row .line {
+      flex: 1;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      white-space: pre-wrap;
+      color: #f3f4f6
+    }
+
+    .mini-copy {
+      background: linear-gradient(180deg, #1a2128, #0f1419);
+      color: #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, .04), 0 6px 12px rgba(0, 0, 0, .35);
+    }
+
+    .mini-copy:hover {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, .06), 0 10px 16px rgba(0, 0, 0, .45)
+    }
+
+    /* Back button link (already styled via a.btn) */
+    a.btn {
+      font-size: 14px;
+      padding: 10px 16px
+    }
+
+    /* -------------------- Daylight theme -------------------- */
+
+    body.theme-daylight {
+      --fg: #111827;
+      --muted: #6b7280;
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --card-2: #e5f0ff;
+      --border: rgba(15, 23, 42, .08);
+      --accent: #2563eb;
+      --accent-2: #60a5fa;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .08);
+      --glow: 0 0 12px rgba(37, 99, 235, .25), 0 0 32px rgba(37, 99, 235, .18);
+      color: var(--fg);
+      background: radial-gradient(900px 500px at 20% -200px, rgba(191, 219, 254, .5), transparent 60%),
+        radial-gradient(700px 400px at 100% 0%, rgba(219, 234, 254, .5), transparent 60%),
+        linear-gradient(180deg, #eff6ff, #f9fafb);
+    }
+
+    body.theme-daylight header {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .9));
+      border-bottom-color: rgba(148, 163, 184, .4);
+    }
+
+    body.theme-daylight h1 {
+      text-shadow: none;
+      filter: none;
+    }
+
+    body.theme-daylight .card h2 {
+      color: #0f172a;
+      background: linear-gradient(180deg, rgba(241, 245, 249, .9), rgba(226, 232, 240, .9));
+    }
+
+    body.theme-daylight textarea {
+      background: #ffffff;
+      color: #111827;
+      border-color: #d1d5db;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .35);
+      caret-color: var(--accent);
+    }
+
+    body.theme-daylight textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    body.theme-daylight textarea:focus {
+      border-color: rgba(37, 99, 235, .6);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, .5);
+    }
+
+    body.theme-daylight .result-row {
+      background: linear-gradient(180deg, #ffffff, #e5f0ff);
+    }
+
+    body.theme-daylight .result-row .line {
+      color: #111827;
+    }
+
+    body.theme-daylight button.secondary,
+    body.theme-daylight .mini-copy {
+      background: linear-gradient(180deg, #e5f0ff, #dbeafe);
+      color: #1f2937;
+      box-shadow: 0 6px 12px rgba(148, 163, 184, .5), inset 0 0 0 1px rgba(148, 163, 184, .5);
+    }
+
+    body.theme-daylight button.secondary:hover,
+    body.theme-daylight .mini-copy:hover {
+      box-shadow: 0 0 0 3px rgba(191, 219, 254, .9), 0 10px 16px rgba(148, 163, 184, .7);
+    }
+
+    body.theme-daylight .theme-switcher {
+      background: linear-gradient(180deg, #eff6ff, #e5e7eb);
+      border-color: rgba(148, 163, 184, .6);
+    }
+
+    /* -------------------- Christmas theme -------------------- */
+
+    body.theme-christmas {
+      --fg: #fefcfb;
+      --muted: #e5e7eb;
+      --bg: #064e3b;
+      --card: #ffffff;
+      --card-2: #ffffff;
+      --border: rgba(248, 250, 252, .16);
+      --accent: #ef4444;
+      --accent-2: #f97373;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .7);
+      --glow: 0 0 14px rgba(248, 250, 252, .45), 0 0 32px rgba(220, 252, 231, .25);
+      color: var(--fg);
+      background:
+        radial-gradient(900px 500px at 15% -200px, rgba(34, 197, 94, .45), transparent 60%),
+        radial-gradient(900px 500px at 85% -200px, rgba(248, 250, 252, .85), transparent 60%),
+        linear-gradient(180deg, #065f46, #b91c1c);
+    }
+
+    body.theme-christmas header {
+      background: linear-gradient(180deg, rgba(15, 23, 42, .9), rgba(15, 23, 42, .85));
+      border-bottom-color: rgba(248, 250, 252, .2);
+    }
+
+    body.theme-christmas h1 {
+      text-shadow: 0 0 16px rgba(248, 250, 252, .7);
+    }
+
+    body.theme-christmas .card {
+      background:
+        linear-gradient(180deg, rgba(248, 250, 252, .04), transparent 70%),
+        linear-gradient(180deg, rgba(15, 23, 42, .95), rgba(15, 23, 42, .9));
+      border-color: rgba(248, 250, 252, .2);
+    }
+
+    body.theme-christmas .card h2 {
+      background: linear-gradient(90deg, rgba(239, 68, 68, .3), rgba(34, 197, 94, .2));
+      border-bottom-color: rgba(248, 250, 252, .2);
+    }
+
+    body.theme-christmas textarea {
+      background: rgba(15, 23, 42, .95);
+      color: #f9fafb;
+      border-color: rgba(248, 250, 252, .25);
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .3);
+    }
+
+    body.theme-christmas textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    body.theme-christmas textarea:focus {
+      border-color: rgba(239, 68, 68, .7);
+      box-shadow: 0 0 0 1px rgba(248, 250, 252, .4);
+    }
+
+    body.theme-christmas .result-row {
+      background: linear-gradient(180deg, rgba(15, 23, 42, .95), rgba(15, 23, 42, .9));
+    }
+
+    body.theme-christmas button.secondary,
+    body.theme-christmas .mini-copy {
+      background: linear-gradient(180deg, #064e3b, #032c20);
+      color: #f9fafb;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(248, 250, 252, .3);
+    }
+
+    body.theme-christmas button.secondary:hover,
+    body.theme-christmas .mini-copy:hover {
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, .5), 0 10px 20px rgba(0, 0, 0, .85);
+    }
+
+    body.theme-christmas .theme-switcher {
+      background: linear-gradient(90deg, rgba(239, 68, 68, .6), rgba(34, 197, 94, .6));
+      border-color: rgba(248, 250, 252, .5);
+    }
+
+    #snow-layer {
+      display: none;
+    }
+
+    body.theme-christmas #snow-layer {
+      display: block;
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9;
+      /* 雪花更多 + 更大 */
+      background-image:
+        radial-gradient(8px 8px at 20px 20px, rgba(255, 255, 255, .98), transparent 60%),
+        radial-gradient(10px 10px at 80px 60px, rgba(255, 255, 255, .97), transparent 60%),
+        radial-gradient(8px 8px at 140px 40px, rgba(255, 255, 255, .98), transparent 60%),
+        radial-gradient(10px 10px at 200px 80px, rgba(255, 255, 255, .98), transparent 60%),
+        radial-gradient(8px 8px at 260px 30px, rgba(255, 255, 255, .98), transparent 60%),
+        radial-gradient(8px 8px at 320px 90px, rgba(255, 255, 255, .95), transparent 60%),
+        radial-gradient(9px 9px at 40px 140px, rgba(255, 255, 255, .97), transparent 60%),
+        radial-gradient(7px 7px at 120px 180px, rgba(255, 255, 255, .96), transparent 60%),
+        radial-gradient(9px 9px at 200px 160px, rgba(255, 255, 255, .98), transparent 60%),
+        radial-gradient(7px 7px at 280px 200px, rgba(255, 255, 255, .95), transparent 60%);
+      /* 图案缩小一点，让重复更密集，看起来“雪更大、更密” */
+      background-size: 180px 180px;
+      opacity: 0.9;
+      animation: snow-fall 14s linear infinite;
+    }
+
+    @keyframes snow-fall {
+      0% {
+        transform: translateY(-10px);
+      }
+
+      100% {
+        transform: translateY(40px);
+      }
+    }
+
+
+    /* -------------------- Skyline theme -------------------- */
+
+    body.theme-skyline {
+      --fg: #f9fafb;
+      --muted: #cbd5f5;
+      --bg: #b0b4bc;
+      --card: #111827;
+      --card-2: #020617;
+      --border: rgba(15, 23, 42, .65);
+      --accent: #2563eb;
+      --accent-2: #60a5fa;
+      --shadow: 0 20px 45px rgba(15, 23, 42, .7);
+      --glow: 0 0 18px rgba(37, 99, 235, .55), 0 0 44px rgba(37, 99, 235, .35);
+      color: var(--fg);
+      background:
+        radial-gradient(900px 500px at 10% -200px, rgba(148, 163, 184, .2), transparent 60%),
+        radial-gradient(900px 500px at 90% -200px, rgba(148, 163, 184, .2), transparent 60%),
+        linear-gradient(180deg, #b8c0cc, #dde4f0);
+    }
+
+    body.theme-skyline header {
+      background: rgba(15, 23, 42, .46);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom-color: rgba(15, 23, 42, .4);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, .65);
+    }
+
+    body.theme-skyline h1 {
+      color: #e5f0ff;
+      text-shadow: 0 2px 0 rgba(15, 23, 42, .6), 0 0 22px rgba(191, 219, 254, .85);
+      filter: drop-shadow(0 8px 20px rgba(37, 99, 235, .35));
+    }
+
+    body.theme-skyline .card {
+      background: linear-gradient(180deg, #1f2937, #0b1120);
+      border-color: rgba(15, 23, 42, .6);
+    }
+
+    body.theme-skyline .card h2 {
+      background: linear-gradient(180deg, #111827, #020617);
+      color: #e5e7eb;
+      border-bottom-color: rgba(15, 23, 42, .7);
+    }
+
+    body.theme-skyline textarea {
+      background: #020617;
+      color: #f9fafb;
+      border-color: rgba(15, 23, 42, .7);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .85);
+    }
+
+    body.theme-skyline textarea::placeholder {
+      color: #6b7280;
+    }
+
+    body.theme-skyline textarea:focus {
+      border-color: rgba(37, 99, 235, .8);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, .8);
+    }
+
+    body.theme-skyline .result-row {
+      background: linear-gradient(180deg, #111827, #0b1120);
+      border-color: rgba(15, 23, 42, .65);
+    }
+
+    body.theme-skyline .result-row .line {
+      color: #f9fafb;
+    }
+
+    body.theme-skyline button.secondary,
+    body.theme-skyline .mini-copy {
+      background: linear-gradient(180deg, #111827, #020617);
+      color: #e5e7eb;
+      box-shadow: 0 6px 12px rgba(15, 23, 42, .8), inset 0 0 0 1px rgba(148, 163, 184, .5);
+    }
+
+    body.theme-skyline button.secondary:hover,
+    body.theme-skyline .mini-copy:hover {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .7), 0 10px 18px rgba(15, 23, 42, .9);
+    }
+
+    body.theme-skyline .theme-switcher {
+      background: linear-gradient(180deg, rgba(15, 23, 42, .95), rgba(15, 23, 42, .98));
+      border-color: rgba(148, 163, 184, .8);
+    }
+
+    body.theme-skyline main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .row {
+      position: relative;
+    }
+
+    body.theme-skyline .row::before,
+    body.theme-skyline .row::after {
+      content: "";
+      position: absolute;
+      top: -320px;
+      bottom: -320px;
+      width: calc(50% - 12px);
+      background: linear-gradient(180deg, #1d4ed8, #60a5fa);
+      opacity: 0.97;
+      border-radius: 0;
+      z-index: -1;
+      box-shadow: 0 22px 50px rgba(15, 23, 42, .8);
+    }
+
+    body.theme-skyline .row::before {
+      left: 0;
+    }
+
+    body.theme-skyline .row::after {
+      right: 0;
+    }
+
+    .skyline-art {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      max-height: 60vh;
+      pointer-events: none;
+      opacity: 0.95;
+      filter: drop-shadow(0 22px 40px rgba(0, 0, 0, .8));
+      display: none;
+      z-index: 0;
+    }
+
+    .skyline-art.skyline-left {
+      left: -5%;
+    }
+
+    .skyline-art.skyline-right {
+      right: -5%;
+    }
+
+    body.theme-skyline .skyline-art {
+      display: block;
+    }
+
+    body.theme-skyline .pierre-name {
+      color: #fff23e;
+    }
+
+    @media (max-width: 1200px) {
+      .skyline-art {
+        display: none !important;
+      }
+    }
+
+    /* -------------------- Pierre theme -------------------- */
+
+    body.theme-pierre {
+      background: #000 url("../dep/images/Pierre_Mode.png") center center / cover fixed no-repeat;
+      color: var(--fg);
+    }
+
+    body.theme-pierre header {
+      background: linear-gradient(180deg, rgba(0, 0, 0, .9), rgba(0, 0, 0, .85));
+      border-bottom-color: rgba(255, 255, 255, .25);
+    }
+
+    body.theme-pierre .theme-switcher {
+      background: linear-gradient(180deg, rgba(15, 23, 42, .9), rgba(15, 23, 42, .95));
+      border-color: rgba(148, 163, 184, .7);
+    }
+  </style>
+</head>
+
+<body class="theme-shadow">
+  <header>
+    <div class="head-left">
+      <h1>Disclosure Cheater Ultimate Version</h1>
+      <div class="small">Disclaimer: This tool was created by <strong class="pierre-name">Pierre</strong>. It runs
+        entirely in your browser
+        and no data is uploaded to or stored. But still please do not paste personal or sensitive information.
+        <strong>PLEASE DOUBLE CHECK BEFORE PASTING ANYTHING INTO ANY REPORTS</strong>. Use at your own discretion.
+      </div>
+
+    </div>
+    <div class="head-right">
+      <label class="theme-switcher">
+        <span>Theme:</span>
+        <select id="themeSelect">
+          <option value="shadow">Shadow</option>
+          <option value="daylight">Daylight</option>
+          <option value="skyline">Skyline</option>
+          <option value="christmas">Christmas</option>
+          <option value="pierre">Pierre</option>
+        </select>
+      </label>
+      <!-- Replace href value with your real website URL. If you prefer a new tab, add target="_blank" rel="noopener". -->
+      <a id="backBtn" href="https://pierrezhang.online/" class="btn" title="Back to my website">Back to my website</a>
+    </div>
+  </header>
+  <main>
+    <div class="row">
+      <section class="card">
+        <h2>① Paste here</h2>
+        <div class="body">
+          <textarea id="input" placeholder="Paste here……"></textarea>
+          <div class="btns" style="margin-top:10px">
+            <button id="run">Execute!</button>
+            <button id="copy" class="secondary">Copy output</button>
+            <button id="clear" class="secondary">Empty notepad</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>② Result (Sorted)</h2>
+        <div class="body">
+          <div id="outputList" class="result-list"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <img class="skyline-art skyline-left" src="../dep/images/R34Front.png" alt="Skyline front view anime" />
+  <img class="skyline-art skyline-right" src="../dep/images/R34Rear.png" alt="Skyline rear view anime" />
+
+  <!-- Snow overlay for Christmas theme -->
+  <div id="snow-layer"></div>
+
+  <script>
+    // ----- Location groups (id/label/patterns) -----
+    const LOCATION_MAP = [
+      { id: 1, label: "Keys", patterns: [/\bkeys?\b/i] },
+      { id: 6, label: "Glovebox", patterns: [/\bglove\s?box\b/i] },
+      { id: 8, label: "Armrest", patterns: [/\barmrest\b/i, /back of (?:center|centre) console/i, /back of armrest/i] },
+      { id: 16, label: "Driver Seat (Back of front seats)", patterns: [/driver seat/i, /back of front seats?/i] },
+      { id: 20, label: "Passenger Seat", patterns: [/passenger seat/i] },
+      { id: 24, label: "Rear Seat", patterns: [/rear seats?/i] },
+      { id: 28, label: "A Pillar", patterns: [/\bA[-\s]?pillar(s)?\b/i, /all pillars?/i, /dash\b/i] },
+      { id: 29, label: "B Pillar", patterns: [/\bB[-\s]?pillar(s)?\b/i] },
+      { id: 30, label: "C Pillar", patterns: [/\bC[-\s]?pillar(s)?\b/i] },
+      { id: 31, label: "Headliner", patterns: [/headliner/i, /sun\s*roof/i, /sun\s*shade/i] },
+      { id: 32, label: "Dashboard", patterns: [/\bdash(?:board)?\b/i, /steering\s*wheel/i] },
+      { id: 33, label: "Centre Console", patterns: [/centre console/i, /center console/i, /infotainment/i] },
+      { id: 39, label: "Door Panels (interior)", patterns: [/door\s*panels?/i] },
+      { id: 45, label: "Trunk Interior", patterns: [/trunk\s*(interior|inside)/i, /interior trunk/i] },
+      { id: 46, label: "Sun Visors", patterns: [/sun\s*visors?/i, /\bvisors?\b/i] },
+      { id: 48, label: "Rear View Mirror", patterns: [/rear\s*view\s*mirrors?\b/i] },
+      { id: 64, label: "Glass / Windows", patterns: [/windshield/i, /rear\s*glass/i, /\bwindows?\b/i, /\bglass\b/i] },
+      { id: 68, label: "Rims / Wheels", patterns: [/\brims?\b/i, /\bwheels?\b/i] },
+      { id: 71, label: "Front Bumper / Hood", patterns: [/front\s*bumper( cover)?/i, /\bhood\b/i] },
+      { id: 72, label: "Fender / Wheel Arch", patterns: [/\bfenders?\b/i, /front.*wheel\s*arch(?:es|s)?/i, /wheel\s*arch(?:es|s)?.*front/i] },
+      { id: 73, label: "Doors & Related", patterns: [/\bdoors?\b/i, /rocker\s*panel/i, /(?:side\s*)?skirts?/i, /window\s*visors?/i, /door\s*jambs?/i, /\bmirrors?\b/i] },
+      { id: 74, label: "Rear Quarter Panel / Wheel Arch", patterns: [/rear\s*quarter\s*panel/i, /rear.*wheel\s*arch(?:es|s)?/i, /wheel\s*arch(?:es|s)?.*rear/i, /\bquarter\s*panel\b/i] },
+      { id: 75, label: "Rear Bumper / Trunk", patterns: [/rear\s*bumper/i, /\btrunk\b/i] },
+      { id: 76, label: "Roof (unibody)", patterns: [/\broof\b/i, /unibody/i] },
+      { id: 100, label: "Gear Shifter", patterns: [/gear\s*shifter/i, /\bshifter\b/i] },
+      { id: 144, label: "Headlight", patterns: [/headlights?/i] },
+      { id: 145, label: "Taillight", patterns: [/tail\s*lights?/i, /taillights?/i] },
+      { id: 191, label: "Blades", patterns: [/\bblades?\b/i, /wiper\s*blades?/i] },
+    ];
+
+    // Issue keywords (for splitting and merging)
+    const ISSUE_KEYS = [
+      "chips/scratches", "scratches", "scratch", "scuffs", "scuff", "dents", "dent", "dings", "ding",
+      "chrome peeling", "paint peeling", "peeling", "tree sap", "cracks", "crack", "scrapes", "scrape",
+      "stone chips", "chips", "chipped", "rust", "stains", "stain", "gouges", "gouge", "peel", "oxidation"
+    ].sort((a, b) => b.length - a.length);
+
+    const CLEAN_LINE_RX = [
+      /^\s*$/i,
+      /^damage\s*$/i,
+      /^\d+\s*\/\s*\d+\s*$/
+    ];
+
+    // Common typo normalization
+    const NORMALIZE = [
+      [/\bmisaligend\b/gi, 'misaligned'],
+      [/\bmisaligned\b/gi, 'misaligned'],
+      [/\bmisaliged\b/gi, 'misaligned'],
+      [/\bmisalinged\b/gi, 'misaligned'],
+      [/\bmis-?aligned\b/gi, 'misaligned'],
+      [/\bwheel\s*arc\b/gi, 'wheel arch'],
+      [/\barches\b/gi, 'arch'],
+      [/\barchs\b/gi, 'arch'],
+      [/\bmissaligned\b/gi, 'misaligned']
+    ];
+    function normalizeTypos(str) { let out = str; for (const [rx, rep] of NORMALIZE) { out = out.replace(rx, rep); } return out; }
+
+    function cleanLines(raw) {
+      const lines = raw.split(/\r?\n/)
+        .map(s => normalizeTypos(s.trim()))
+        .filter(s => !CLEAN_LINE_RX.some(rx => rx.test(s)));
+      const seen = new Set();
+      return lines.filter(s => { const key = s.toLowerCase().replace(/\s+/g, ' '); if (seen.has(key)) return false; seen.add(key); return true; });
+    }
+
+    function findLocationGroup(text) {
+      const lowText = text.toLowerCase();
+      // Route 'Hood Visor(s)' to Hood (71)
+      if (/\bhood\s*visors?\b/i.test(text)) { return { id: 71 }; }
+      // Route 'Wheel Arch' (or 'Wheel Arc') before generic 'Wheels'
+      if (/\bwheel\s*arch(?:es|s)?\b/i.test(lowText)) {
+        if (/\brear\b|\bquarter\b/.test(lowText)) { return { id: 74 }; }
+        return { id: 72 };
+      }
+
+      for (const item of LOCATION_MAP) { for (const p of item.patterns) { if (p.test(text)) return item; } }
+      return { id: 999, label: "Others", patterns: [] };
+    }
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function splitLocationIssue(phrase) {
+      const low = phrase.toLowerCase();
+
+      for (const key of ISSUE_KEYS) {
+        const rx = new RegExp('\\b' + escapeRegex(key.toLowerCase()) + '\\b');
+        const match = rx.exec(low);
+
+        if (match && match.index > 0) {
+          const idx = match.index;
+          const loc = phrase.slice(0, idx).trim().replace(/[\-–—]+\s*$/, '');
+          const issue = phrase.slice(idx).trim();
+          return { location: loc || phrase, issue: issue };
+        }
+      }
+      return { location: phrase, issue: "" };
+    }
+
+    function process(raw) {
+      const cleaned = cleanLines(raw);
+      const buckets = new Map();
+      for (const line of cleaned) {
+        const { id } = findLocationGroup(line);
+        const { location, issue } = splitLocationIssue(line);
+        if (!buckets.has(id)) buckets.set(id, { entries: new Map() });
+        const locKey = location.replace(/\s+/g, ' ').trim();
+        if (!buckets.get(id).entries.has(locKey)) buckets.get(id).entries.set(locKey, new Set());
+        if (issue) {
+          const normalizedIssue = issue.replace(/\s*\/\s*/g, '/').replace(/\s{2,}/g, ' ').trim();
+          buckets.get(id).entries.get(locKey).add(normalizedIssue);
+        } else {
+          buckets.get(id).entries.get(locKey).add("");
+        }
+      }
+      const ids = Array.from(buckets.keys()).sort((a, b) => { if (a === 999 && b !== 999) return 1; if (b === 999 && a !== 999) return -1; return a - b; });
+      const lines = [];
+
+
+      for (const id of ids) {
+        const { entries } = buckets.get(id);
+        const locInfo = new Map();
+        for (const [loc, issues] of entries) {
+          const list = Array.from(issues).filter(Boolean);
+          const merged = mergeIssues(list);
+          locInfo.set(loc, { issues: merged });
+        }
+        const used = new Set();
+        const parts = [];
+        const locs = Array.from(locInfo.keys()).sort((a, b) => a.length - b.length);
+        const DONT_GROUP_CHILD = [/^hood\s+visor$/i, /^sun\s*roof$/i, /^sun\s*shade$/i];
+        function isDontGroup(name) { return DONT_GROUP_CHILD.some(rx => rx.test(name)); }
+        for (const base of locs) {
+          if (used.has(base)) continue;
+          const children = [];
+          for (const other of locs) {
+            if (other === base || used.has(other)) continue;
+            if (isDontGroup(other)) continue;
+            if (other.toLowerCase().startsWith(base.toLowerCase() + ' ')) { children.push(other); }
+          }
+          let piece = base;
+          const segs = [];
+          const baseIssue = (locInfo.get(base).issues || '').trim();
+          if (baseIssue) segs.push(baseIssue);
+          for (const child of children) {
+            used.add(child);
+            const rest = child.slice(base.length).trim();
+            const childIssue = (locInfo.get(child).issues || '').trim();
+            segs.push((rest ? rest + (childIssue ? ' ' + childIssue : '') : childIssue).trim());
+          }
+          const mergedSeg = mergeIssues(segs.filter(Boolean));
+          piece = toTitleCase(piece + (mergedSeg ? ' ' + mergedSeg : ''));
+          parts.push(piece);
+          used.add(base);
+        }
+        for (const [loc, info] of locInfo) {
+          if (used.has(loc)) continue;
+          const issues = (info.issues || '').trim();
+          const text = toTitleCase(loc + (issues ? ' ' + issues : ''));
+          parts.push(text);
+        }
+        const seenParts = new Set();
+        const finalParts = [];
+        for (const part of parts) {
+          const key = part.toLowerCase();
+          if (seenParts.has(key)) continue;
+          seenParts.add(key);
+          finalParts.push(part);
+        }
+        if (finalParts.length) { lines.push(`${id} ${finalParts.join('; ')} (Light Imperfections)`.replace(/\s*\/\s*/g, '/').replace(/\bPpf\b/g, 'PPF')); }
+      }
+      return lines; // array of lines
+    }
+
+
+
+    function mergeIssues(issueArr) {
+      // Token-level unique merge with ISSUE_KEYS priority ordering.
+      if (!issueArr || !issueArr.length) return "";
+      const tokens = [];
+      for (const raw of issueArr) {
+        if (!raw) continue;
+        const cleaned = String(raw).replace(/\s*\/\s*/g, '/').replace(/\s{2,}/g, ' ').trim();
+        if (!cleaned) continue;
+        const parts = cleaned.split('/').map(s => s.trim()).filter(Boolean);
+        for (const p of parts) {
+          const key = p.toLowerCase();
+          if (!tokens.some(t => t.key === key)) tokens.push({ key, text: p });
+        }
+      }
+      const priority = (t) => {
+        const i = ISSUE_KEYS.findIndex(k => k.toLowerCase() === t.key);
+        return i === -1 ? 10000 : i;
+      };
+      tokens.sort((a, b) => priority(a) - priority(b));
+      return tokens.map(t => t.text).join('/');
+    }
+
+
+    function toTitleCase(str) {
+      if (!str) return str; const lower = str.toLowerCase(); const seps = new Set([' ', '/', '-']); let out = ''; let upperNext = true;
+      for (const ch of lower) { if (upperNext && ch >= 'a' && ch <= 'z') { out += ch.toUpperCase(); upperNext = false; } else { out += ch; out += ''; upperNext = seps.has(ch); } }
+      return out;
+    }
+
+    // --- Theme switcher ---
+    const bodyEl = document.body;
+    const themeSelect = document.getElementById('themeSelect');
+    const titleEl = document.querySelector('h1');
+    const subtitleEl = document.querySelector('.small');
+    const runBtn = document.getElementById('run');
+    const copyBtn = document.getElementById('copy');
+
+    const originalTitleText = titleEl.textContent;
+    const originalSubtitleHTML = subtitleEl.innerHTML;
+    const originalRunText = runBtn.textContent;
+    const originalCopyText = copyBtn.textContent;
+
+    let currentTheme = 'shadow';
+
+    function updateButtonLabelsForTheme(theme) {
+      const miniCopyButtons = document.querySelectorAll('.mini-copy');
+      if (theme === 'pierre') {
+        runBtn.textContent = 'Pierre!';
+        copyBtn.textContent = 'Pierre';
+        miniCopyButtons.forEach(btn => btn.textContent = 'Pierre');
+      } else {
+        runBtn.textContent = originalRunText;
+        copyBtn.textContent = originalCopyText;
+        miniCopyButtons.forEach(btn => btn.textContent = 'Copy');
+      }
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      bodyEl.classList.remove('theme-shadow', 'theme-daylight', 'theme-christmas', 'theme-pierre', 'theme-skyline');
+      bodyEl.classList.add('theme-' + theme);
+
+      if (theme === 'pierre') {
+        titleEl.textContent = "Pierre’s Overpowered Cheater 8888";
+        subtitleEl.textContent = "Good Morning Pierre";
+      } else {
+        titleEl.textContent = originalTitleText;
+        subtitleEl.innerHTML = originalSubtitleHTML;
+      }
+
+      updateButtonLabelsForTheme(theme);
+
+      if (themeSelect) {
+        themeSelect.value = theme;
+      }
+
+      try {
+        localStorage.setItem('dc-theme', theme);
+      } catch (e) { }
+    }
+
+    (function initTheme() {
+      let saved = 'shadow';
+      try {
+        const stored = localStorage.getItem('dc-theme');
+        if (stored) saved = stored;
+      } catch (e) { }
+      applyTheme(saved);
+      if (themeSelect) {
+        themeSelect.value = saved;
+        themeSelect.addEventListener('change', (e) => {
+          applyTheme(e.target.value);
+        });
+      }
+    })();
+
+    // --- UI ---
+    const $ = sel => document.querySelector(sel);
+    let lastLines = [];
+    function renderOutput(lines) {
+      const listEl = document.getElementById('outputList');
+      listEl.innerHTML = '';
+      lastLines = lines || [];
+      lastLines.forEach((line) => {
+        const row = document.createElement('div'); row.className = 'result-row';
+        const text = document.createElement('span'); text.className = 'line'; text.textContent = line;
+        const btn = document.createElement('button'); btn.className = 'mini-copy'; btn.textContent = currentTheme === 'pierre' ? 'Pierre' : 'Copy';
+        btn.addEventListener('click', () => {
+          // 去掉行首的数字与空格，例如 "16 "、"3   "
+          const contentOnly = line.replace(/^\d+\s+/, '');
+          navigator.clipboard.writeText(contentOnly);
+        });
+        row.appendChild(text); row.appendChild(btn); listEl.appendChild(row);
+      });
+      // 确保切换主题后新渲染的按钮也跟随 Pierre/普通 文案
+      updateButtonLabelsForTheme(currentTheme);
+    }
+
+    $('#run').addEventListener('click', () => { const lines = process($('#input').value); renderOutput(lines); });
+    $('#copy').addEventListener('click', () => { navigator.clipboard.writeText((lastLines || []).join('\n')); $('#copy').textContent = 'Copied!'; setTimeout(() => $('#copy').textContent = currentTheme === 'pierre' ? 'Pierre' : 'Copy output', 1200); });
+    $('#clear').addEventListener('click', () => { $('#input').value = ''; lastLines = []; renderOutput([]); });
+    $('#copyAll').addEventListener('click', () => { navigator.clipboard.writeText((lastLines || []).join('\n')); $('#copyAll').textContent = 'Copied!'; setTimeout(() => $('#copyAll').textContent = 'Copy all', 1200); });
+  </script>
+</body>
+
+</html>
