@@ -4,7 +4,7 @@ if (window.gsap && window.ScrollTrigger) {
 }
 
 // Simple parallax for every element with data-speed
-export function initParallax() {
+function initParallax() {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 767px)').matches;
 
