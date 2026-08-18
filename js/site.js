@@ -1,64 +1,119 @@
-// Small enhancements: mobile nav, active link highlight, progress bar, utilities
+// Homepage enhancements: navigation, section state, progress, and one-time reveals.
 (function () {
-  const $ = (s, root = document) => root.querySelector(s);
-  const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+  'use strict';
 
-  // Year
-  const yearEl = $('#year');
-  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+  const select = (selector, root = document) => root.querySelector(selector);
+  const selectAll = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  // Mobile nav
-  const btn = $('#nav-toggle');
-  const drawer = $('#nav-drawer');
-  const menu = $('#nav-menu');
-  const toggleNav = () => {
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!expanded));
-    drawer.classList.toggle('hidden');
+  const year = select('#year');
+  if (year) year.textContent = String(new Date().getFullYear());
+
+  const header = select('#site-header');
+  const progress = select('#progress');
+  const navToggle = select('#nav-toggle');
+  const navMenu = select('#nav-menu');
+  const navIcon = navToggle ? select('i', navToggle) : null;
+  const mobileBreakpoint = window.matchMedia('(max-width: 800px)');
+
+  const setMenuState = (open) => {
+    if (!navToggle || !navMenu) return;
+    navMenu.classList.toggle('is-open', open);
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    if (navIcon) {
+      navIcon.classList.toggle('fa-bars', !open);
+      navIcon.classList.toggle('fa-xmark', open);
+    }
   };
-  if (btn && drawer) {
-    btn.addEventListener('click', toggleNav);
-    // Close when clicking a link
-    $$('#nav-drawer .nav-link').forEach(a => a.addEventListener('click', () => {
-      if (btn.getAttribute('aria-expanded') === 'true') toggleNav();
-    }));
-  }
 
-  // Progress bar
-  const progress = $('#progress');
-  const setProgress = () => {
-    const top = window.scrollY || document.documentElement.scrollTop;
-    const height = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = Math.max(0, Math.min(1, height ? top / height : 0));
-    if (progress) progress.style.width = (pct * 100).toFixed(2) + '%';
-  };
-  setProgress();
-  window.addEventListener('scroll', setProgress, { passive: true });
-  window.addEventListener('resize', setProgress);
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      setMenuState(navToggle.getAttribute('aria-expanded') !== 'true');
+    });
 
-  // Active link highlight using IntersectionObserver
-  const links = $$('.nav-link');
-  const map = new Map(links.map(a => [a.dataset.section, a]));
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        const id = e.target.id;
-        map.forEach(a => a.removeAttribute('aria-current'));
-        const active = map.get(id);
-        if (active) active.setAttribute('aria-current', 'page');
+    selectAll('.nav-link', navMenu).forEach((link) => {
+      link.addEventListener('click', () => setMenuState(false));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') {
+        setMenuState(false);
+        navToggle.focus();
       }
     });
-  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 });
-  ['home', 'projects'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) observer.observe(el);
-  });
 
-  // Back to top
-  const toTop = $('#to-top');
-  if (toTop) {
-    toTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    mobileBreakpoint.addEventListener('change', (event) => {
+      if (!event.matches) setMenuState(false);
     });
+  }
+
+  let scrollFrame = 0;
+  const updateScrollUI = () => {
+    const top = window.scrollY || document.documentElement.scrollTop;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+
+    if (header) header.classList.toggle('is-scrolled', top > 12);
+    if (progress) {
+      const ratio = scrollable > 0 ? Math.min(1, Math.max(0, top / scrollable)) : 0;
+      progress.style.width = `${(ratio * 100).toFixed(2)}%`;
+    }
+    scrollFrame = 0;
+  };
+
+  const requestScrollUpdate = () => {
+    if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateScrollUI);
+  };
+
+  updateScrollUI();
+  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
+  window.addEventListener('resize', requestScrollUpdate);
+
+  const navLinks = selectAll('.nav-link[data-section]');
+  const sections = selectAll('main section[id]').filter((section) =>
+    navLinks.some((link) => link.dataset.section === section.id)
+  );
+
+  const setActiveSection = (id) => {
+    navLinks.forEach((link) => {
+      if (link.dataset.section === id) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  };
+
+  setActiveSection('home');
+
+  const updateActiveSection = () => {
+    const activationLine = (header ? header.offsetHeight : 0) + window.innerHeight * 0.28;
+    let activeId = sections[0] ? sections[0].id : 'home';
+    sections.forEach((section) => {
+      if (section.getBoundingClientRect().top <= activationLine) activeId = section.id;
+    });
+    setActiveSection(activeId);
+  };
+
+  updateActiveSection();
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  window.addEventListener('resize', updateActiveSection);
+
+  const revealItems = selectAll('.metric-item, .timeline-item, .project-card, .skill-group');
+  if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+    revealItems.forEach((item) => item.classList.add('is-visible'));
+  } else {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, {
+      rootMargin: '0px 0px -8% 0px',
+      threshold: 0.05
+    });
+
+    revealItems.forEach((item) => revealObserver.observe(item));
   }
 })();

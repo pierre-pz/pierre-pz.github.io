@@ -1,280 +1,418 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport" />
-  <title>Pierre Zhang – Portfolio</title>
+  <title>Pierre Zhang | Data, BI &amp; Automation</title>
   <meta
-    content="Portfolio of Pierre Zhang — Data Analyst. Selected projects in Power BI, sustainability, and data analysis."
+    content="Pierre Zhang builds data tools, Power BI dashboards and automation that turn operational data into measurable impact."
     name="description" />
-  <meta content="Pierre Zhang – Portfolio" property="og:title" />
-  <meta content="Selected projects in data analysis and dashboards." property="og:description" />
+  <meta content="Pierre Zhang | Data, BI &amp; Automation" property="og:title" />
+  <meta content="Data tools, business intelligence dashboards and automation built for measurable operational impact."
+    property="og:description" />
   <meta content="website" property="og:type" />
-  <meta content="#1C1C1C" name="theme-color" />
+  <meta content="#0F1117" name="theme-color" />
   <meta content="dark" name="color-scheme" />
   <link href="https://pierre-pz.github.io/" rel="canonical" />
-  <!-- Performance hints -->
   <link crossorigin="" href="https://rsms.me" rel="preconnect" />
-  <link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect" />
   <link crossorigin="" href="https://cdnjs.cloudflare.com" rel="preconnect" />
-  <!-- Fonts & CSS -->
   <link href="https://rsms.me/inter/inter.css" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            carbon: '#1C1C1C',
-            accent: '#ffd100',
-          }
-        }
-      }
-    }
-  </script>
   <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     rel="stylesheet" />
-  <!-- Reduced motion + utilities -->
-  <style>
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
-      }
-
-      .motion-safe\:hover\:scale-105:hover {
-        transform: none !important;
-      }
-    }
-
-    html {
-      scroll-padding-top: 4rem;
-    }
-
-    /* offset for sticky nav */
-    /* Prevent image layout shift */
-    .cover-figure {
-      position: relative;
-    }
-
-    .cover-figure::before {
-      content: "";
-      display: block;
-      padding-top: 56.25%;
-    }
-
-    /* 16:9 aspect */
-    .cover-figure>img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Page-level hazy yellow background — single layer to avoid seams */
-    .page-haze {
-      position: relative;
-      background-color: #1C1C1C;
-      /* Three wide radial gradients placed at the top area; they fade to transparent so no hard edge */
-      background-image:
-        radial-gradient(900px 520px at 50% 140px, rgba(255, 209, 0, 0.02), rgba(255, 209, 0, 0.0) 70%),
-        radial-gradient(720px 380px at 12% 560px, rgba(255, 209, 0, 0.05), rgba(255, 209, 0, 0.0) 70%),
-        radial-gradient(720px 380px at 88% 560px, rgba(255, 209, 0, 0.05), rgba(255, 209, 0, 0.0) 70%),
-        radial-gradient(720px 380px at 50% 1120px, rgba(255, 209, 0, 0.04), rgba(255, 209, 0, 0.0) 70%);
-      background-repeat: no-repeat;
-    }
-
-    @media (max-width: 767px) {
-      .page-haze {
-        background-image:
-          radial-gradient(600px 380px at 50% 120px, rgba(255, 209, 0, 0.16), rgba(255, 209, 0, 0.0) 70%),
-          radial-gradient(520px 300px at 20% 540px, rgba(255, 209, 0, 0.10), rgba(255, 209, 0, 0.0) 70%),
-          radial-gradient(520px 300px at 80% 540px, rgba(255, 209, 0, 0.10), rgba(255, 209, 0, 0.0) 70%),
-          radial-gradient(940px 300px at 80% 540px, rgba(255, 209, 0, 0.10), rgba(255, 209, 0, 0.0) 70%);
-      }
-    }
-  </style>
-  <!-- Vendor JS (deferred so DOM is parsed first) -->
-  <script defer="" src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <!-- App bundles (must come AFTER vendor libs) -->
-  <script defer="" src="js/parallax.js"></script>
-  <script defer="" src="js/site.js"></script>
-
-  <!-- JSON-LD (Person) -->
+  <link href="css/site.css?v=3" rel="stylesheet" />
+  <script defer src="js/site.js?v=3"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "Pierre Zhang",
-    "jobTitle": "Data Analyst",
+    "jobTitle": "Data and Business Intelligence Professional",
     "url": "https://pierre-pz.github.io/",
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "University of Toronto"
+    },
     "sameAs": [
       "https://github.com/pierre-pz",
-      "https://www.linkedin.com/in/pierre-zhang-06423b268/"
+      "https://www.linkedin.com/in/pierre-z/"
     ]
   }
   </script>
 </head>
 
-<body class="bg-carbon text-white selection:bg-accent/50 font-inter antialiased page-haze">
-  <!-- Scroll progress -->
-  <div class="fixed inset-x-0 top-0 z-[60] h-1 w-0 bg-accent" id="progress"></div>
-  <!-- Skip link for keyboard users -->
-  <a class="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-2 focus:left-2 focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-carbon"
-    href="#main">Skip to content</a>
-  <!-- ========= NAVIGATION ========= -->
-  <header class="sticky top-0 z-50 bg-carbon/80 backdrop-blur supports-backdrop-blur:bg-carbon/60">
-    <nav aria-label="Primary" class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-      <a class="text-sm font-black tracking-widest text-accent" href="#home">Pierre's Website</a>
-      <button aria-controls="nav-menu" aria-expanded="false" aria-label="Toggle navigation"
-        class="md:hidden rounded px-3 py-2 text-accent ring-accent focus:outline-none focus:ring-2" id="nav-toggle">
-        <i class="fa-solid fa-bars"></i>
+<body>
+  <div aria-hidden="true" class="scroll-progress" id="progress"></div>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="site-header">
+    <nav aria-label="Primary" class="site-container nav-inner">
+      <a class="brand" href="#home" aria-label="Pierre Zhang, home">
+        <span class="brand-mark" aria-hidden="true">PZ</span>
+        <span class="brand-name">Pierre Zhang</span>
+      </a>
+      <button aria-controls="nav-menu" aria-expanded="false" aria-label="Open navigation" class="nav-toggle"
+        id="nav-toggle" type="button">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
       </button>
-      <ul class="hidden items-center gap-8 text-xs font-semibold tracking-widest uppercase text-accent md:flex"
-        id="nav-menu">
-        <li><a
-            class="nav-link relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            data-section="home" href="#home">Home</a></li>
-        <li><a
-            class="nav-link relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            data-section="projects" href="#projects">Projects</a></li>
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="dep/Resume_of_Pierre.pdf" rel="noopener noreferrer" target="_blank">Résumé</a></li>
+      <ul class="nav-menu" id="nav-menu">
+        <li><a class="nav-link" data-section="home" href="#home">HOME</a></li>
+        <li><a class="nav-link" data-section="experience" href="#experience">EXPERIENCE</a></li>
+        <li><a class="nav-link" data-section="projects" href="#projects">PROJECTS</a></li>
+        <li><a class="nav-link" data-section="about" href="#about">ABOUT</a></li>
+        <li><a class="nav-link" data-section="contact" href="#contact">CONTACT</a></li>
       </ul>
     </nav>
-    <!-- mobile menu -->
-    <div class="hidden border-t border-white/5 bg-carbon md:hidden" id="nav-drawer">
-      <ul class="mx-auto grid max-w-6xl gap-2 px-4 py-3 text-sm font-medium tracking-wider text-accent">
-        <li><a
-            class="nav-link block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            data-section="home" href="#home">Home</a></li>
-        <li><a
-            class="nav-link block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            data-section="projects" href="#projects">Projects</a></li>
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="dep/Resume_of_Pierre.pdf" rel="noopener noreferrer" target="_blank">Résumé</a></li>
-      </ul>
-    </div>
   </header>
+
   <main id="main">
-    <!-- ========= HERO ========= -->
-    <section class="relative flex min-h-screen flex-col items-center justify-center pt-14" data-speed="0.1" id="home">
-      <!-- decorative background -->
-
-      <h1 class="relative text-center text-4xl font-extrabold tracking-widest sm:text-7xl md:text-8xl">
-        <span class="text-accent drop-shadow-[0_0_24px_#ffd100]">PIERRE ZHANG</span>
-      </h1>
-      <p
-        class="relative mt-6 max-w-2xl text-center text-base sm:text-lg md:text-xl font-light tracking-wide text-zinc-300">
-        Data Analyst · Honours Bachelor of Science — University of Toronto
-      </p>
-      <div class="relative mt-8 flex gap-6 text-2xl">
-        <a aria-label="GitHub" class="transition hover:text-accent" href="https://github.com/pierre-pz"><i
-            class="fa-brands fa-github"></i></a>
-        <a aria-label="LinkedIn" class="transition hover:text-accent"
-          href="https://www.linkedin.com/in/pierre-zhang-06423b268/"><i class="fa-brands fa-linkedin"></i></a>
-        <a aria-label="Email" class="transition hover:text-accent" href="mailto:pierre4spirit@gmail.com"><i
-            class="fa-solid fa-envelope"></i></a>
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="site-container hero-grid">
+        <div class="hero-content">
+          <p class="eyebrow">Data · BI · Automation</p>
+          <h1 id="hero-title">Hi, I'm <span>Pierre.</span></h1>
+          <p class="hero-copy">I build data tools, dashboards and automation that turn complex operational data into
+            actionable insights and measurable impact.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#projects">Explore Projects <i class="fa-solid fa-arrow-down"
+                aria-hidden="true"></i></a>
+            <a class="button button-secondary" href="dep/Resume_of_Pierre.pdf" rel="noopener noreferrer"
+              target="_blank">Résumé <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+          </div>
+          <div class="hero-meta">
+            <div class="social-links" aria-label="Social links">
+              <a aria-label="Pierre Zhang on GitHub" class="social-link" href="https://github.com/pierre-pz"
+                rel="noopener noreferrer" target="_blank"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+              <a aria-label="Pierre Zhang on LinkedIn" class="social-link" href="https://www.linkedin.com/in/pierre-z/"
+                rel="noopener noreferrer" target="_blank"><i class="fa-brands fa-linkedin-in"
+                  aria-hidden="true"></i></a>
+              <a aria-label="Email Pierre Zhang" class="social-link" href="mailto:pierre4spirit@gmail.com"><i
+                  class="fa-solid fa-envelope" aria-hidden="true"></i></a>
+            </div>
+            <span class="location">Toronto, Ontario</span>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="visual-frame">
+            <span class="visual-label label-one">Operational data</span>
+            <div class="globe">
+              <span class="globe-line latitude-one"></span>
+              <span class="globe-line latitude-two"></span>
+              <span class="globe-line longitude-one"></span>
+              <span class="globe-line longitude-two"></span>
+              <span class="globe-node node-one"></span>
+              <span class="globe-node node-two"></span>
+              <span class="globe-node node-three"></span>
+              <span class="globe-node node-four"></span>
+              <span class="globe-node node-five"></span>
+            </div>
+            <span class="visual-label label-two">Actionable insight</span>
+          </div>
+        </div>
       </div>
-      <a class="relative mt-12 rounded-3xl bg-accent px-8 py-4 text-base sm:text-lg font-semibold text-carbon shadow-lg transition motion-safe:hover:scale-105 hover:bg-[#ffdf32] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/40"
-        href="dep/Resume_of_Pierre.pdf" rel="noopener noreferrer" target="_blank">View Résumé</a>
     </section>
-    <!-- ========= PROJECTS ========= -->
-    <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24" data-speed="0.3" id="projects">
-      <h2 class="mb-12 text-center text-3xl sm:text-4xl font-bold tracking-wider">Featured Projects</h2>
-      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-        <a aria-label="Open NYC Taxi 2025Q1 Power BI dashboard" class="block"
-          href="https://app.powerbi.com/view?r=eyJrIjoiOTFhNzAxMGMtMDE3Ny00ODViLTkwNzUtMWFjMjI0MzBmOTA1IiwidCI6IjZmMGJiNzJmLTUzNzctNGRkZi05MzZhLWI2YzcyYmYyMWFlMiIsImMiOjF9"
-          rel="noopener noreferrer" target="_blank">
-          <article
-            class="group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-lg transition-transform duration-500 [transform-style:preserve-3d] perspective-1000 motion-safe:hover:[transform:rotateY(6deg)_rotateX(3deg)]">
-            <figure class="cover-figure">
-              <img alt="NYC Taxi 2025Q1 — interactive Power BI dashboard cover" decoding="async" loading="lazy"
-                src="dep/images/taxi img.png" />
-            </figure>
-            <div class="p-6">
-              <h3 class="mb-2 text-lg sm:text-xl font-semibold">NYC Taxi 2025Q1 Dashboard [Still Optimizing]</h3>
-              <p class="text-zinc-400">Power BI Dashboard</p>
-            </div>
-          </article>
-        </a>
 
+    <section aria-labelledby="impact-title" class="metrics-section">
+      <div class="site-container">
+        <h2 class="visually-hidden" id="impact-title">Selected impact metrics</h2>
+        <div class="metrics-grid">
+          <article class="metric-item">
+            <strong class="metric-value">+20.5%</strong>
+            <span class="metric-label">Fraud Recall Improvement</span>
+          </article>
+          <article class="metric-item">
+            <strong class="metric-value">10+</strong>
+            <span class="metric-label">Hours / Week Automated</span>
+          </article>
+          <article class="metric-item">
+            <strong class="metric-value">1.2M+</strong>
+            <span class="metric-label">Records Analyzed</span>
+          </article>
+          <article class="metric-item">
+            <strong class="metric-value">5+</strong>
+            <span class="metric-label">Dashboards Built</span>
+          </article>
+        </div>
+      </div>
+    </section>
 
-        <a aria-label="Open the 2025 Canadian employment-income estimate" class="block" href="income-tax.html">
+    <section class="section" id="experience" aria-labelledby="experience-title">
+      <div class="site-container">
+        <div class="section-heading">
+          <p class="section-kicker">Experience</p>
+          <h2 id="experience-title">Turning operational work into better systems.</h2>
+          <p>A concise view of the roles most relevant to analytics, reporting and automation.</p>
+        </div>
 
-          <article
-            class="group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-lg transition-transform duration-500 [transform-style:preserve-3d] perspective-1000 motion-safe:hover:[transform:rotateY(6deg)_rotateX(3deg)]">
-            <figure class="cover-figure">
-              <img alt="2025 Canadian employment-income and disposable-cash estimate" decoding="async" loading="lazy"
-                src="dep/images/income-tax.png" onerror="this.remove();">
-            </figure>
-            <div class="p-6">
-              <h3 class="mb-2 text-lg sm:text-xl font-semibold">Canada Income & Tax Planner (2025)</h3>
-              <p class="text-zinc-400">Simplified 2025 employee income and disposable-cash estimate</p>
+        <div class="timeline">
+          <article class="timeline-item">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <div class="timeline-meta">
+              <p class="timeline-date">MAR 2026 — PRESENT</p>
+              <p class="timeline-location">Milton, Ontario</p>
+            </div>
+            <div class="timeline-content">
+              <p class="timeline-company">Ontario Government</p>
+              <h3>Program Admin Support Clerk</h3>
+              <ul>
+                <li>Supports program administration in a full-time contract role with the Ontario Public Service.</li>
+              </ul>
             </div>
           </article>
-        </a>
 
-        <a aria-label="Open Campus Fridge Network project poster as PDF" class="block" href="dep/proj1.pdf"
-          rel="noopener noreferrer" target="_blank">
-          <article
-            class="group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-lg transition-transform duration-500 [transform-style:preserve-3d] perspective-1000 motion-safe:hover:[transform:rotateY(6deg)_rotateX(3deg)]">
-            <figure class="cover-figure">
-              <img alt="Campus Fridge Network — project poster" decoding="async" loading="lazy"
-                src="dep/images/project1.png" />
-            </figure>
-            <div class="p-6">
-              <h3 class="mb-2 text-lg sm:text-xl font-semibold">Campus Fridge Network</h3>
-              <p class="text-zinc-400">Sustainability Project</p>
+          <article class="timeline-item">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <div class="timeline-meta">
+              <p class="timeline-date">JUL 2025 — MAR 2026</p>
+              <p class="timeline-location">Mississauga, Ontario</p>
+            </div>
+            <div class="timeline-content">
+              <p class="timeline-company">Clutch</p>
+              <h3>Quality Control Associate</h3>
+              <ul>
+                <li>Built a JavaScript QC reporting tool that reduced report generation from 15 minutes to 3 minutes.</li>
+                <li>Worked with cross-functional teams on real-time SQL dashboards and operational reporting.</li>
+                <li>Published monthly analytical summaries using Excel PivotTables and maintained reproducible
+                  documentation.</li>
+              </ul>
             </div>
           </article>
-        </a>
-        <a aria-label="Open Sustainability Support for Residences project poster as PDF" class="block"
-          href="dep/proj2.pdf" rel="noopener noreferrer" target="_blank">
-          <article
-            class="group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-lg transition-transform duration-500 [transform-style:preserve-3d] perspective-1000 motion-safe:hover:[transform:rotateY(6deg)_rotateX(3deg)]">
-            <figure class="cover-figure">
-              <img alt="Sustainability Support for Residences — project poster" decoding="async" loading="lazy"
-                src="dep/images/project2.png" />
-            </figure>
-            <div class="p-6">
-              <h3 class="mb-2 text-lg sm:text-xl font-semibold">Sustainability Support for Residences</h3>
-              <p class="text-zinc-400">Sustainability Project</p>
+
+          <article class="timeline-item">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <div class="timeline-meta">
+              <p class="timeline-date">SEP — DEC 2024</p>
+              <p class="timeline-location">Jinan, Shandong, China</p>
+            </div>
+            <div class="timeline-content">
+              <p class="timeline-company">Shandong Eagle Software Technology</p>
+              <h3>Power BI Intern</h3>
+              <ul>
+                <li>Developed three Power BI and DAX dashboards that shortened financial analysis cycles by 20%.</li>
+                <li>Automated daily ledger reconciliation with Python ETL scripts, reducing manual processing time by
+                  30%.</li>
+                <li>Implemented row-level security and delivered weekly analysis for operational teams.</li>
+              </ul>
             </div>
           </article>
-        </a>
-        <a aria-label="Open Heart Attack Model Analysis Report PDF" class="block" href="dep/proj3.pdf"
-          rel="noopener noreferrer" target="_blank">
-          <article
-            class="group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-lg transition-transform duration-500 [transform-style:preserve-3d] perspective-1000 motion-safe:hover:[transform:rotateY(6deg)_rotateX(3deg)]">
-            <figure class="cover-figure">
-              <img alt="Heart Attack Model Analysis Report — data analysis poster" decoding="async" loading="lazy"
-                src="dep/images/project3.png" />
-            </figure>
-            <div class="p-6">
-              <h3 class="mb-2 text-lg sm:text-xl font-semibold">Heart Attack Model Analysis Report</h3>
-              <p class="text-zinc-400">Data Analysis Project</p>
+
+          <article class="timeline-item">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <div class="timeline-meta">
+              <p class="timeline-date">MAY — AUG 2024</p>
+              <p class="timeline-location">Jinan, Shandong, China</p>
+            </div>
+            <div class="timeline-content">
+              <p class="timeline-company">Weihai City Commercial Bank</p>
+              <h3>Data Analyst Intern</h3>
+              <ul>
+                <li>Queried and analyzed more than 10,000 daily transactions in MySQL, improving fraud-detection recall
+                  by 20.5%.</li>
+                <li>Built three interactive Power BI heat-map dashboards for risk profiling.</li>
+                <li>Cleaned and normalized a 1.2M-record database, reducing missing values to approximately 1%.</li>
+              </ul>
             </div>
           </article>
-        </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-surface" id="projects" aria-labelledby="projects-title">
+      <div class="site-container">
+        <div class="section-heading section-heading-row">
+          <div>
+            <p class="section-kicker">Featured Projects</p>
+            <h2 id="projects-title">Analysis designed to be used.</h2>
+          </div>
+          <p>Three projects that demonstrate dashboarding, calculation systems and statistical modeling.</p>
+        </div>
+
+        <div class="projects-grid">
+          <a aria-label="Open the NYC Taxi Power BI Dashboard" class="project-card"
+            href="https://app.powerbi.com/view?r=eyJrIjoiOTFhNzAxMGMtMDE3Ny00ODViLTkwNzUtMWFjMjI0MzBmOTA1IiwidCI6IjZmMGJiNzJmLTUzNzctNGRkZi05MzZhLWI2YzcyYmYyMWFlMiIsImMiOjF9"
+            rel="noopener noreferrer" target="_blank">
+            <article>
+              <div class="project-image">
+                <img alt="Yellow taxi representing the NYC Taxi Power BI dashboard" decoding="async" loading="lazy"
+                  src="dep/images/taxi img.png" />
+                <span class="project-number">01</span>
+              </div>
+              <div class="project-body">
+                <div class="project-title-row">
+                  <h3>NYC Taxi Power BI Dashboard</h3>
+                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                </div>
+                <p>Exploratory analysis and an interactive KPI suite built on 8.5M TLC trip records, using Power Query
+                  and a star-schema model to surface demand, revenue, distance, duration and tip patterns.</p>
+                <ul class="tag-list" aria-label="Technologies">
+                  <li>Power BI</li>
+                  <li>Power Query</li>
+                  <li>DAX</li>
+                  <li>Data Modeling</li>
+                </ul>
+              </div>
+            </article>
+          </a>
+
+          <a aria-label="Open the Canada Income and Tax Planner for 2025" class="project-card"
+            href="income-tax.html">
+            <article>
+              <div class="project-image project-image-tax">
+                <img alt="Canada Income and Tax Planner illustration" decoding="async" loading="lazy"
+                  src="dep/images/income-tax.png" />
+                <span class="project-number">02</span>
+              </div>
+              <div class="project-body">
+                <div class="project-title-row">
+                  <h3>Canada Income &amp; Tax Planner (2025)</h3>
+                  <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </div>
+                <p>A responsive employee-income and cash-flow estimator for all 13 provinces and territories, with
+                  CPP/QPP, EI/QPIP and RRSP treatment in a pure calculation engine backed by 26 automated tests.</p>
+                <ul class="tag-list" aria-label="Technologies">
+                  <li>JavaScript</li>
+                  <li>Automated Tests</li>
+                  <li>Multilingual UI</li>
+                  <li>Accessibility</li>
+                </ul>
+              </div>
+            </article>
+          </a>
+
+          <a aria-label="Open the Heart Attack Analysis report PDF" class="project-card" href="dep/proj3.pdf"
+            rel="noopener noreferrer" target="_blank">
+            <article>
+              <div class="project-image project-image-heart">
+                <img alt="Heart attack analysis data preprocessing workflow" decoding="async" loading="lazy"
+                  src="dep/images/project3.png" />
+                <span class="project-number">03</span>
+              </div>
+              <div class="project-body">
+                <div class="project-title-row">
+                  <h3>Heart Attack Analysis</h3>
+                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                </div>
+                <p>Statistical analysis of clinical data covering preprocessing, a reproducible train/test split,
+                  feature selection and regression modeling with AIC/BIC, diagnostics and held-out evaluation.</p>
+                <ul class="tag-list" aria-label="Technologies">
+                  <li>R</li>
+                  <li>Statistical Modeling</li>
+                  <li>Preprocessing</li>
+                  <li>Evaluation</li>
+                </ul>
+              </div>
+            </article>
+          </a>
+        </div>
+
+        <div class="other-work">
+          <p class="other-work-label">Other Work</p>
+          <div class="other-work-links">
+            <a href="dep/proj1.pdf" rel="noopener noreferrer" target="_blank">
+              <span>Campus Fridge Network</span>
+              <small>Research · Clustering · Sustainability</small>
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            </a>
+            <a href="dep/proj2.pdf" rel="noopener noreferrer" target="_blank">
+              <span>Sustainability Support for Residences</span>
+              <small>Research · Operational Improvement</small>
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="skills" aria-labelledby="skills-title">
+      <div class="site-container">
+        <div class="section-heading section-heading-row">
+          <div>
+            <p class="section-kicker">Skills &amp; Tools</p>
+            <h2 id="skills-title">A practical analytics toolkit.</h2>
+          </div>
+          <p>Focused on the tools that move work from raw data to a clear, reusable decision system.</p>
+        </div>
+        <div class="skills-grid">
+          <article class="skill-group">
+            <span class="skill-icon" aria-hidden="true"><i class="fa-solid fa-chart-column"></i></span>
+            <h3>Analytics</h3>
+            <ul>
+              <li>Python</li>
+              <li>R</li>
+              <li>Statistics</li>
+            </ul>
+          </article>
+          <article class="skill-group">
+            <span class="skill-icon" aria-hidden="true"><i class="fa-solid fa-database"></i></span>
+            <h3>Data &amp; Engineering</h3>
+            <ul>
+              <li>SQL</li>
+              <li>ETL</li>
+              <li>Data Modeling</li>
+              <li>Git</li>
+            </ul>
+          </article>
+          <article class="skill-group">
+            <span class="skill-icon" aria-hidden="true"><i class="fa-solid fa-gears"></i></span>
+            <h3>BI &amp; Automation</h3>
+            <ul>
+              <li>Power BI</li>
+              <li>Excel</li>
+              <li>Power Query</li>
+              <li>JavaScript</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section about-section" id="about" aria-labelledby="about-title">
+      <div class="site-container about-grid">
+        <div>
+          <p class="section-kicker">About Me</p>
+          <h2 id="about-title">Analytical training, applied to real operations.</h2>
+        </div>
+        <div class="about-copy">
+          <p>I'm a University of Toronto graduate with an Honours Bachelor of Science in Mathematics and Statistics.
+            That foundation shapes how I approach data quality, measurement and modeling.</p>
+          <p>Based in the Toronto area, I'm most interested in the point where data, systems and automation improve
+            day-to-day operations — making reporting faster, decisions clearer and tools easier to trust.</p>
+          <div class="education-note">
+            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+            <span><strong>University of Toronto</strong> · H.BSc, Mathematics &amp; Statistics · 2025</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="site-container">
+        <div class="contact-card">
+          <div>
+            <p class="section-kicker">Contact</p>
+            <h2 id="contact-title">Let's build data solutions that make an impact.</h2>
+            <p>Have a data, BI or automation opportunity in mind? I'd be glad to hear about it.</p>
+          </div>
+          <div class="contact-actions">
+            <a class="button button-primary" href="mailto:pierre4spirit@gmail.com">Email Pierre <i
+                class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            <div class="contact-links">
+              <a href="https://www.linkedin.com/in/pierre-z/" rel="noopener noreferrer" target="_blank">LinkedIn <i
+                  class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+              <a href="https://github.com/pierre-pz" rel="noopener noreferrer" target="_blank">GitHub <i
+                  class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
-  <!-- ========= FOOTER ========= -->
-  <footer class="border-t border-white/5 bg-carbon/95 px-6 py-10 text-center text-sm text-zinc-400">
-    <div class="mx-auto max-w-6xl">
-      <p class="mb-2">© <span id="year"></span> Pierre Zhang. All rights reserved.</p>
-      <p class="text-zinc-500">Built with Tailwind &amp; GSAP. Optimized for accessibility and performance.</p>
-      <button
-        class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white/90 backdrop-blur transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        id="to-top">
-        <i class="fa-solid fa-arrow-up"></i> Back to top
-      </button>
+
+  <footer class="site-footer">
+    <div class="site-container footer-inner">
+      <p>© <span id="year"></span> Pierre Zhang</p>
+      <p>Data · BI · Automation</p>
+      <a href="#home">Back to top <i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
     </div>
   </footer>
 </body>
