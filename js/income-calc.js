@@ -1,1276 +1,704 @@
-/* js/income-calc.js
-   Canada Income & Tax Planner (2025)
-   - real-time income/tax/expenses calculation
-   - :Chart.js  + /
-*/
-(() => {
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-  const fmt = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 });
-  const fmt2 = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 2 });
+(function () {
+  'use strict';
 
-  // ===== I18N (en, fr, zh-CN, hi) =====
-  let __lang = (localStorage.getItem('lang') || document.documentElement.lang || 'en');
-  const I18N = {
-    "fr": {
-      "Canada Income & Tax Planner": "Planificateur de revenu et d’impôt (Canada)",
-      "Based on 2025 tax rates · Real-time calculation · Covers all 13 provinces/territories": "Basé sur les taux 2025 · Calcul en temps réel · 13 provinces/territoires",
-      "🧩 Module 1: Income (incl. benefits)": "🧩 Module 1 : Revenu (avantages inclus)",
-      "Pay input method": "Mode de saisie du salaire",
-      "Hourly": "Horaire",
-      "Annual": "Annuel",
-      "Hourly($/h)": "Taux horaire ($/h)",
-      "Hours per week": "Heures/semaine",
-      "Weeks per year": "Semaines/an",
-      "annual($)": "Salaire annuel ($)",
-      "Hint: Entering a positive value here will switch to Annual mode automatically.": "Astuce : entrer une valeur positive ici basculera en mode « Annuel ».",
-      "Paid vacation (weeks)": "Congés payés (sem.)",
-      "Vacation Pay(%)": "Indemnité de congés (%)",
-      "None": "Aucun",
-      "2 weeks": "2 semaines",
-      "3 weeks": "3 semaines",
-      "4 weeks": "4 semaines",
-      "Custom": "Personnalisé",
-      "Work weeks are actual working weeks; paid vacation is added on top. A warning appears if total weeks exceed 52.": "Les semaines de travail sont réelles ; les congés payés s’ajoutent. Un avertissement apparaît si le total dépasse 52.",
-      "Vacation pay is taxable (per CRA).": "L’indemnité de congés est imposable (CRA).",
-      "Bonus": "Prime",
-      "Allowance": "Allocation",
-      "Commission": "Commission",
-      "RRSP Contribution": "Cotisation RRSP",
-      "Stock (taxable)": "Actions (impos.)",
-      "Other (taxable)": "Autres (impos.)",
-      "RRSP input mode": "Mode de saisie RRSP",
-      "Amount ($)": "Montant ($)",
-      "Percentage (%)": "Pourcentage (%)",
-      "RRSP contribution (annual) $": "Cotisation RRSP (annuelle) $",
-      "RRSP contribution (% of pay)": "Cotisation RRSP (% du salaire)",
-      "Stock (taxable, annual) $": "Actions (impos., annuel) $",
-      "Other (taxable, annual) $": "Autres (impos., annuel) $",
-      "RRSP is a deduction (not part of gross pay) and reduces taxable income (auto-checked against 2025 limits). Stock/Other are treated as taxable income (dividend/capital gains rules not detailed here).": "Le RRSP est une déduction (hors brut) qui réduit le revenu imposable (contrôlé vs limites 2025). Actions/Autres sont imposables (sans détail dividendes/CG).",
-      "I'm self-employed": "Je suis travailleur autonome",
-      "Self-employed pay both the employee and employer shares (CPP/QPP doubled); EI not applicable by default.": "Les autonomes paient les parts employé et employeur (CPP/QPP doublé) ; EI non applicable par défaut.",
-      "+ Add a second job": "+ Ajouter un second emploi",
-      "Optional: for part-time/extra income": "Optionnel : temps partiel/appoint",
-      "Second Job": "Second emploi",
-      "Remove second job": "Supprimer le second emploi",
-      "Total annual income (incl. benefits)": "Revenu annuel total (avantages inclus)",
-      "Monthly gross": "Brut mensuel",
-      "Weekly gross": "Brut hebdo",
-      "⚠️ 'Work weeks + paid vacation weeks' exceed 52. Please check inputs to avoid double-counting.": "⚠️ « Semaines de travail + congés payés » > 52. Vérifiez pour éviter le double comptage.",
-      "🧩 Module 2: Taxes (2025 latest rates)": "🧩 Module 2 : Impôts (taux 2025)",
-      "Province/Territory": "Province/Territoire",
-      "Federal tax": "Impôt fédéral",
-      "Provincial/Territorial tax": "Impôt provincial/territorial",
-      "CPP / QPP": "CPP / QPP",
-      "EI": "EI",
-      "Total tax": "Impôts totaux",
-      "After-tax income (annual)": "Revenu après impôt (annuel)",
-      "Average tax rate": "Taux d’imposition moyen",
-      "Includes Ontario surtax and Quebec federal tax abatement (16.5%); CPP/QPP and EI computed separately (2025 rules); credits are not included.": "Inclut la surtaxe de l’Ontario et l’abattement fédéral du Québec (16,5 %) ; CPP/QPP et EI calculés séparément (règles 2025) ; crédits exclus.",
-      "By tax bands: green = take-home for that segment; red = taxes for that segment": "Par tranches : vert = net pour la tranche ; rouge = impôt de la tranche",
-      "🧩 Module 3: Expenses & leftover analysis": "🧩 Module 3 : Dépenses & reste",
-      "Mortgage/Rent (monthly)": "Hypothèque/Loyer (mens.)",
-      "Auto Insurance (monthly)": "Assurance auto (mens.)",
-      "Commuting (monthly)": "Déplacements (mens.)",
-      "Internet/Phone (monthly)": "Internet/Téléphone (mens.)",
-      "Groceries (monthly)": "Épicerie (mens.)",
-      "Insurance/Loans (monthly)": "Assurances/Prêts (mens.)",
-      "+ Add custom expense": "+ Ajouter une dépense",
-      "How to use": "Mode d’emploi",
-      "Use this area for discretionary or uncommon expenses (e.g., premium car leases, pet care, lessons, hobbies). Name it and enter a monthly amount. You can add multiple custom rows and remove them anytime.": "Pour des dépenses discrétionnaires/inhabituelles (ex. location auto premium, animaux, cours, loisirs). Donnez un nom et un montant mensuel. Plusieurs lignes possibles, supprimables.",
-      "Monthly after-tax income": "Revenu net mensuel",
-      "Monthly expenses": "Dépenses mensuelles",
-      "Monthly leftover": "Reste mensuel",
-      "Weekly leftover": "Reste hebdo",
-      "Leftover": "Reste",
-      "Leftover Share": "Part du reste",
-      "Expenses": "Dépenses",
-      "Take-home (segment)": "Net (tranche)",
-      "Tax (segment)": "Impôt (tranche)",
-      "After-tax": "Après impôt",
-      "After-tax Income": "Revenu après impôt"
+  const engine = globalThis.CanadaTax2025;
+  if (!engine) throw new Error('The 2025 tax engine did not load.');
+
+  const $ = function (selector) { return document.querySelector(selector); };
+  const $$ = function (selector) { return Array.from(document.querySelectorAll(selector)); };
+  const byId = function (id) { return document.getElementById(id); };
+  const numberValue = function (id) {
+    const input = byId(id);
+    const number = Number(input && input.value);
+    return Number.isFinite(number) && number > 0 ? number : 0;
+  };
+  const selected = function (name) {
+    const radio = document.querySelector('input[name="' + name + '"]:checked');
+    return radio ? radio.value : 'hourly';
+  };
+  const currency = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const TRANSLATIONS = {
+    fr: {
+      title: "Estimation canadienne 2025 du revenu d'emploi annuel et des liquidités disponibles",
+      subtitle: 'Règles annuelles 2025 finalisées · Situations simples de salariés · Toutes les provinces et tous les territoires',
+      disclaimerTitle: 'Portée et limites importantes',
+      disclaimer: "Il s'agit d'une estimation annuelle simplifiée pour 2025 visant un salarié célibataire de 19 à 64 ans, et non d'une déclaration de revenus, d'un calcul des retenues à la source ni de conseils fiscaux, juridiques, de paie ou financiers. L'impôt réel dépend des déductions, crédits, prestations, de la résidence, de la fréquence de paie, de la situation personnelle et de la cotisation de l'ARC ou de Revenu Québec. Confirmez vos droits REER dans votre dernier avis de cotisation ou votre compte de l'ARC. Les dividendes, gains en capital et revenus de travail autonome ne sont pas modélisés.",
+      methodology: 'Méthode, hypothèses et sources officielles',
+      vacationHelp: "Pour un salaire horaire, les semaines travaillées excluent les congés payés. Choisissez les semaines payées ou un pourcentage; les deux ne sont jamais appliqués ensemble. Le salaire annuel est réputé inclure les congés payés.",
+      additionalHelp: "Utilisez seulement une rémunération d'emploi en espèces qui n'est pas déjà saisie. Elle est incluse pour le RPC/RRQ et l'AE.",
+      otherHelp: "Imposé aux taux ordinaires, mais exclu du RPC/RRQ et de l'AE. N'inscrivez pas de dividendes ni de gains en capital.",
+      rrspHelp: "Inscrivez le plafond personnel figurant dans votre dernier avis de cotisation ou votre compte de l'ARC. Le plafond annuel de 32 490 $ n'est pas automatiquement votre marge disponible. Si la cotisation dépasse le plafond inscrit, toute la cotisation réduit les liquidités, mais seul le plafond inscrit est déduit. Les pénalités de cotisation excédentaire ne sont pas modélisées.",
+      provinceHelp: "Suppose la même province ou le même territoire de résidence et d'emploi pendant toute l'année 2025. Les situations multiterritoriales et les années partielles sont hors portée.",
+      annualContributionHelp: "Le RPC/RRQ et l'AE utilisent un calcul annuel normalisé sur le revenu d'emploi combiné. Avec plusieurs employeurs, les retenues réelles peuvent différer; les cotisations excédentaires peuvent être remboursées après la cotisation.",
+      spendable: 'Liquidités disponibles après financement du REER',
+      beforeRrsp: 'Liquidités après impôt avant financement du REER',
+      rrspSaving: "Réduction estimée de l'impôt sur le revenu grâce à la déduction REER",
+      expenseHeading: '3. Dépenses mensuelles et excédent ou déficit'
     },
-    "zh-CN": {
-      "Canada Income & Tax Planner": "加拿大收入与税务规划器",
-      "Based on 2025 tax rates · Real-time calculation · Covers all 13 provinces/territories": "基于 2025 年税率 · 实时计算 · 覆盖 13 个省/地区",
-      "🧩 Module 1: Income (incl. benefits)": "🧩 模块 1：收入（含福利）",
-      "Pay input method": "薪酬录入方式",
-      "Hourly": "按小时",
-      "Annual": "按年",
-      "Hourly($/h)": "时薪($/h)",
-      "Hours per week": "每周小时",
-      "Weeks per year": "每年周数",
-      "annual($)": "年薪($)",
-      "Hint: Entering a positive value here will switch to Annual mode automatically.": "提示：此处输入正数会自动切换到“按年”。",
-      "Paid vacation (weeks)": "带薪休假（周）",
-      "Vacation Pay(%)": "假期工资(%)",
-      "None": "无",
-      "2 weeks": "2 周",
-      "3 weeks": "3 周",
-      "4 weeks": "4 周",
-      "Custom": "自定义",
-      "Work weeks are actual working weeks; paid vacation is added on top. A warning appears if total weeks exceed 52.": "工作周是实际工作周；带薪休假另外加上。若总周数超过 52 将显示警告。",
-      "Vacation pay is taxable (per CRA).": "假期工资需纳税（依据 CRA）。",
-      "Bonus": "奖金",
-      "Allowance": "津贴",
-      "Commission": "佣金",
-      "RRSP Contribution": "RRSP 供款",
-      "Stock (taxable)": "股票（计税）",
-      "Other (taxable)": "其他（计税）",
-      "RRSP input mode": "RRSP 输入方式",
-      "Amount ($)": "金额 ($)",
-      "Percentage (%)": "百分比 (%)",
-      "RRSP contribution (annual) $": "RRSP 供款（年）$",
-      "RRSP contribution (% of pay)": "RRSP 供款（薪酬百分比）",
-      "Stock (taxable, annual) $": "股票（计税，年）$",
-      "Other (taxable, annual) $": "其他（计税，年）$",
-      "RRSP is a deduction (not part of gross pay) and reduces taxable income (auto-checked against 2025 limits). Stock/Other are treated as taxable income (dividend/capital gains rules not detailed here).": "RRSP 属于扣除项（不计入税前收入），可降低应税收入（自动按 2025 限额校验）。股票/其他按应税收入处理（未细化分红/资本增值规则）。",
-      "I'm self-employed": "我是自雇人士",
-      "Self-employed pay both the employee and employer shares (CPP/QPP doubled); EI not applicable by default.": "自雇需承担雇员与雇主份额（CPP/QPP 加倍）；默认不适用 EI。",
-      "+ Add a second job": "+ 添加第二份工作",
-      "Optional: for part-time/extra income": "可选：兼职/额外收入",
-      "Second Job": "第二份工作",
-      "Remove second job": "移除第二份工作",
-      "Total annual income (incl. benefits)": "年总收入（含福利）",
-      "Monthly gross": "月度税前",
-      "Weekly gross": "每周税前",
-      "⚠️ 'Work weeks + paid vacation weeks' exceed 52. Please check inputs to avoid double-counting.": "⚠️ “工作周 + 带薪假周”超过 52。请检查输入避免重复计算。",
-      "🧩 Module 2: Taxes (2025 latest rates)": "🧩 模块 2：税费（2025 最新税率）",
-      "Province/Territory": "省/地区",
-      "Federal tax": "联邦税",
-      "Provincial/Territorial tax": "省/地区税",
-      "CPP / QPP": "CPP / QPP",
-      "EI": "EI",
-      "Total tax": "税费合计",
-      "After-tax income (annual)": "税后收入（年）",
-      "Average tax rate": "平均税率",
-      "Includes Ontario surtax and Quebec federal tax abatement (16.5%); CPP/QPP and EI computed separately (2025 rules); credits are not included.": "已包含安省附加税和魁省联邦税减免（16.5%）；CPP/QPP 与 EI 单独计算（2025 规则）；不含各类抵免。",
-      "By tax bands: green = take-home for that segment; red = taxes for that segment": "分税档显示：绿色＝该段到手；红色＝该段税额",
-      "🧩 Module 3: Expenses & leftover analysis": "🧩 模块 3：支出与结余分析",
-      "Mortgage/Rent (monthly)": "房贷/房租（每月）",
-      "Auto Insurance (monthly)": "车险（每月）",
-      "Commuting (monthly)": "通勤（每月）",
-      "Internet/Phone (monthly)": "网络/电话（每月）",
-      "Groceries (monthly)": "杂货（每月）",
-      "Insurance/Loans (monthly)": "保险/贷款（每月）",
-      "+ Add custom expense": "+ 添加自定义支出",
-      "How to use": "如何使用",
-      "Use this area for discretionary or uncommon expenses (e.g., premium car leases, pet care, lessons, hobbies). Name it and enter a monthly amount. You can add multiple custom rows and remove them anytime.": "此处用于可自由支配或非常见支出（如高端车辆租赁、宠物照护、课程、爱好等）。请命名并填入月金额。可添加多行并随时删除。",
-      "Monthly after-tax income": "月度税后收入",
-      "Monthly expenses": "月度支出",
-      "Monthly leftover": "月度结余",
-      "Weekly leftover": "每周结余",
-      "Leftover": "结余",
-      "Leftover Share": "结余占比",
-      "Expenses": "支出",
-      "Take-home (segment)": "到手（该段）",
-      "Tax (segment)": "税（该段）",
-      "After-tax": "税后",
-      "After-tax Income": "税后收入"
+    'zh-CN': {
+      title: '2025 年加拿大年度就业收入与可支配现金估算',
+      subtitle: '固定使用已最终确定的 2025 全年规则 · 基本雇员情形 · 所有省和地区',
+      disclaimerTitle: '范围与重要限制',
+      disclaimer: '这是面向 19 至 64 岁单身雇员的简化 2025 年年度估算，并非报税表、工资预扣计算，也不构成税务、法律、工资或财务建议。实际税额取决于扣除、抵免、福利、居住地、发薪频率、个人情况以及加拿大税务局或魁北克税务局的评税。请在最新评税通知或 CRA 账户中确认 RRSP 额度。本工具不计算股息、资本利得或自雇收入。',
+      methodology: '计算方法、假设与官方来源',
+      vacationHelp: '按小时计薪时，工作周数不包括带薪休假。请选择带薪休假周数或假期工资百分比，计算器不会同时应用两者。年薪视为已包含假期补偿。',
+      additionalHelp: '仅填写上方尚未计入的额外现金就业报酬；该金额计入 CPP/QPP 和 EI。',
+      otherHelp: '按普通收入税率计税，但不计入 CPP/QPP 和 EI。请勿填写股息或资本利得。',
+      rrspHelp: '请填写最新评税通知或 CRA 账户中的个人可扣除额度。32,490 加元的年度上限并不自动等于个人可用额度。若供款超过所填额度，全部供款都会减少现金，但仅扣除所填额度。本工具不计算超额供款罚款。',
+      provinceHelp: '假设 2025 全年居住省区与工作省区相同。不涵盖跨省区或部分年度居民情况。',
+      annualContributionHelp: 'CPP/QPP 和 EI 按合并就业收入进行标准化年度计算。多个雇主的实际预扣可能不同；超额供款可在评税后退还。',
+      spendable: '支付 RRSP 供款后的可支配现金',
+      beforeRrsp: '支付 RRSP 供款前的税后现金',
+      rrspSaving: 'RRSP 扣除带来的估计所得税减少额',
+      expenseHeading: '3. 每月支出及盈余或赤字'
     },
-    "hi": {
-      "Canada Income & Tax Planner": "कनाडा आय व कर योजनाकार",
-      "Based on 2025 tax rates · Real-time calculation · Covers all 13 provinces/territories": "2025 कर दरों पर आधारित · रियल‑टाइम गणना · 13 प्रांत/क्षेत्र शामिल",
-      "🧩 Module 1: Income (incl. benefits)": "🧩 मॉड्यूल 1: आय (लाभ सहित)",
-      "Pay input method": "वेतन इनपुट तरीका",
-      "Hourly": "घंटे के हिसाब से",
-      "Annual": "वार्षिक",
-      "Hourly($/h)": "घंटे का दर ($/h)",
-      "Hours per week": "साप्ताहिक घंटे",
-      "Weeks per year": "वर्ष में सप्ताह",
-      "annual($)": "वार्षिक वेतन ($)",
-      "Hint: Entering a positive value here will switch to Annual mode automatically.": "संकेत: यहाँ धनात्मक मान दर्ज करने पर स्वतः ‘वार्षिक’ मोड चुना जाएगा।",
-      "Paid vacation (weeks)": "सवैतनिक अवकाश (सप्ताह)",
-      "Vacation Pay(%)": "अवकाश वेतन (%)",
-      "None": "कोई नहीं",
-      "2 weeks": "2 सप्ताह",
-      "3 weeks": "3 सप्ताह",
-      "4 weeks": "4 सप्ताह",
-      "Custom": "कस्टम",
-      "Work weeks are actual working weeks; paid vacation is added on top. A warning appears if total weeks exceed 52.": "कार्य सप्ताह वास्तविक काम के सप्ताह हैं; सवैतनिक अवकाश अतिरिक्त जोड़ा जाता है। कुल 52 से अधिक होने पर चेतावनी दिखाई देगी।",
-      "Vacation pay is taxable (per CRA).": "अवकाश वेतन करयोग्य है (CRA के अनुसार)।",
-      "Bonus": "बोनस",
-      "Allowance": "भत्ता",
-      "Commission": "कमीशन",
-      "RRSP Contribution": "RRSP अंशदान",
-      "Stock (taxable)": "शेयर (करयोग्य)",
-      "Other (taxable)": "अन्य (करयोग्य)",
-      "RRSP input mode": "RRSP इनपुट मोड",
-      "Amount ($)": "राशि ($)",
-      "Percentage (%)": "प्रतिशत (%)",
-      "RRSP contribution (annual) $": "RRSP अंशदान (वार्षिक) $",
-      "RRSP contribution (% of pay)": "RRSP अंशदान (वेतन %)",
-      "Stock (taxable, annual) $": "शेयर (करयोग्य, वार्षिक) $",
-      "Other (taxable, annual) $": "अन्य (करयोग्य, वार्षिक) $",
-      "RRSP is a deduction (not part of gross pay) and reduces taxable income (auto-checked against 2025 limits). Stock/Other are treated as taxable income (dividend/capital gains rules not detailed here).": "RRSP कटौती है (ग्रॉस में शामिल नहीं) और करयोग्य आय घटाती है (2025 सीमा के अनुसार स्वतः जाँच)। शेयर/अन्य को करयोग्य आय माना गया है (लाभांश/पूँजीगत लाभ का विस्तार यहाँ नहीं)।",
-      "I'm self-employed": "मैं स्व-नियोजित हूँ",
-      "Self-employed pay both the employee and employer shares (CPP/QPP doubled); EI not applicable by default.": "स्व-नियोजित को कर्मचारी व नियोक्ता दोनों हिस्से (CPP/QPP दोगुना) देने होते हैं; डिफ़ॉल्ट रूप से EI लागू नहीं।",
-      "+ Add a second job": "+ दूसरी नौकरी जोड़ें",
-      "Optional: for part-time/extra income": "वैकल्पिक: पार्ट‑टाइम/अतिरिक्त आय",
-      "Second Job": "दूसरी नौकरी",
-      "Remove second job": "दूसरी नौकरी हटाएँ",
-      "Total annual income (incl. benefits)": "वार्षिक कुल आय (लाभ सहित)",
-      "Monthly gross": "मासिक ग्रॉस",
-      "Weekly gross": "साप्ताहिक ग्रॉस",
-      "⚠️ 'Work weeks + paid vacation weeks' exceed 52. Please check inputs to avoid double-counting.": "⚠️ ‘कार्य सप्ताह + सवैतनिक अवकाश सप्ताह’ 52 से अधिक हैं। दोहरी गणना से बचने हेतु इनपुट जाँचें।",
-      "🧩 Module 2: Taxes (2025 latest rates)": "🧩 मॉड्यूल 2: कर (2025 नवीनतम दरें)",
-      "Province/Territory": "प्रांत/क्षेत्र",
-      "Federal tax": "फेडरल टैक्स",
-      "Provincial/Territorial tax": "प्रांतीय/क्षेत्रीय टैक्स",
-      "CPP / QPP": "CPP / QPP",
-      "EI": "EI",
-      "Total tax": "कुल कर",
-      "After-tax income (annual)": "कर‑बाद आय (वार्षिक)",
-      "Average tax rate": "औसत कर दर",
-      "Includes Ontario surtax and Quebec federal tax abatement (16.5%); CPP/QPP and EI computed separately (2025 rules); credits are not included.": "ओंटारियो सरचार्ज और क्यूबेक संघीय कर में 16.5% छूट शामिल; CPP/QPP व EI अलग से (2025 नियम); क्रेडिट शामिल नहीं।",
-      "By tax bands: green = take-home for that segment; red = taxes for that segment": "कर बैंड अनुसार: हरा = उस खंड की घर‑ले राशि; लाल = उस खंड का कर",
-      "🧩 Module 3: Expenses & leftover analysis": "🧩 मॉड्यूल 3: खर्च व शेष",
-      "Mortgage/Rent (monthly)": "बंधक/किराया (मासिक)",
-      "Auto Insurance (monthly)": "ऑटो बीमा (मासिक)",
-      "Commuting (monthly)": "आवागमन (मासिक)",
-      "Internet/Phone (monthly)": "इंटरनेट/फोन (मासिक)",
-      "Groceries (monthly)": "किराना (मासिक)",
-      "Insurance/Loans (monthly)": "बीमा/ऋण (मासिक)",
-      "+ Add custom expense": "+ कस्टम खर्च जोड़ें",
-      "How to use": "कैसे उपयोग करें",
-      "Use this area for discretionary or uncommon expenses (e.g., premium car leases, pet care, lessons, hobbies). Name it and enter a monthly amount. You can add multiple custom rows and remove them anytime.": "यह क्षेत्र विवेकाधीन/अप्रचलित खर्चों के लिए है (जैसे प्रीमियम कार लीज, पालतू देखभाल, कक्षाएँ, शौक)। नाम दें और मासिक राशि दर्ज करें। कई पंक्तियाँ जोड़ें और कभी भी हटाएँ।",
-      "Monthly after-tax income": "मासिक कर‑बाद आय",
-      "Monthly expenses": "मासिक खर्च",
-      "Monthly leftover": "मासिक शेष",
-      "Weekly leftover": "साप्ताहिक शेष",
-      "Leftover": "शेष",
-      "Leftover Share": "शेष का अनुपात",
-      "Expenses": "खर्च",
-      "Take-home (segment)": "टेक‑होम (खंड)",
-      "Tax (segment)": "कर (खंड)",
-      "After-tax": "कर‑बाद",
-      "After-tax Income": "कर‑बाद आय"
+    hi: {
+      title: '2025 कनाडाई वार्षिक रोज़गार आय और खर्च-योग्य नकदी का अनुमान',
+      subtitle: 'अंतिम पूर्ण-वर्ष 2025 नियम · सामान्य कर्मचारी स्थितियाँ · सभी प्रांत और क्षेत्र',
+      disclaimerTitle: 'दायरा और महत्वपूर्ण सीमाएँ',
+      disclaimer: 'यह 19 से 64 वर्ष के एकल कर्मचारी के लिए 2025 का सरलीकृत वार्षिक अनुमान है, टैक्स रिटर्न, पेरोल विदहोल्डिंग गणना, या कर, कानूनी, पेरोल अथवा वित्तीय सलाह नहीं। वास्तविक कर कटौतियों, क्रेडिट, लाभ, निवास, वेतन आवृत्ति, व्यक्तिगत परिस्थितियों और CRA या Revenu Québec के आकलन पर निर्भर करता है। अपनी नवीनतम Notice of Assessment या CRA खाते में RRSP सीमा की पुष्टि करें। लाभांश, पूंजीगत लाभ और स्वरोज़गार को मॉडल नहीं किया गया है।',
+      methodology: 'पद्धति, मान्यताएँ और आधिकारिक स्रोत',
+      vacationHelp: 'प्रति घंटा वेतन में काम के सप्ताह सवेतन अवकाश को शामिल नहीं करते। सवेतन सप्ताह या प्रतिशत में से एक चुनें; दोनों कभी साथ लागू नहीं होते। वार्षिक वेतन में अवकाश भुगतान शामिल माना जाता है।',
+      additionalHelp: 'केवल वह अतिरिक्त नकद रोज़गार मुआवज़ा दर्ज करें जो ऊपर पहले से दर्ज नहीं है। इसे CPP/QPP और EI में शामिल किया जाता है।',
+      otherHelp: 'सामान्य दरों पर करयोग्य, पर CPP/QPP और EI से बाहर। लाभांश या पूंजीगत लाभ दर्ज न करें।',
+      rrspHelp: 'अपनी नवीनतम Notice of Assessment या CRA खाते की व्यक्तिगत सीमा दर्ज करें। $32,490 की वार्षिक सीमा स्वतः आपकी उपलब्ध सीमा नहीं है। योगदान दर्ज सीमा से अधिक हो तो पूरा योगदान नकदी घटाता है, लेकिन केवल दर्ज सीमा की कटौती होती है। अधिक योगदान के दंड मॉडल नहीं किए गए हैं।',
+      provinceHelp: 'पूरे 2025 में निवास और रोजगार का प्रांत या क्षेत्र समान माना गया है। बहु-क्षेत्र और आंशिक-वर्ष निवास दायरे से बाहर हैं।',
+      annualContributionHelp: 'CPP/QPP और EI संयुक्त रोज़गार आय पर एक मानकीकृत वार्षिक गणना का उपयोग करते हैं। कई नियोक्ताओं के साथ वास्तविक स्रोत कटौतियाँ अलग हो सकती हैं; अतिरिक्त योगदान आकलन के बाद वापस मिल सकते हैं।',
+      spendable: 'RRSP योगदान के बाद खर्च-योग्य नकदी',
+      beforeRrsp: 'RRSP देने से पहले कर-पश्चात नकदी',
+      rrspSaving: 'RRSP कटौती से अनुमानित आयकर कमी',
+      expenseHeading: '3. मासिक खर्च और अधिशेष या घाटा'
     }
   };
-  const __I18N_ORIG__ = new WeakMap();
-  function i18n_t(s){
-    try{
-      const pack = I18N[__lang] || {};
-      return pack[s] || s;
-    }catch(e){ return s; }
-  }
-  
-function i18n_apply(){
-    try{
-      const pack = I18N[__lang] || null;
-      // Walk all text nodes and translate based on ORIGINAL text
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
-      const nodes = [];
-      while (walker.nextNode()){
-        const node = walker.currentNode;
-        if (!node || !node.nodeValue) continue;
-        const raw = node.nodeValue;
-        const trimmed = raw.trim();
-        if (!trimmed) continue;
-        const original = __I18N_ORIG__.has(node) ? __I18N_ORIG__.get(node) : trimmed;
-        if (!__I18N_ORIG__.has(node)) __I18N_ORIG__.set(node, original);
-        const target = (pack && pack[original]) ? pack[original] : original;
-        if (target !== trimmed){
-          // Replace only the trimmed portion to preserve spaces
-          node.nodeValue = raw.replace(trimmed, target);
-        }
-      }
-      // Attributes: placeholder, aria-label — store originals in data-*
-      document.querySelectorAll('[placeholder]').forEach(el=>{
-        const key = el.getAttribute('data-i18n-ph') || el.getAttribute('placeholder');
-        if (!el.hasAttribute('data-i18n-ph')) el.setAttribute('data-i18n-ph', key);
-        const t = (pack && pack[key]) ? pack[key] : key;
-        if (el.getAttribute('placeholder') !== t) el.setAttribute('placeholder', t);
-      });
-      document.querySelectorAll('[aria-label]').forEach(el=>{
-        const key = el.getAttribute('data-i18n-aria') || el.getAttribute('aria-label');
-        if (!el.hasAttribute('data-i18n-aria')) el.setAttribute('data-i18n-aria', key);
-        const t = (pack && pack[key]) ? pack[key] : key;
-        if (el.getAttribute('aria-label') !== t) el.setAttribute('aria-label', t);
-      });
-      document.title = (pack && pack[document.title]) ? pack[document.title] : document.title;
-    }catch(e){}
-  }
-  function i18n_set(lang){
-    __lang = lang || 'en';
-    localStorage.setItem('lang', __lang);
-    document.documentElement.setAttribute('lang', __lang);
-    i18n_apply();
-    // retrigger charts/outputs to refresh labels
-    try{ scheduleUpdate(); }catch(e){}
-  }
-  document.addEventListener('DOMContentLoaded', ()=>{
-    document.querySelectorAll('[data-lang]').forEach(a=>{
-      a.addEventListener('click', (e)=>{
-        e.preventDefault();
-        i18n_set(a.getAttribute('data-lang'));
-      });
-    });
-    // initial
-    i18n_set(__lang);
+
+  Object.assign(TRANSLATIONS.fr, {
+    incomeHeading: '1. Revenu annuel et REER',
+    payMethod: "Mode de saisie de l'emploi principal",
+    hourly: 'Taux horaire',
+    annual: 'Salaire annuel',
+    hourlyRate: 'Taux horaire ($)',
+    hoursPerWeek: 'Heures par semaine',
+    workingWeeks: 'Semaines travaillées',
+    annualSalary: 'Salaire annuel ($), vacances payées incluses',
+    vacationMethod: "Méthode d'indemnisation des vacances",
+    vacationNone: 'Aucune',
+    vacationWeeksOption: 'Semaines de vacances payées',
+    vacationPercentOption: 'Pourcentage de paie de vacances',
+    paidVacationWeeks: 'Semaines de vacances payées',
+    vacationPayPercent: 'Paie de vacances (%)',
+    bonus: 'Prime annuelle ($)',
+    allowance: 'Allocation imposable ($)',
+    commission: 'Commission ($)',
+    addJob: '+ Ajouter un deuxième emploi',
+    secondJob: 'Deuxième emploi',
+    payMethod2: 'Mode de saisie du deuxième emploi',
+    removeJob: 'Supprimer le deuxième emploi',
+    additionalEmployment: "Revenu d'emploi imposable supplémentaire ($)",
+    otherIncome: 'Autre revenu ordinaire imposable ($)',
+    rrspContribution: 'Cotisation REER financée en 2025 ($)',
+    rrspLimit: 'Plafond de déduction REER disponible ($)',
+    grossCash: 'Revenu brut en espèces',
+    employmentIncome: "Revenu d'emploi",
+    otherOrdinary: 'Autre revenu ordinaire',
+    rrspDeduction: 'Déduction REER utilisée',
+    taxableIncome: 'Revenu imposable fédéral',
+    taxHeading: "2. Impôt sur le revenu et cotisations salariales de 2025",
+    province: "Province ou territoire de résidence et d'emploi",
+    provinceON: 'Ontario', provinceBC: 'Colombie-Britannique', provinceAB: 'Alberta', provinceSK: 'Saskatchewan', provinceMB: 'Manitoba',
+    provinceQC: 'Québec — soutien limité', provinceNB: 'Nouveau-Brunswick', provinceNS: 'Nouvelle-Écosse', provincePE: 'Île-du-Prince-Édouard',
+    provinceNL: 'Terre-Neuve-et-Labrador', provinceYT: 'Yukon', provinceNT: 'Territoires du Nord-Ouest', provinceNU: 'Nunavut',
+    federalTax: 'Impôt fédéral sur le revenu',
+    provTax: 'Impôt provincial ou territorial sur le revenu',
+    taxPayroll: 'Impôt sur le revenu plus cotisations salariales',
+    rrspCash: 'Cotisation REER',
+    rent: 'Hypothèque ou loyer',
+    carInsurance: 'Assurance automobile',
+    commuting: 'Transport domicile-travail',
+    phone: 'Internet et téléphone',
+    groceries: 'Épicerie',
+    loans: 'Autres assurances ou prêts',
+    addExpense: '+ Ajouter une dépense personnalisée',
+    monthlySpendable: 'Liquidités mensuelles disponibles',
+    monthlyExpenses: 'Dépenses mensuelles',
+    monthlySurplus: 'Excédent mensuel',
+    monthlyDeficit: 'Déficit mensuel',
+    weeklySurplus: 'Excédent hebdomadaire',
+    weeklyDeficit: 'Déficit hebdomadaire',
+    warningWeeks: "Emploi {job} : les semaines travaillées plus les semaines de vacances payées dépassent 52.",
+    warningVacationConflict: "Emploi {job} : les semaines payées et le pourcentage ont tous deux été saisis; les semaines payées sont utilisées et le pourcentage est ignoré.",
+    warningRrspLimitRequired: "Aucune déduction REER n'a été appliquée, car aucun plafond disponible n'a été saisi.",
+    warningRrspLimitExceeded: 'La cotisation dépasse le plafond REER saisi; seul ce plafond est déduit, mais la cotisation entière réduit les liquidités.',
+    warningRrspNetIncomeLimit: 'La déduction REER est limitée au revenu net estimé; la cotisation entière réduit toujours les liquidités.',
+    warningQuebecLimited: "Le soutien du Québec couvre le revenu d'emploi de base, la déduction pour travailleurs, le RRQ, l'AE, le RQAP, l'impôt provincial et l'abattement fédéral. La prime d'assurance médicaments et les crédits dépendant de la situation ne sont pas modélisés.",
+    warningQuebecOtherIncome: "Au Québec, un revenu autre que d'emploi peut entraîner des règles supplémentaires, notamment la cotisation au Fonds des services de santé, qui sont hors portée.",
+    chartUnavailable: 'Graphique non disponible; les résultats numériques demeurent valides.',
+    noCashActivity: 'Aucun mouvement de trésorerie',
+    incomeTaxChart: 'Impôt sur le revenu',
+    payrollChart: 'RPC/RRQ, AE et RQAP',
+    rrspContributionChart: 'Cotisation REER',
+    spendableCashChart: 'Liquidités disponibles',
+    cashShortfall: 'Insuffisance de trésorerie',
+    annualShortfallNote: "Les sorties dépassent le revenu brut en espèces; le graphique présente l'insuffisance comme une valeur positive.",
+    annualAllocationNote: 'Répartition annuelle des liquidités; toutes les valeurs du graphique sont non négatives.',
+    noMonthlyActivity: 'Aucun mouvement mensuel de trésorerie',
+    spendableCashAvailable: 'Liquidités disponibles',
+    monthlyDeficitNote: 'Les dépenses dépassent les liquidités mensuelles; le déficit est représenté comme une valeur positive.',
+    monthlyAllocationNote: "Les liquidités mensuelles sont réparties entre les dépenses et l'excédent.",
+    ontarioDetails: 'Surtaxe de l’Ontario {surtax}; prime-santé {healthPremium}.',
+    quebecDetails: 'Revenu imposable du Québec après la déduction pour travailleurs : {taxableIncome}. Abattement fédéral : {abatement}.',
+    customExpenseName: 'Nom de la dépense personnalisée',
+    customExpenseAmount: 'Montant mensuel de la dépense personnalisée',
+    expenseNamePlaceholder: 'Nom de la dépense',
+    removeCustomExpense: 'Supprimer la dépense personnalisée',
+    taxChartAria: 'Graphique de la répartition annuelle des liquidités',
+    cashChartAria: 'Graphique des flux de trésorerie mensuels'
   });
 
-  const TAX_2025 = {
-    federal: [
-      { upTo: 57375, rate: 0.145 },
-      { upTo: 114750, rate: 0.205 },
-      { upTo: 177882, rate: 0.26 },
-      { upTo: 253414, rate: 0.29 },
-      { upTo: Infinity, rate: 0.33 }
-    ],
-    provinces: {
-      "British Columbia": [
-        { upTo: 49279, rate: 0.0506 },
-        { upTo: 98560, rate: 0.0770 },
-        { upTo: 113158, rate: 0.1050 },
-        { upTo: 137407, rate: 0.1229 },
-        { upTo: 186306, rate: 0.1470 },
-        { upTo: 259829, rate: 0.1680 },
-        { upTo: Infinity, rate: 0.2050 },
-      ],
-      "Alberta": [
-        { upTo: 60000, rate: 0.08 },
-        { upTo: 151234, rate: 0.10 },
-        { upTo: 181481, rate: 0.12 },
-        { upTo: 241974, rate: 0.13 },
-        { upTo: 362961, rate: 0.14 },
-        { upTo: Infinity, rate: 0.15 },
-      ],
-      "Saskatchewan": [
-        { upTo: 53463, rate: 0.105 },
-        { upTo: 152750, rate: 0.125 },
-        { upTo: Infinity, rate: 0.145 },
-      ],
-      "Manitoba": [
-        { upTo: 47000, rate: 0.108 },
-        { upTo: 100000, rate: 0.1275 },
-        { upTo: Infinity, rate: 0.174 },
-      ],
-      "Ontario": [
-        { upTo: 52886, rate: 0.0505 },
-        { upTo: 105775, rate: 0.0915 },
-        { upTo: 150000, rate: 0.1116 },
-        { upTo: 220000, rate: 0.1216 },
-        { upTo: Infinity, rate: 0.1316 },
-      ],
-      "Quebec": [
-        { upTo: 53255, rate: 0.14 },
-        { upTo: 106495, rate: 0.19 },
-        { upTo: 129590, rate: 0.24 },
-        { upTo: Infinity, rate: 0.2575 },
-      ],
-      "New Brunswick": [
-        { upTo: 51306, rate: 0.094 },
-        { upTo: 102614, rate: 0.14 },
-        { upTo: 190060, rate: 0.16 },
-        { upTo: Infinity, rate: 0.195 },
-      ],
-      "Nova Scotia": [
-        { upTo: 29590, rate: 0.0879 },
-        { upTo: 59180, rate: 0.1495 },
-        { upTo: 93000, rate: 0.1667 },
-        { upTo: 150000, rate: 0.175 },
-        { upTo: Infinity, rate: 0.21 },
-      ],
-      "Prince Edward Island": [
-        { upTo: 33328, rate: 0.095 },
-        { upTo: 64656, rate: 0.1347 },
-        { upTo: 105000, rate: 0.166 },
-        { upTo: 140000, rate: 0.1762 },
-        { upTo: Infinity, rate: 0.19 },
-      ],
-      "Newfoundland and Labrador": [
-        { upTo: 44192, rate: 0.087 },
-        { upTo: 88382, rate: 0.145 },
-        { upTo: 157792, rate: 0.158 },
-        { upTo: 220910, rate: 0.178 },
-        { upTo: 282214, rate: 0.198 },
-        { upTo: 564429, rate: 0.208 },
-        { upTo: 1128858, rate: 0.213 },
-        { upTo: Infinity, rate: 0.218 },
-      ],
-      "Yukon": [
-        { upTo: 57375, rate: 0.064 },
-        { upTo: 114750, rate: 0.09 },
-        { upTo: 177882, rate: 0.109 },
-        { upTo: 500000, rate: 0.128 },
-        { upTo: Infinity, rate: 0.15 },
-      ],
-      "Northwest Territories": [
-        { upTo: 51964, rate: 0.059 },
-        { upTo: 103930, rate: 0.086 },
-        { upTo: 168967, rate: 0.122 },
-        { upTo: Infinity, rate: 0.1405 },
-      ],
-      "Nunavut": [
-        { upTo: 54707, rate: 0.04 },
-        { upTo: 109413, rate: 0.07 },
-        { upTo: 177881, rate: 0.09 },
-        { upTo: Infinity, rate: 0.115 },
-      ]
-    },
-    onSurtax: { t1: 5710, r1: 0.20, t2: 7307, r2: 0.36 },
-    qcFedAbatement: 0.165
-  };
-  // ===== (BPA)2025 — /Provincial Tax =====
-  // : ~15.7k, Province ≥10k.
-  // :( $2,000) 0 Federal Tax 0 Provincial Tax.
-  // :;  UI, .
-  const BPA_2025 = {
-    federal: 15705,
-    // , ; , .
-    provinces: {
-      "Ontario": 11865
-    },
-    defaultProvince: 12000
-  };
-  function _getProvinceBPA(province){
-    return (BPA_2025.provinces && BPA_2025.provinces[province]) || BPA_2025.defaultProvince;
-  }
+  Object.assign(TRANSLATIONS['zh-CN'], {
+    incomeHeading: '1. 年度收入与 RRSP',
+    payMethod: '主要工作的薪酬输入方式',
+    hourly: '时薪',
+    annual: '年薪',
+    hourlyRate: '时薪（加元）',
+    hoursPerWeek: '每周工时',
+    workingWeeks: '工作周数',
+    annualSalary: '年薪（加元，含带薪休假）',
+    vacationMethod: '休假补偿方式',
+    vacationNone: '无',
+    vacationWeeksOption: '带薪休假周数',
+    vacationPercentOption: '休假工资百分比',
+    paidVacationWeeks: '带薪休假周数',
+    vacationPayPercent: '休假工资（%）',
+    bonus: '年度奖金（加元）',
+    allowance: '应税津贴（加元）',
+    commission: '佣金（加元）',
+    addJob: '+ 添加第二份工作',
+    secondJob: '第二份工作',
+    payMethod2: '第二份工作的薪酬输入方式',
+    removeJob: '移除第二份工作',
+    additionalEmployment: '额外应税就业收入（加元）',
+    otherIncome: '其他按普通税率计税的收入（加元）',
+    rrspContribution: '2025 年实际支付的 RRSP 供款（加元）',
+    rrspLimit: '可用 RRSP 扣除额度（加元）',
+    grossCash: '现金总收入',
+    employmentIncome: '就业收入',
+    otherOrdinary: '其他普通收入',
+    rrspDeduction: '已使用的 RRSP 扣除额',
+    taxableIncome: '联邦应税收入',
+    taxHeading: '2. 2025 年所得税与雇员供款',
+    province: '居住及就业所在省或地区',
+    provinceON: '安大略省', provinceBC: '不列颠哥伦比亚省', provinceAB: '阿尔伯塔省', provinceSK: '萨斯喀彻温省', provinceMB: '曼尼托巴省',
+    provinceQC: '魁北克省 — 有限支持', provinceNB: '新不伦瑞克省', provinceNS: '新斯科舍省', provincePE: '爱德华王子岛省',
+    provinceNL: '纽芬兰与拉布拉多省', provinceYT: '育空地区', provinceNT: '西北地区', provinceNU: '努纳武特地区',
+    federalTax: '联邦所得税',
+    provTax: '省或地区所得税',
+    taxPayroll: '所得税与工资供款合计',
+    rrspCash: 'RRSP 供款',
+    rent: '房贷或房租',
+    carInsurance: '汽车保险',
+    commuting: '通勤',
+    phone: '网络与电话',
+    groceries: '食品杂货',
+    loans: '其他保险或贷款',
+    addExpense: '+ 添加自定义支出',
+    monthlySpendable: '每月可支配现金',
+    monthlyExpenses: '每月支出',
+    monthlySurplus: '每月盈余',
+    monthlyDeficit: '每月赤字',
+    weeklySurplus: '每周盈余',
+    weeklyDeficit: '每周赤字',
+    warningWeeks: '工作 {job}：工作周数与带薪休假周数之和超过 52。',
+    warningVacationConflict: '工作 {job}：同时填写了带薪休假周数和休假工资百分比；计算采用周数并忽略百分比。',
+    warningRrspLimitRequired: '由于未填写可用 RRSP 扣除额度，本次未应用 RRSP 扣除。',
+    warningRrspLimitExceeded: '供款超过所填 RRSP 额度；仅扣除所填额度，但全部供款都会减少现金。',
+    warningRrspNetIncomeLimit: 'RRSP 扣除额被限制为估计净收入；全部供款仍会减少现金。',
+    warningQuebecLimited: '魁北克支持涵盖基本就业收入、工人扣除、QPP、EI、QPIP、省税和联邦减免。本工具不计算处方药保险费和取决于个人情况的抵免。',
+    warningQuebecOtherIncome: '魁北克的非就业收入可能触发额外规则，包括卫生服务基金供款；这些不在本估算范围内。',
+    chartUnavailable: '图表不可用；数值结果仍然有效。',
+    noCashActivity: '无现金活动',
+    incomeTaxChart: '所得税',
+    payrollChart: 'CPP/QPP、EI 与 QPIP',
+    rrspContributionChart: 'RRSP 供款',
+    spendableCashChart: '可支配现金',
+    cashShortfall: '现金缺口',
+    annualShortfallNote: '现金流出超过现金总收入；图表以正数表示现金缺口。',
+    annualAllocationNote: '年度现金分配；图表中的所有数值均为非负数。',
+    noMonthlyActivity: '无每月现金活动',
+    spendableCashAvailable: '可用的可支配现金',
+    monthlyDeficitNote: '支出超过每月可支配现金；图表以正数表示赤字。',
+    monthlyAllocationNote: '每月可支配现金分为支出与盈余。',
+    ontarioDetails: '安大略附加税 {surtax}；安大略健康保费 {healthPremium}。',
+    quebecDetails: '扣除工人扣除额后的魁北克应税收入：{taxableIncome}。联邦减免：{abatement}。',
+    customExpenseName: '自定义支出名称',
+    customExpenseAmount: '每月自定义支出金额',
+    expenseNamePlaceholder: '支出名称',
+    removeCustomExpense: '移除自定义支出',
+    taxChartAria: '年度现金分配图',
+    cashChartAria: '每月现金流图'
+  });
 
+  Object.assign(TRANSLATIONS.hi, {
+    incomeHeading: '1. वार्षिक आय और RRSP',
+    payMethod: 'मुख्य नौकरी का वेतन इनपुट',
+    hourly: 'प्रति घंटा',
+    annual: 'वार्षिक वेतन',
+    hourlyRate: 'प्रति घंटा दर ($)',
+    hoursPerWeek: 'प्रति सप्ताह घंटे',
+    workingWeeks: 'काम किए गए सप्ताह',
+    annualSalary: 'वार्षिक वेतन ($), सवेतन अवकाश सहित',
+    vacationMethod: 'अवकाश मुआवज़ा विधि',
+    vacationNone: 'कोई नहीं',
+    vacationWeeksOption: 'सवेतन अवकाश सप्ताह',
+    vacationPercentOption: 'अवकाश वेतन प्रतिशत',
+    paidVacationWeeks: 'सवेतन अवकाश सप्ताह',
+    vacationPayPercent: 'अवकाश वेतन (%)',
+    bonus: 'वार्षिक बोनस ($)',
+    allowance: 'करयोग्य भत्ता ($)',
+    commission: 'कमीशन ($)',
+    addJob: '+ दूसरी नौकरी जोड़ें',
+    secondJob: 'दूसरी नौकरी',
+    payMethod2: 'दूसरी नौकरी का वेतन इनपुट',
+    removeJob: 'दूसरी नौकरी हटाएँ',
+    additionalEmployment: 'अतिरिक्त करयोग्य रोज़गार आय ($)',
+    otherIncome: 'अन्य सामान्य करयोग्य आय ($)',
+    rrspContribution: '2025 में वित्तपोषित RRSP योगदान ($)',
+    rrspLimit: 'उपलब्ध RRSP कटौती सीमा ($)',
+    grossCash: 'सकल नकद आय',
+    employmentIncome: 'रोज़गार आय',
+    otherOrdinary: 'अन्य सामान्य आय',
+    rrspDeduction: 'उपयोग की गई RRSP कटौती',
+    taxableIncome: 'संघीय करयोग्य आय',
+    taxHeading: '2. 2025 आयकर और कर्मचारी योगदान',
+    province: 'निवास और रोज़गार का प्रांत या क्षेत्र',
+    provinceON: 'ओंटारियो', provinceBC: 'ब्रिटिश कोलंबिया', provinceAB: 'अल्बर्टा', provinceSK: 'सस्केचेवान', provinceMB: 'मैनिटोबा',
+    provinceQC: 'क्यूबेक — सीमित समर्थन', provinceNB: 'न्यू ब्रंसविक', provinceNS: 'नोवा स्कोटिया', provincePE: 'प्रिंस एडवर्ड आइलैंड',
+    provinceNL: 'न्यूफ़ाउंडलैंड और लैब्राडोर', provinceYT: 'युकोन', provinceNT: 'नॉर्थवेस्ट टेरिटरीज़', provinceNU: 'नुनावुत',
+    federalTax: 'संघीय आयकर',
+    provTax: 'प्रांतीय या क्षेत्रीय आयकर',
+    taxPayroll: 'आयकर और पेरोल योगदान',
+    rrspCash: 'RRSP योगदान',
+    rent: 'बंधक या किराया',
+    carInsurance: 'वाहन बीमा',
+    commuting: 'आवागमन',
+    phone: 'इंटरनेट और फ़ोन',
+    groceries: 'किराना',
+    loans: 'अन्य बीमा या ऋण',
+    addExpense: '+ कस्टम खर्च जोड़ें',
+    monthlySpendable: 'मासिक खर्च-योग्य नकदी',
+    monthlyExpenses: 'मासिक खर्च',
+    monthlySurplus: 'मासिक अधिशेष',
+    monthlyDeficit: 'मासिक घाटा',
+    weeklySurplus: 'साप्ताहिक अधिशेष',
+    weeklyDeficit: 'साप्ताहिक घाटा',
+    warningWeeks: 'नौकरी {job}: काम के सप्ताह और सवेतन अवकाश सप्ताह मिलाकर 52 से अधिक हैं।',
+    warningVacationConflict: 'नौकरी {job}: सवेतन सप्ताह और अवकाश वेतन प्रतिशत दोनों दर्ज किए गए; सप्ताह उपयोग किए गए और प्रतिशत अनदेखा किया गया।',
+    warningRrspLimitRequired: 'उपलब्ध RRSP कटौती सीमा दर्ज न होने के कारण कोई RRSP कटौती लागू नहीं की गई।',
+    warningRrspLimitExceeded: 'योगदान दर्ज RRSP सीमा से अधिक है; केवल दर्ज सीमा की कटौती होती है, लेकिन पूरा योगदान नकदी घटाता है।',
+    warningRrspNetIncomeLimit: 'RRSP कटौती अनुमानित शुद्ध आय तक सीमित है; पूरा योगदान फिर भी नकदी घटाता है।',
+    warningQuebecLimited: 'क्यूबेक समर्थन में मूल रोज़गार आय, कर्मचारी कटौती, QPP, EI, QPIP, प्रांतीय कर और संघीय छूट शामिल हैं। प्रिस्क्रिप्शन दवा बीमा प्रीमियम और परिस्थिति-आधारित क्रेडिट मॉडल नहीं किए गए हैं।',
+    warningQuebecOtherIncome: 'क्यूबेक में रोज़गार के अलावा आय पर अतिरिक्त नियम लागू हो सकते हैं, जिनमें स्वास्थ्य सेवा निधि योगदान शामिल है; ये इस अनुमान के दायरे से बाहर हैं।',
+    chartUnavailable: 'चार्ट उपलब्ध नहीं है; संख्यात्मक परिणाम वैध हैं।',
+    noCashActivity: 'कोई नकद गतिविधि नहीं',
+    incomeTaxChart: 'आयकर',
+    payrollChart: 'CPP/QPP, EI और QPIP',
+    rrspContributionChart: 'RRSP योगदान',
+    spendableCashChart: 'खर्च-योग्य नकदी',
+    cashShortfall: 'नकदी की कमी',
+    annualShortfallNote: 'नकद बहिर्वाह सकल नकद आय से अधिक है; चार्ट कमी को धनात्मक मान के रूप में दिखाता है।',
+    annualAllocationNote: 'वार्षिक नकद आवंटन; चार्ट के सभी मान गैर-ऋणात्मक हैं।',
+    noMonthlyActivity: 'कोई मासिक नकद गतिविधि नहीं',
+    spendableCashAvailable: 'उपलब्ध खर्च-योग्य नकदी',
+    monthlyDeficitNote: 'खर्च मासिक खर्च-योग्य नकदी से अधिक हैं; घाटे को धनात्मक मान के रूप में दिखाया गया है।',
+    monthlyAllocationNote: 'मासिक खर्च-योग्य नकदी खर्च और अधिशेष में विभाजित है।',
+    ontarioDetails: 'ओंटारियो अधिभार {surtax}; स्वास्थ्य प्रीमियम {healthPremium}।',
+    quebecDetails: 'कर्मचारी कटौती के बाद क्यूबेक करयोग्य आय: {taxableIncome}। संघीय छूट: {abatement}।',
+    customExpenseName: 'कस्टम खर्च का नाम',
+    customExpenseAmount: 'मासिक कस्टम खर्च राशि',
+    expenseNamePlaceholder: 'खर्च का नाम',
+    removeCustomExpense: 'कस्टम खर्च हटाएँ',
+    taxChartAria: 'वार्षिक नकद आवंटन चार्ट',
+    cashChartAria: 'मासिक नकदी प्रवाह चार्ट'
+  });
 
-  // ===== 2025 CPP/QPP/EI & RRSP ( CRA / Retraite Québec ) =====
-  const CPP_2025 = {
-    ympe: 71300, // Year's Maximum Pensionable Earnings
-    yampe: 81200, // Second ceiling
-    ybe: 3500,    // Year's Basic Exemption
-    rateEmp: 0.0595,       // Employee rate (CPP1)
-    rateSE: 0.119,         // Self-employed (both shares)
-    maxEmp: 4034.10,       // Maximum employee CPP1
-    cpp2RateEmp: 0.04,     // CPP2 employee
-    cpp2RateSE: 0.08,      // CPP2 self-employed
-    maxCPP2Emp: 396.00     // Maximum employee CPP2
-  };
-  const QPP_2025 = {
-    mpe: 71300,
-    yampe: 81200,
-    ybe: 3500,
-    baseRateEmp: 0.054,  // 5.4%
-    addRateEmp: 0.01,    // +1% additional ( 6.4%)
-    baseRateSE: 0.108,   // 10.8%
-    addRateSE: 0.02,     // +2% ( 12.8%)
-    add2RateEmp: 0.04,   // 4% on [MPE, YAMPE]
-    add2RateSE: 0.08     // 8% self-employed
-  };
-  const EI_2025 = {
-    mie: 65700,                // Maximum Insurable Earnings
-    rate: { default: 0.0164, quebec: 0.0131 }, // employee
-    maxEmp: { default: 1077.48, quebec: 860.67 }
-  };
-  const RRSP_2025 = {
-    dollarLimit: 32490,  // 2025 RRSP dollar limit
-    earnedPct: 0.18
-  };
+  const ENGLISH_DYNAMIC = Object.freeze({
+    monthlySurplus: 'Monthly surplus', monthlyDeficit: 'Monthly deficit', weeklySurplus: 'Weekly surplus', weeklyDeficit: 'Weekly deficit',
+    warningWeeks: 'Job {job}: Working weeks plus paid vacation weeks exceed 52.',
+    warningVacationConflict: 'Job {job}: Paid vacation weeks and vacation-pay percentage were both entered; paid weeks were used and the percentage was ignored.',
+    warningRrspLimitRequired: 'No RRSP deduction was applied because an available deduction limit was not entered.',
+    warningRrspLimitExceeded: 'The contribution exceeds the entered available RRSP deduction limit; only the available limit was deducted, while the full contribution reduces spendable cash.',
+    warningRrspNetIncomeLimit: 'The RRSP deduction was limited to estimated net income; the full contribution still reduces spendable cash.',
+    warningQuebecLimited: 'Quebec support covers basic employment income, the worker deduction, QPP, EI, QPIP, provincial tax and the federal abatement. The Quebec prescription drug insurance premium and situation-dependent credits are not modeled.',
+    warningQuebecOtherIncome: 'Quebec income other than employment may trigger additional rules, including the health services fund contribution, that are outside this estimate.',
+    chartUnavailable: 'Chart unavailable; numeric results remain valid.', noCashActivity: 'No cash activity', incomeTaxChart: 'Income tax',
+    payrollChart: 'CPP/QPP, EI and QPIP', rrspContributionChart: 'RRSP contribution', spendableCashChart: 'Spendable cash', cashShortfall: 'Cash shortfall',
+    annualShortfallNote: 'Outflows exceed gross cash income; the chart shows the shortfall as a positive magnitude.',
+    annualAllocationNote: 'Annual cash allocation; all chart values are non-negative.', noMonthlyActivity: 'No monthly cash activity',
+    spendableCashAvailable: 'Spendable cash available', monthlyDeficitNote: 'Expenses exceed monthly spendable cash; the deficit is charted as a positive magnitude.',
+    monthlyAllocationNote: 'Monthly spendable cash is divided between expenses and surplus.',
+    ontarioDetails: 'Ontario surtax {surtax}; health premium {healthPremium}.',
+    quebecDetails: 'Quebec taxable income after worker deduction: {taxableIncome}. Federal abatement: {abatement}.',
+    customExpenseName: 'Custom expense name', customExpenseAmount: 'Monthly custom expense amount', expenseNamePlaceholder: 'Expense name',
+    removeCustomExpense: 'Remove custom expense', taxChartAria: 'Annual cash allocation chart', cashChartAria: 'Monthly cash flow chart'
+  });
 
+  let currentLanguage = 'en';
+  let secondJobEnabled = false;
+  let taxChart = null;
+  let cashChart = null;
+  let customExpenseCount = 0;
+  let updateQueued = false;
 
-  function calcTaxByBrackets(income, brackets) {
-    let tax = 0, lastCap = 0;
-    for (const b of brackets) {
-      const cap = Math.min(income, b.upTo);
-      if (cap > lastCap) {
-        tax += (cap - lastCap) * b.rate;
-        lastCap = cap;
-      }
-      if (income <= b.upTo) break;
-    }
-    return Math.max(0, tax);
-  }
+  const LANGUAGE_STORAGE_KEY = 'taxPlannerLanguage';
+  const WARNING_TRANSLATION_KEYS = Object.freeze({
+    WEEKS_OVER_52: 'warningWeeks',
+    VACATION_METHOD_CONFLICT: 'warningVacationConflict',
+    RRSP_LIMIT_REQUIRED: 'warningRrspLimitRequired',
+    RRSP_LIMIT_EXCEEDED: 'warningRrspLimitExceeded',
+    RRSP_NET_INCOME_LIMIT: 'warningRrspNetIncomeLimit',
+    QUEBEC_LIMITED_SUPPORT: 'warningQuebecLimited',
+    QUEBEC_OTHER_INCOME_LIMITATION: 'warningQuebecOtherIncome'
+  });
 
-  
-  function computeTaxes(annualIncome, province) {
-    // annualIncome “”( RRSP ).
-    if (!annualIncome || annualIncome <= 0) {
-      return { federal: 0, provincial: 0, total: 0, after: 0, avgRate: 0 };
-    }
-    // — :“”, ( BPA).
-    const fedRaw = calcTaxByBrackets(annualIncome, TAX_2025.federal);
-    const fedCredit = (TAX_2025.federal[0]?.rate || 0) * (BPA_2025.federal || 0);
-    const fedAfterCredit = Math.max(0, fedRaw - fedCredit);
-    // Quebec:“”Federal Tax 16.5% .
-    const fed = (province === 'Quebec') ? (fedAfterCredit * (1 - TAX_2025.qcFedAbatement)) : fedAfterCredit;
-
-    // — Provincial Tax:“Provincial Tax”,  BPA().
-    const provBr = TAX_2025.provinces[province] || [];
-    const provRaw = calcTaxByBrackets(annualIncome, provBr);
-    const provCredit = (provBr[0]?.rate || 0) * _getProvinceBPA(province);
-    const provBase = Math.max(0, provRaw - provCredit);
-
-    // Ontario“()”.
-    let prov = provBase;
-    if (province === 'Ontario') {
-      const { t1, r1, t2, r2 } = TAX_2025.onSurtax;
-      if (provBase > t1) prov += (provBase - t1) * r1;
-      if (provBase > t2) prov += (provBase - t2) * r2;
-    }
-
-    const total = fed + prov;
-    const after = Math.max(0, annualIncome - total);
-    const avgRate = total / annualIncome;
-    return { federal: fed, provincial: prov, total, after, avgRate };
-  }
-
-  // ===== () =====
-  
-  function taxAtIncome(income, province, wantBeforeSurtax=false) {
-    // returns {fedRaw, fedAdj, provBeforeSurtax, provTotal}
-    // fedAdj  BPA (Quebec); provTotal  BPA (Ontario).
-    const fedRaw = calcTaxByBrackets(income, TAX_2025.federal);
-    const fedCredit = (TAX_2025.federal[0]?.rate || 0) * (BPA_2025.federal || 0);
-    const fedAfterCredit = Math.max(0, fedRaw - fedCredit);
-    const fedAdj = (province === 'Quebec') ? (fedAfterCredit * (1 - TAX_2025.qcFedAbatement)) : fedAfterCredit;
-
-    const provBr = TAX_2025.provinces[province] || [];
-    const provBefore = calcTaxByBrackets(income, provBr);
-    const provCredit = (provBr[0]?.rate || 0) * _getProvinceBPA(province);
-    const provBase = Math.max(0, provBefore - provCredit);
-    let provTotal = provBase;
-    if (province === 'Ontario') {
-      const { t1, r1, t2, r2 } = TAX_2025.onSurtax;
-      if (provBase > t1) provTotal += (provBase - t1) * r1;
-      if (provBase > t2) provTotal += (provBase - t2) * r2;
-    }
-    return { fedRaw, fedAdj, provBeforeSurtax: provBefore, provTotal };
-  }
-
-  
-  function computeBracketSegments(annualIncome, province) {
-    const provBr = TAX_2025.provinces[province] || [];
-    const breakpoints = new Set([0]);
-    TAX_2025.federal.forEach(b => breakpoints.add(Math.min(b.upTo, annualIncome)));
-    provBr.forEach(b => breakpoints.add(Math.min(b.upTo, annualIncome)));
-    breakpoints.add(annualIncome);
-    const pts = Array.from(breakpoints).filter(x => !isNaN(x)).sort((a,b)=>a-b);
-
-    // — :/, BPA , Quebec, Ontario —
-    const fedRawTotal = calcTaxByBrackets(annualIncome, TAX_2025.federal);
-    const fedCreditTotalCap = (TAX_2025.federal[0]?.rate || 0) * (BPA_2025.federal || 0);
-    const fedCreditTotal = Math.min(fedRawTotal, fedCreditTotalCap);
-    const fedAfterCreditTotal = Math.max(0, fedRawTotal - fedCreditTotal);
-    const fedAbateTotal = (province === 'Quebec') ? (fedAfterCreditTotal * TAX_2025.qcFedAbatement) : 0;
-    const fedNetTotal = Math.max(0, fedAfterCreditTotal - fedAbateTotal);
-
-    const provBeforeTotal = calcTaxByBrackets(annualIncome, provBr);
-    const provCreditCap = (provBr[0]?.rate || 0) * _getProvinceBPA(province);
-    const provCreditTotal = Math.min(provBeforeTotal, provCreditCap);
-    const provBaseTotal = Math.max(0, provBeforeTotal - provCreditTotal);
-    let provSurtaxTotal = 0;
-    if (province === 'Ontario') {
-      const { t1, r1, t2, r2 } = TAX_2025.onSurtax;
-      if (provBaseTotal > t1) provSurtaxTotal += (provBaseTotal - t1) * r1;
-      if (provBaseTotal > t2) provSurtaxTotal += (provBaseTotal - t2) * r2;
-    }
-    const provNetTotal = provBaseTotal + provSurtaxTotal;
-
-    const segments = [];
-    for (let i=0;i<pts.length-1;i++) {
-      const a = pts[i], b = pts[i+1];
-      if (b <= a) continue;
-      const w = Math.min(b, annualIncome) - a;
-
-      // :“”, //.
-      const fedRawA = calcTaxByBrackets(a, TAX_2025.federal);
-      const fedRawB = calcTaxByBrackets(b, TAX_2025.federal);
-      const fedRawSeg = fedRawB - fedRawA;
-
-      const provBeforeA = calcTaxByBrackets(a, provBr);
-      const provBeforeB = calcTaxByBrackets(b, provBr);
-      const provBeforeSeg = provBeforeB - provBeforeA;
-
-      const fedCreditSeg = (fedRawTotal > 0) ? (fedCreditTotal * (fedRawSeg / fedRawTotal)) : 0;
-      const fedAfterCreditSeg = Math.max(0, fedRawSeg - fedCreditSeg);
-      const fedAbateSeg = (fedAfterCreditTotal > 0 && province === 'Quebec')
-        ? (fedAbateTotal * (fedAfterCreditSeg / fedAfterCreditTotal))
-        : 0;
-      const fedSeg = Math.max(0, fedAfterCreditSeg - fedAbateSeg);
-
-      const provCreditSeg = (provBeforeTotal > 0) ? (provCreditTotal * (provBeforeSeg / provBeforeTotal)) : 0;
-      const provBaseSeg = Math.max(0, provBeforeSeg - provCreditSeg);
-      let provSurtaxSeg = 0;
-      if (province === 'Ontario' && provBaseTotal > 0) {
-        // Allocate surtax proportionally to post-credit provincial base tax
-        provSurtaxSeg = provSurtaxTotal * (provBaseSeg / provBaseTotal);
-      }
-      const provSeg = provBaseSeg + provSurtaxSeg;
-
-      const segTax = Math.max(0, fedSeg + provSeg);
-      segments.push({
-        label: `${fmt.format(a)}–${fmt.format(b)}`,
-        width: w,
-        tax: segTax,
-        keep: Math.max(0, w - segTax)
-      });
-    }
-    return segments;
-  }
-
-  function ensureBracketChart() {
-    const ctx = document.getElementById('bracketBar');
-    if (!ctx) return;
-    if (!bracketChart) {
-      bracketChart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: [], datasets: [
-          { label: 'Take-home (segment)', data: [], stack: 's', borderWidth: 0, backgroundColor: '#22c55e' },
-          { label: 'Tax (segment)', data: [], stack: 's', borderWidth: 0, backgroundColor: '#ef4444' },
-        ]},
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          scales: {
-            x: { ticks: { color: '#e5e7eb' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { ticks: { color: '#e5e7eb' }, grid: { display: false } }
-          },
-          plugins: {
-            legend: { labels: { color: '#e5e7eb' } },
-            tooltip: {
-              callbacks: {
-                label: (c) => `${c.dataset.label}: ${fmt2.format(c.parsed.x ?? c.parsed)}`
-              }
-            }
-          }
-        }
-      });
-    }
-  }
-
-  function renderBracketBar(province, annualIncome) {
-    ensureBracketChart();
-    if (!bracketChart) return;
-    const segs = computeBracketSegments(annualIncome, province);
-    bracketChart.data.labels = segs.map(s => s.label);
-    bracketChart.data.datasets[0].data = segs.map(s => s.keep);
-    bracketChart.data.datasets[1].data = segs.map(s => s.tax);
-    bracketChart.update();
-  }
-
-
-  const els = {
-    mode: $$('input[name="mode"]'),
-    hourlyFields: $('#hourlyFields'),
-    annualField: $('#annualField'),
-    hourlyRate: $('#hourlyRate'),
-    hoursPerWeek: $('#hoursPerWeek'),
-    weeksPerYear: $('#weeksPerYear'),
-    annualSalary: $('#annualSalary'),
-    paidVacationPreset: $('#paidVacationPreset'),
-    paidVacationCustom: $('#paidVacationCustom'),
-    vacPayPreset: $('#vacPayPreset'),
-    vacPayCustom: $('#vacPayCustom'),
-    chkBonus: $('#chkBonus'),
-    chkAllowance: $('#chkAllowance'),
-    chkCommission: $('#chkCommission'),
-    bonusVal: $('#bonusVal'),
-    allowanceVal: $('#allowanceVal'),
-    commissionVal: $('#commissionVal'),
-    chkRRSP: $('#chkRRSP'), rrspVal: $('#rrspVal'),
-    chkStock: $('#chkStock'), stockVal: $('#stockVal'),
-    chkOther: $('#chkOther'), otherVal: $('#otherVal'),
-    rrspMode: $('#rrspMode'), rrspPct: $('#rrspPct'), rrspModeWrap: $('#rrspModeWrap'),
-    chkSelfEmp: $('#chkSelfEmp'),
-    outCPPQPP: $('#outCPPQPP'), outEI: $('#outEI'),
-    outAnnualGross: $('#outAnnualGross'),
-    outMonthlyGross: $('#outMonthlyGross'),
-    outWeeklyGross: $('#outWeeklyGross'),
-    weeksCheck: $('#weeksCheck'),
-    province: $('#province'),
-    outFedTax: $('#outFedTax'),
-    outProvTax: $('#outProvTax'),
-    outTotalTax: $('#outTotalTax'),
-    outAfterTax: $('#outAfterTax'),
-    outAvgRate: $('#outAvgRate'),
-    expRent: $('#expRent'),
-    expCarIns: $('#expCarIns'),
-    expTransit: $('#expTransit'),
-    expInternet: $('#expInternet'),
-    expGrocery: $('#expGrocery'),
-    expLoan: $('#expLoan'),
-    btnAddCustom: $('#btnAddCustom'),
-    customList: $('#customList'),
-    outMonthlyNet: $('#outMonthlyNet'),
-    outMonthlyExp: $('#outMonthlyExp'),
-    outMonthlyLeft: $('#outMonthlyLeft'),
-    outLeftPct: $('#outLeftPct'),
-    outWeeklyLeft: $('#outWeeklyLeft'),
-  };
-  // ===== Second Job() =====
-  function el2(id){ return document.getElementById(id); }
-  function isJob2Enabled(){ return !el2('job2Wrap')?.classList.contains('hidden'); }
-
-  function getPaidVacationWeeks2() {
-    const sel = el2('paidVacationPreset2');
-    if (!sel) return 0;
-    const v = sel.value;
-    if (v === 'custom') return Number(el2('paidVacationCustom2')?.value || 0);
-    return Number(v || 0);
-  }
-  function getVacPayPct2() {
-    const sel = el2('vacPayPreset2');
-    if (!sel) return 0;
-    const v = sel.value;
-    if (v === 'custom') return Number(el2('vacPayCustom2')?.value || 0);
-    return Number(v || 0);
-  }
-
-  function computeJobGross2() {
-    if (!isJob2Enabled()) return 0;
-    const mode2 = Array.from(document.querySelectorAll('input[name="mode2"]')).find(r=>r.checked)?.value || 'hourly';
-    let base = 0;
-    if (mode2 === 'annual') {
-      base = Number(el2('annualSalary2')?.value || 0);
-    } else {
-      const hr = Number(el2('hourlyRate2')?.value || 0);
-      let hpw = Number(el2('hoursPerWeek2')?.value || 0);
-      if (hpw > 168) { hpw = 168; el2('hoursPerWeek2').value = 168; }
-      if (hpw < 0) { hpw = 0; }
-      let wpy = Number(el2('weeksPerYear2')?.value || 0);
-      if (wpy > 52) { wpy = 52; el2('weeksPerYear2').value = 52; }
-      if (wpy < 0) { wpy = 0; }
-      const vacWeeks = getPaidVacationWeeks2();
-      const totalWeeks = wpy + vacWeeks;
-      el2('weeksCheck2')?.classList.toggle('hidden', totalWeeks <= 52);
-      base = hr * hpw * wpy + hr * hpw * vacWeeks;
-    }
-    const vacPay = base * (getVacPayPct2() / 100);
-    const bonus = el2('chkBonus2')?.checked ? Number(el2('bonusVal2')?.value || 0) : 0;
-    const allow = el2('chkAllowance2')?.checked ? Number(el2('allowanceVal2')?.value || 0) : 0;
-    const comm = el2('chkCommission2')?.checked ? Number(el2('commissionVal2')?.value || 0) : 0;
-    return Math.max(0, base + vacPay + bonus + allow + comm);
-  }
-
-
-  function getPaidVacationWeeks() {
-    const v = els.paidVacationPreset.value;
-    if (v === 'custom') return Number(els.paidVacationCustom.value || 0);
-    return Number(v || 0);
-  }
-  function getVacPayPct() {
-    const v = els.vacPayPreset.value;
-    if (v === 'custom') return Number(els.vacPayCustom.value || 0);
-    return Number(v || 0);
-  }
-
-  
-
-  function clampRRSP(earnedIncome, inputRRSP) {
-    const limit = Math.min(RRSP_2025.dollarLimit, earnedIncome * RRSP_2025.earnedPct);
-    return Math.max(0, Math.min(Number(inputRRSP||0), limit));
-  }
-
-  function computeIncomeBreakdown() {
-    // Employment components from job1 + job2
-    const mode = els.mode.find(r => r.checked)?.value || 'hourly';
-    let base = 0;
-    if (mode === 'annual') {
-      base = Number(els.annualSalary.value || 0);
-    } else {
-      const hr = Number(els.hourlyRate.value || 0);
-      let hpw = Number(els.hoursPerWeek.value || 0);
-      if (hpw > 168) { hpw = 168; els.hoursPerWeek.value = 168; }
-      if (hpw < 0) { hpw = 0; }
-      let wpy = Number(els.weeksPerYear.value || 0);
-      if (wpy > 52) { wpy = 52; els.weeksPerYear.value = 52; }
-      if (wpy < 0) { wpy = 0; }
-      const vacWeeks = getPaidVacationWeeks();
-      base = hr * hpw * (wpy + vacWeeks);
-    }
-    const vacPay = base * (getVacPayPct() / 100);
-    const bonus = els.chkBonus.checked ? Number(els.bonusVal.value || 0) : 0;
-    const allow = els.chkAllowance.checked ? Number(els.allowanceVal.value || 0) : 0;
-    const comm = els.chkCommission.checked ? Number(els.commissionVal.value || 0) : 0;
-    const job1Employment = Math.max(0, base + vacPay + bonus + allow + comm);
-
-    const job2 = computeJobGross2(); // job2 already includes its bonus/allowance/commission
-    const employmentIncome = job1Employment + job2;
-
-    const stock = els.chkStock?.checked ? Number(els.stockVal?.value || 0) : 0;
-    const other = els.chkOther?.checked ? Number(els.otherVal?.value || 0) : 0;
-    let rrspCandidate = 0;
-    if (els.chkRRSP?.checked) {
-      const mode = els.rrspMode?.value || 'amount';
-      if (mode === 'percent') {
-        const pct = Math.max(0, Number(els.rrspPct?.value || 0));
-        rrspCandidate = employmentIncome * (pct / 100);
-      } else {
-        rrspCandidate = Number(els.rrspVal?.value || 0);
-      }
-    }
-
-
-    const totalGross = employmentIncome + stock + other;
-    const rrspDed = clampRRSP(employmentIncome, rrspCandidate);
-    const taxableIncome = Math.max(0, totalGross - rrspDed);
-    return { totalGross, employmentIncome, stock, other, rrspDed, taxableIncome };
-  }
-
-  function computeCPP_QPP_EI(employmentIncome, province, selfEmp) {
-    // CPP/QPP: only on employment income
-    const isQC = (province === 'Quebec');
-    let cppqpp = 0;
-    if (!isQC) {
-      // CPP
-      const earnings1 = Math.max(0, Math.min(CPP_2025.ympe, employmentIncome) - CPP_2025.ybe);
-      const rate1 = selfEmp ? CPP_2025.rateSE : CPP_2025.rateEmp;
-      let part1 = earnings1 * rate1;
-      if (!selfEmp) part1 = Math.min(part1, CPP_2025.maxEmp);
-      // CPP2
-      const earnings2 = Math.max(0, Math.min(CPP_2025.yampe, employmentIncome) - CPP_2025.ympe);
-      const rate2 = selfEmp ? CPP_2025.cpp2RateSE : CPP_2025.cpp2RateEmp;
-      let part2 = earnings2 * rate2;
-      if (!selfEmp) part2 = Math.min(part2, CPP_2025.maxCPP2Emp);
-      cppqpp = part1 + part2;
-    } else {
-      // QPP
-      const earnings1 = Math.max(0, Math.min(QPP_2025.mpe, employmentIncome) - QPP_2025.ybe);
-      const rate1 = selfEmp ? (QPP_2025.baseRateSE + QPP_2025.addRateSE) : (QPP_2025.baseRateEmp + QPP_2025.addRateEmp);
-      let part1 = earnings1 * rate1;
-      // Official maximums (derived by formula) are respected via earnings caps
-
-      const earnings2 = Math.max(0, Math.min(QPP_2025.yampe, employmentIncome) - QPP_2025.mpe);
-      const rate2 = selfEmp ? QPP_2025.add2RateSE : QPP_2025.add2RateEmp;
-      let part2 = earnings2 * rate2;
-      cppqpp = part1 + part2;
-    }
-
-    // EI (employees only by default; self-employed not covered unless opted-in -> treat as 0)
-    let ei = 0;
-    if (!selfEmp) {
-      const mie = EI_2025.mie;
-      const rate = isQC ? EI_2025.rate.quebec : EI_2025.rate.default;
-      const cap = isQC ? EI_2025.maxEmp.quebec : EI_2025.maxEmp.default;
-      ei = Math.min((Math.min(employmentIncome, mie)) * rate, cap);
-    }
-    const planLabel = isQC ? 'QPP' : 'CPP';
-    return { cppqpp, ei, planLabel };
-  }
-
-  function computeAnnualGross() {
-    // job1()+ job2()
-    const mode = els.mode.find(r => r.checked)?.value || 'hourly';
-    let base = 0;
-    if (mode === 'annual') {
-      base = Number(els.annualSalary.value || 0);
-    } else {
-      const hr = Number(els.hourlyRate.value || 0);
-      let hpw = Number(els.hoursPerWeek.value || 0);
-      if (hpw > 168) { hpw = 168; els.hoursPerWeek.value = 168; }
-      if (hpw < 0) { hpw = 0; }
-      let wpy = Number(els.weeksPerYear.value || 0);
-      if (wpy > 52) { wpy = 52; els.weeksPerYear.value = 52; }
-      if (wpy < 0) { wpy = 0; }
-      const vacWeeks = getPaidVacationWeeks();
-      const totalWeeks = wpy + vacWeeks;
-      els.weeksCheck.classList.toggle('hidden', totalWeeks <= 52);
-      base = hr * hpw * wpy + hr * hpw * vacWeeks;
-    }
-    const vacPay = base * (getVacPayPct() / 100);
-    const bonus = els.chkBonus.checked ? Number(els.bonusVal.value || 0) : 0;
-    const allow = els.chkAllowance.checked ? Number(els.allowanceVal.value || 0) : 0;
-    const comm = els.chkCommission.checked ? Number(els.commissionVal.value || 0) : 0;
-
-    const job1 = Math.max(0, base + vacPay + bonus + allow + comm);
-    const job2 = computeJobGross2();
-    return job1 + job2;
-  }
-
-
-  function renderIncomeOutputs(annual) {
-    els.outAnnualGross.textContent = fmt.format(annual);
-    els.outMonthlyGross.textContent = fmt2.format(annual / 12);
-    els.outWeeklyGross.textContent = fmt2.format(annual / 52);
-  }
-
-  function syncModeUI() {
-    const mode = els.mode.find(r => r.checked)?.value || 'hourly';
-    els.hourlyFields.classList.toggle('hidden', mode !== 'hourly');
-    els.annualField.classList.toggle('hidden', mode !== 'annual');
-  }
-  function syncVacUI() {
-    els.paidVacationCustom.classList.toggle('hidden', els.paidVacationPreset.value !== 'custom');
-    els.vacPayCustom.classList.toggle('hidden', els.vacPayPreset.value !== 'custom');
-  }
-  function syncBenefitInputs() {
-    els.bonusVal.classList.toggle('hidden', !els.chkBonus.checked);
-    els.allowanceVal.classList.toggle('hidden', !els.chkAllowance.checked);
-    els.commissionVal.classList.toggle('hidden', !els.chkCommission.checked);
-    els.rrspVal?.classList.toggle('hidden', !els.chkRRSP?.checked);
-    els.stockVal?.classList.toggle('hidden', !els.chkStock?.checked);
-    els.otherVal?.classList.toggle('hidden', !els.chkOther?.checked);
-    els.rrspVal?.classList.toggle('hidden', !els.chkRRSP?.checked);
-    els.stockVal?.classList.toggle('hidden', !els.chkStock?.checked);
-    els.otherVal?.classList.toggle('hidden', !els.chkOther?.checked);
-  }
-
-  const PercentLabels = {
-    id: 'percentLabels',
-    afterDatasetsDraw(chart) {
-      const ds = chart.data.datasets[0];
-      if (!ds) return;
-      const total = ds.data.reduce((a, b) => a + b, 0) || 1;
-      const meta = chart.getDatasetMeta(0);
-      const ctx = chart.ctx;
-      ctx.save();
-      ctx.fillStyle = '#e5e7eb';
-      ctx.font = '12px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      meta.data.forEach((arc, i) => {
-        const val = ds.data[i];
-        if (!val || val <= 0) return;
-        const props = arc.getProps(['x','y','startAngle','endAngle','innerRadius','outerRadius'], true);
-        const angle = (props.startAngle + props.endAngle) / 2;
-        const r = (props.innerRadius + props.outerRadius) / 2;
-        const x = props.x + Math.cos(angle) * r;
-        const y = props.y + Math.sin(angle) * r;
-        const pct = Math.round((val / total) * 100);
-        ctx.fillText(`${pct}%`, x, y);
-      });
-      ctx.restore();
-    }
-  };
-  const CenterText = {
-    id: 'centerText',
-    afterDraw(chart) {
-      const text = chart.options.plugins?.centerText?.text;
-      if (!text) return;
-      const {left, right, top, bottom} = chart.chartArea;
-      const x = (left + right) / 2;
-      const y = (top + bottom) / 2;
-      const ctx = chart.ctx;
-      ctx.save();
-      ctx.fillStyle = '#e5e7eb';
-      ctx.font = 'bold 18px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, x, y);
-      ctx.restore();
-    }
-  };
-  if (window.Chart) {
-    Chart.register(PercentLabels, CenterText);
-  }
-
-  let taxChart, expChart, bracketChart, leftChart;
-
-  function ensureTaxChart() {
-    const ctx = document.getElementById('taxDonut');
-    if (!ctx) return;
-    if (!taxChart) {
-      taxChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Federal Tax','Provincial/Territorial Tax','CPP/QPP','EI','After-tax Income'], datasets: [{ data: [0,0,0,0,1], borderWidth: 0 }] }, options: {
-          plugins: {
-            legend: { labels: { color: '#e5e7eb' } },
-            tooltip: { callbacks: { label: (c) => `${c.label}: ${fmt2.format(c.parsed)}` } },
-            centerText: { text: '' }
-          },
-          cutout: '60%'
-        }
-      });
-    }
-  }
-
-  
-  function ensureLeftChart() {
-    const ctx = document.getElementById('leftDonut');
-    if (!ctx) return;
-    if (!leftChart) {
-      leftChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Leftover', 'Expenses'],
-          datasets: [{
-            data: [0, 0],
-            borderWidth: 0,
-            backgroundColor: ['#22c55e', '#ef4444']
-          }]
-        },
-        options: {
-          plugins: {
-            legend: { labels: { color: '#e5e7eb' } },
-            tooltip: { callbacks: { label: (c) => `${c.label}: ${fmt2.format(c.parsed)}` } },
-            centerText: { text: '' }
-          },
-          cutout: '60%'
-        }
-      });
-    }
-  }
-function ensureExpChart() {
-    const ctx = document.getElementById('expDonut');
-    if (!ctx) return;
-    if (!expChart) {
-      expChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: [], datasets: [{ data: [], borderWidth: 0, backgroundColor: [] }] },
-        options: {
-          plugins: {
-            legend: { labels: { color: '#e5e7eb' } },
-            tooltip: { callbacks: { label: (c) => `${c.label}: ${fmt2.format(c.parsed)}` } },
-            centerText: { text: '' }
-          },
-          cutout: '60%'
-        }
-      });
-    }
-  }
-
-
-  function renderTax(province, annualGross) {
-    // Use breakdown: RRSP deduction reduces taxable income; CPP/QPP & EI reduce net cash but not taxable income
-    const selfEmp = !!els.chkSelfEmp?.checked;
-    const br = computeIncomeBreakdown();
-    const taxable = Math.max(0, br.taxableIncome);
-    const { federal, provincial, total, after, avgRate } = computeTaxes(taxable, province);
-    const { cppqpp, ei, planLabel } = computeCPP_QPP_EI(br.employmentIncome, province, selfEmp);
-
-    els.outFedTax.textContent = fmt.format(federal);
-    els.outProvTax.textContent = fmt.format(provincial);
-    els.outTotalTax.textContent = fmt.format(total);
-    els.outCPPQPP && (els.outCPPQPP.textContent = fmt.format(cppqpp));
-    els.outEI && (els.outEI.textContent = fmt.format(ei));
-
-    const afterAll = Math.max(0, annualGross - total - cppqpp - ei);
-    els.outAfterTax.textContent = fmt.format(afterAll);
-    els.outAvgRate.textContent = ( (total + cppqpp + ei) / (annualGross||1) * 100 ).toFixed(1) + '%';
-
-    ensureTaxChart();
-    if (taxChart) {
-      taxChart.data.labels = [i18n_t('Federal Tax'), i18n_t('Provincial/Territorial Tax'), planLabel, i18n_t('EI'), i18n_t('After-tax Income')];
-      taxChart.data.datasets[0].data = [federal, provincial, cppqpp, ei, Math.max(0, afterAll)];
-      const afterPct = annualGross > 0 ? Math.round((afterAll / annualGross) * 100) : 0;
-      taxChart.options.plugins.centerText.text = `${afterPct}% ` + i18n_t('After-tax');
-      taxChart.update();
-    }
-    //  taxable( RRSP)
-    renderBracketBar(province, taxable);
-    return { afterAnnual: afterAll };
-  }
-
-  function getMonthlyExpenses() {
-    const basics = [
-      Number(els.expRent.value || 0),
-      Number(els.expCarIns.value || 0),
-      Number(els.expTransit.value || 0),
-      Number(els.expInternet.value || 0),
-      Number(els.expGrocery.value || 0),
-      Number(els.expLoan.value || 0),
-    ].reduce((a, b) => a + b, 0);
-    const customs = Array.from(document.querySelectorAll('#customList input[type="number"]')).reduce((sum, el) => sum + Number(el.value || 0), 0);
-    return basics + customs;
-  }
-
-
-  function getExpenseBreakdown() {
-    // Expenses(Custom)
-    const items = [
-      ['Mortgage/Rent', Number(els.expRent.value||0)],
-      ['Auto Insurance', Number(els.expCarIns.value||0)],
-      ['Commuting', Number(els.expTransit.value||0)],
-      ['Internet/Phone', Number(els.expInternet.value||0)],
-      ['Groceries', Number(els.expGrocery.value||0)],
-      ['Insurance/Loans', Number(els.expLoan.value||0)],
-    ];
-    document.querySelectorAll('#customList .grid input[type="text"]').forEach((nameEl, idx) => {
-      const valEl = nameEl.parentElement.querySelector('input[type="number"]');
-      items.push([nameEl.value || 'Custom', Number(valEl?.value||0)]);
+  function translate(key, replacements) {
+    const languageValue = TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key];
+    let value = languageValue || ENGLISH_DYNAMIC[key] || key;
+    Object.keys(replacements || {}).forEach(function (replacement) {
+      value = value.split('{' + replacement + '}').join(replacements[replacement]);
     });
-    // Filter <= 0
-    const filtered = items.filter(([_,v]) => v>0);
-    // Sort and take top 5
-    filtered.sort((a,b)=>b[1]-a[1]);
-    const top5 = filtered.slice(0,5);
-    const others = filtered.slice(5).reduce((s,[,v])=>s+v,0);
-    if (others>0) top5.push(['Other Expenses', others]);
-    return top5;
+    return value;
   }
 
-  function renderExpense(afterAnnual) {
-    const monthlyNet = afterAnnual / 12;
-    const monthlyExp = getMonthlyExpenses();
-    const monthlyLeft = Math.max(0, monthlyNet - monthlyExp);
-    const leftPct = monthlyNet > 0 ? (monthlyLeft / monthlyNet) : 0;
-    els.outMonthlyNet.textContent = fmt2.format(monthlyNet);
-    els.outMonthlyExp.textContent = fmt2.format(monthlyExp);
-    els.outMonthlyLeft.textContent = fmt2.format(monthlyLeft);
-    els.outWeeklyLeft.textContent = fmt2.format(monthlyLeft / 4.345);
-    els.outLeftPct.textContent = (leftPct * 100).toFixed(1) + '%';
-    ensureLeftChart();
-    if (leftChart) {
-      leftChart.data.labels = [i18n_t('Leftover'), i18n_t('Expenses')];
-      leftChart.data.datasets[0].data = [monthlyLeft, monthlyExp];
-      leftChart.options.plugins.centerText.text = i18n_t('Leftover Share');
-      leftChart.update();
+  function applyTranslations() {
+    $$('[data-i18n]').forEach(function (element) {
+      if (!element.dataset.i18nDefault) element.dataset.i18nDefault = element.textContent;
+      const languageValue = TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][element.dataset.i18n];
+      element.textContent = languageValue || element.dataset.i18nDefault;
+    });
+    $$('[data-i18n-placeholder]').forEach(function (element) {
+      if (!element.dataset.i18nPlaceholderDefault) element.dataset.i18nPlaceholderDefault = element.getAttribute('placeholder') || '';
+      const languageValue = TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][element.dataset.i18nPlaceholder];
+      element.setAttribute('placeholder', languageValue || element.dataset.i18nPlaceholderDefault);
+    });
+    $$('[data-i18n-aria-label]').forEach(function (element) {
+      if (!element.dataset.i18nAriaLabelDefault) element.dataset.i18nAriaLabelDefault = element.getAttribute('aria-label') || '';
+      const languageValue = TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][element.dataset.i18nAriaLabel];
+      element.setAttribute('aria-label', languageValue || element.dataset.i18nAriaLabelDefault);
+    });
+  }
+
+  function isSupportedLanguage(language) {
+    return language === 'en' || Object.prototype.hasOwnProperty.call(TRANSLATIONS, language);
+  }
+
+  function storedLanguage() {
+    try {
+      const language = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      return isSupportedLanguage(language) ? language : 'en';
+    } catch (error) {
+      return 'en';
     }
-    ensureExpChart();
-    if (expChart) {
-      const parts = getExpenseBreakdown();
-      const labels = parts.map(p=>p[0]);
-      const data = parts.map(p=>p[1]);
-      expChart.data.labels = labels;
-      expChart.data.datasets[0].data = data;
-      // (6:5 + )
-      const n = data.length;
-      const colors = [];
-      for (let i=0;i<n;i++) {
-        const hue = Math.round((i * 360) / Math.max(6, n+1));
-        colors.push(`hsl(${hue} 70% 55%)`);
+  }
+
+  function setLanguage(language) {
+    currentLanguage = isSupportedLanguage(language) ? language : 'en';
+    document.documentElement.lang = currentLanguage;
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+    } catch (error) {
+      // The calculator still works when storage is unavailable.
+    }
+    applyTranslations();
+    update();
+  }
+
+  function jobInput(suffix) {
+    const method = byId('vacationMethod' + suffix).value;
+    return {
+      mode: selected('mode' + suffix),
+      hourlyRate: numberValue('hourlyRate' + suffix),
+      hoursPerWeek: numberValue('hoursPerWeek' + suffix),
+      workingWeeks: numberValue('weeksPerYear' + suffix),
+      annualSalary: numberValue('annualSalary' + suffix),
+      paidVacationWeeks: method === 'weeks' ? numberValue('paidVacationWeeks' + suffix) : 0,
+      vacationPayPercent: method === 'percent' ? numberValue('vacationPayPercent' + suffix) : 0,
+      bonus: numberValue('bonusVal' + suffix),
+      allowance: numberValue('allowanceVal' + suffix),
+      commission: numberValue('commissionVal' + suffix)
+    };
+  }
+
+  function monthlyExpenses() {
+    const values = {
+      rent: numberValue('expRent'),
+      carInsurance: numberValue('expCarIns'),
+      commuting: numberValue('expTransit'),
+      phone: numberValue('expInternet'),
+      groceries: numberValue('expGrocery'),
+      loans: numberValue('expLoan')
+    };
+    $$('.custom-expense-amount').forEach(function (input, index) {
+      values['custom' + index] = Number(input.value) > 0 ? Number(input.value) : 0;
+    });
+    return values;
+  }
+
+  function calculatorInput() {
+    const limitInput = byId('rrspLimit').value.trim();
+    const jobs = [jobInput('')];
+    if (secondJobEnabled) jobs.push(jobInput('2'));
+    return {
+      provinceCode: byId('province').value,
+      jobs: jobs,
+      additionalEmploymentIncome: numberValue('additionalEmploymentIncome'),
+      otherOrdinaryIncome: numberValue('otherOrdinaryIncome'),
+      rrspContribution: numberValue('rrspContribution'),
+      availableRrspDeductionLimit: limitInput === '' ? undefined : Number(limitInput),
+      monthlyExpenses: monthlyExpenses()
+    };
+  }
+
+  function setMoney(id, value) {
+    byId(id).textContent = currency.format(value);
+  }
+
+  function renderWarnings(result) {
+    const box = byId('validationWarnings');
+    byId('rrspContribution').removeAttribute('aria-invalid');
+    byId('rrspLimit').removeAttribute('aria-invalid');
+    ['', '2'].forEach(function (suffix) {
+      byId('weeksPerYear' + suffix).removeAttribute('aria-invalid');
+      byId('paidVacationWeeks' + suffix).removeAttribute('aria-invalid');
+    });
+    if (!result.warnings.length) {
+      box.replaceChildren();
+      box.classList.add('hidden');
+      return;
+    }
+    const list = document.createElement('ul');
+    list.className = 'list-disc pl-5 space-y-1';
+    result.warnings.forEach(function (warning) {
+      const item = document.createElement('li');
+      const translationKey = WARNING_TRANSLATION_KEYS[warning.code];
+      item.textContent = translationKey
+        ? translate(translationKey, { job: String((warning.jobIndex || 0) + 1) })
+        : warning.message;
+      list.appendChild(item);
+      if (warning.code.indexOf('RRSP_') === 0) {
+        byId('rrspContribution').setAttribute('aria-invalid', 'true');
+        byId('rrspLimit').setAttribute('aria-invalid', 'true');
       }
-      expChart.data.datasets[0].backgroundColor = colors;
-      expChart.options.plugins.centerText.text = i18n_t('Expenses');
-      expChart.update();
-    }
+      if (warning.code === 'WEEKS_OVER_52') {
+        const suffix = warning.jobIndex === 1 ? '2' : '';
+        byId('weeksPerYear' + suffix).setAttribute('aria-invalid', 'true');
+        byId('paidVacationWeeks' + suffix).setAttribute('aria-invalid', 'true');
+      }
+    });
+    box.replaceChildren(list);
+    box.classList.remove('hidden');
   }
 
-  function addCustomRow() {
+  function chartDefaults() {
+    return {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#e5e7eb' } },
+        tooltip: { callbacks: { label: function (context) { return context.label + ': ' + currency.format(context.parsed); } } }
+      }
+    };
+  }
+
+  function renderTaxChart(result) {
+    if (typeof Chart === 'undefined') {
+      byId('taxChartNote').textContent = translate('chartUnavailable');
+      return;
+    }
+    let labels;
+    let data;
+    let colors;
+    if (result.grossCashIncome === 0 && result.rrspContribution === 0) {
+      labels = [translate('noCashActivity')];
+      data = [1];
+      colors = ['#3f3f46'];
+    } else if (result.spendableCashAfterRrsp >= 0) {
+      labels = [translate('incomeTaxChart'), translate('payrollChart'), translate('rrspContributionChart'), translate('spendableCashChart')];
+      data = [result.incomeTax, result.payrollContributions, result.rrspContribution, result.spendableCashAfterRrsp];
+      colors = ['#ef4444', '#f97316', '#60a5fa', '#22c55e'];
+    } else {
+      labels = [translate('incomeTaxChart'), translate('payrollChart'), translate('rrspContributionChart'), translate('cashShortfall')];
+      data = [result.incomeTax, result.payrollContributions, result.rrspContribution, Math.abs(result.spendableCashAfterRrsp)];
+      colors = ['#ef4444', '#f97316', '#60a5fa', '#f87171'];
+    }
+    if (taxChart) taxChart.destroy();
+    taxChart = new Chart(byId('taxDonut'), { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] }, options: chartDefaults() });
+    byId('taxChartNote').textContent = result.spendableCashAfterRrsp < 0
+      ? translate('annualShortfallNote')
+      : translate('annualAllocationNote');
+  }
+
+  function renderCashChart(result) {
+    if (typeof Chart === 'undefined') {
+      byId('cashChartNote').textContent = translate('chartUnavailable');
+      return;
+    }
+    const deficit = result.monthlySurplus < 0;
+    let labels;
+    let data;
+    let colors;
+    if (result.monthlyExpenses === 0 && result.monthlySpendableCash === 0) {
+      labels = [translate('noMonthlyActivity')];
+      data = [1];
+      colors = ['#3f3f46'];
+    } else if (deficit) {
+      labels = [translate('spendableCashAvailable'), translate('monthlyDeficit')];
+      data = [Math.max(0, result.monthlySpendableCash), Math.abs(result.monthlySurplus)];
+      colors = ['#60a5fa', '#f87171'];
+    } else {
+      labels = [translate('monthlyExpenses'), translate('monthlySurplus')];
+      data = [result.monthlyExpenses, result.monthlySurplus];
+      colors = ['#fb7185', '#22c55e'];
+    }
+    if (cashChart) cashChart.destroy();
+    cashChart = new Chart(byId('leftDonut'), { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] }, options: chartDefaults() });
+    byId('cashChartNote').textContent = deficit
+      ? translate('monthlyDeficitNote')
+      : translate('monthlyAllocationNote');
+  }
+
+  function render(result) {
+    setMoney('outAnnualGross', result.grossCashIncome);
+    setMoney('outEmploymentIncome', result.employmentIncome);
+    setMoney('outOtherIncome', result.otherOrdinaryIncome);
+    setMoney('outRrspDeduction', result.rrspDeduction);
+    setMoney('outTaxableIncome', result.taxableIncome);
+    setMoney('outFedTax', result.federalIncomeTax);
+    setMoney('outProvTax', result.provincialIncomeTax);
+    setMoney('outCPPQPP', result.cppOrQpp);
+    setMoney('outEI', result.employeeEi);
+    setMoney('outQPIP', result.employeeQpip);
+    setMoney('outTotalDeductions', result.incomeTaxPlusPayrollContributions);
+    setMoney('outRrspSaving', result.rrspIncomeTaxReduction);
+    setMoney('outAfterTaxBeforeRrsp', result.afterTaxCashBeforeRrsp);
+    setMoney('outRrspContribution', result.rrspContribution);
+    setMoney('outSpendable', result.spendableCashAfterRrsp);
+    setMoney('outMonthlyNet', result.monthlySpendableCash);
+    setMoney('outMonthlyExp', result.monthlyExpenses);
+    setMoney('outMonthlyLeft', result.monthlySurplus);
+    setMoney('outWeeklyLeft', result.weeklySurplus);
+
+    byId('cppLabel').textContent = result.pensionPlan;
+    byId('qpipCard').classList.toggle('hidden', result.provinceCode !== 'QC');
+    const provincialDetails = [];
+    if (result.provinceCode === 'ON') provincialDetails.push(translate('ontarioDetails', {
+      surtax: currency.format(result.ontarioSurtax),
+      healthPremium: currency.format(result.ontarioHealthPremium)
+    }));
+    if (result.provinceCode === 'QC') provincialDetails.push(translate('quebecDetails', {
+      taxableIncome: currency.format(result.provincialTaxableIncome),
+      abatement: currency.format(result.federalQuebecAbatement)
+    }));
+    byId('outProvDetails').textContent = provincialDetails.join(' ');
+
+    const deficit = result.monthlySurplus < 0;
+    byId('monthlyFlowLabel').textContent = translate(deficit ? 'monthlyDeficit' : 'monthlySurplus');
+    byId('weeklyFlowLabel').textContent = translate(deficit ? 'weeklyDeficit' : 'weeklySurplus');
+    byId('cashFlowResults').classList.toggle('deficit-state', deficit);
+    byId('outMonthlyLeft').classList.toggle('text-red-400', deficit);
+    byId('outMonthlyLeft').classList.toggle('text-accent', !deficit);
+    byId('outWeeklyLeft').classList.toggle('text-red-300', deficit);
+
+    renderWarnings(result);
+    renderTaxChart(result);
+    renderCashChart(result);
+  }
+
+  function update() {
+    if (!byId('calculator')) return;
+    render(engine.calculateEstimate(calculatorInput()));
+  }
+
+  function queueUpdate() {
+    if (updateQueued) return;
+    updateQueued = true;
+    requestAnimationFrame(function () {
+      updateQueued = false;
+      update();
+    });
+  }
+
+  function syncPayMode(suffix) {
+    const annual = selected('mode' + suffix) === 'annual';
+    byId('hourlyFields' + suffix).classList.toggle('hidden', annual);
+    byId('annualField' + suffix).classList.toggle('hidden', !annual);
+    byId('vacationFields' + suffix).classList.toggle('hidden', annual);
+  }
+
+  function syncVacation(suffix) {
+    const method = byId('vacationMethod' + suffix).value;
+    byId('paidVacationWrap' + suffix).classList.toggle('hidden', method !== 'weeks');
+    byId('vacationPercentWrap' + suffix).classList.toggle('hidden', method !== 'percent');
+  }
+
+  function addCustomExpense() {
+    customExpenseCount += 1;
     const row = document.createElement('div');
-    row.className = 'grid grid-cols-2 gap-2';
-    row.innerHTML = `
-      <input type="text" placeholder="Name" class="rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" value="Custom">
-      <div class="flex items-center gap-2">
-        <input type="number" min="0" step="10" value="0"
-              class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-        <button aria-label="Remove" class="shrink-0 rounded-md bg-white/10 px-2 py-2 hover:bg-white/20 text-xs">✕</button>
-      </div>
-    `;
-    const removeBtn = row.querySelector('button');
-    removeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      row.remove();
-      scheduleUpdate();
+    const nameId = 'customName' + customExpenseCount;
+    const amountId = 'customAmount' + customExpenseCount;
+    row.className = 'grid grid-cols-[1fr_8rem_auto] gap-2 items-center';
+    row.innerHTML = '<label class="sr-only" data-i18n="customExpenseName" for="' + nameId + '">' + translate('customExpenseName') + '</label>' +
+      '<input id="' + nameId + '" type="text" data-i18n-placeholder="expenseNamePlaceholder" placeholder="' + translate('expenseNamePlaceholder') + '" class="rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">' +
+      '<label class="sr-only" data-i18n="customExpenseAmount" for="' + amountId + '">' + translate('customExpenseAmount') + '</label>' +
+      '<input id="' + amountId + '" type="number" min="0" step="10" value="0" class="custom-expense-amount rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">' +
+      '<button type="button" class="remove-custom rounded-md bg-white/10 px-3 py-2" data-i18n-aria-label="removeCustomExpense" aria-label="' + translate('removeCustomExpense') + '">×</button>';
+    row.querySelector('.remove-custom').addEventListener('click', function () { row.remove(); queueUpdate(); });
+    row.querySelector('.custom-expense-amount').addEventListener('input', queueUpdate);
+    byId('customList').appendChild(row);
+  }
+
+  function initialize() {
+    const navButton = byId('nav-toggle');
+    const navDrawer = byId('nav-drawer');
+    navButton.addEventListener('click', function () {
+      const opening = navDrawer.classList.contains('hidden');
+      navDrawer.classList.toggle('hidden', !opening);
+      navButton.setAttribute('aria-expanded', String(opening));
     });
-    row.querySelectorAll('input').forEach(el => el.addEventListener('input', scheduleUpdate));
-    document.getElementById('customList').appendChild(row);
+    $$('[data-lang]').forEach(function (link) {
+      link.addEventListener('click', function (event) { event.preventDefault(); setLanguage(link.dataset.lang); });
+    });
+    $$('input[name="mode"], input[name="mode2"]').forEach(function (radio) {
+      radio.addEventListener('change', function () { syncPayMode(radio.name === 'mode2' ? '2' : ''); queueUpdate(); });
+    });
+    byId('vacationMethod').addEventListener('change', function () { syncVacation(''); queueUpdate(); });
+    byId('vacationMethod2').addEventListener('change', function () { syncVacation('2'); queueUpdate(); });
+    byId('btnToggleJob2').addEventListener('click', function () {
+      secondJobEnabled = true;
+      byId('job2Wrap').classList.remove('hidden');
+      byId('btnToggleJob2').classList.add('hidden');
+      byId('btnToggleJob2').setAttribute('aria-expanded', 'true');
+      queueUpdate();
+    });
+    byId('btnRemoveJob2').addEventListener('click', function () {
+      secondJobEnabled = false;
+      byId('job2Wrap').classList.add('hidden');
+      byId('btnToggleJob2').classList.remove('hidden');
+      byId('btnToggleJob2').setAttribute('aria-expanded', 'false');
+      queueUpdate();
+    });
+    byId('btnAddCustom').addEventListener('click', addCustomExpense);
+    byId('calculator').addEventListener('input', queueUpdate);
+    byId('calculator').addEventListener('change', queueUpdate);
+    window.addEventListener('scroll', function () {
+      const root = document.documentElement;
+      const maximum = root.scrollHeight - root.clientHeight;
+      byId('progress').style.width = (maximum > 0 ? root.scrollTop / maximum * 100 : 0) + '%';
+    }, { passive: true });
+    syncPayMode('');
+    syncPayMode('2');
+    syncVacation('');
+    syncVacation('2');
+    setLanguage(storedLanguage());
   }
 
-  let rafToken = 0;
-  function scheduleUpdate() {
-    cancelAnimationFrame(rafToken);
-    rafToken = requestAnimationFrame(updateAll);
-  }
-
-  function updateAll() {
-    const mode = els.mode.find(r => r.checked)?.value || 'hourly';
-    els.hourlyFields.classList.toggle('hidden', mode !== 'hourly');
-    els.annualField.classList.toggle('hidden', mode !== 'annual');
-    els.paidVacationCustom.classList.toggle('hidden', els.paidVacationPreset.value !== 'custom');
-    els.vacPayCustom.classList.toggle('hidden', els.vacPayPreset.value !== 'custom');
-    els.bonusVal.classList.toggle('hidden', !els.chkBonus.checked);
-    els.allowanceVal.classList.toggle('hidden', !els.chkAllowance.checked);
-    els.commissionVal.classList.toggle('hidden', !els.chkCommission.checked);
-    els.rrspVal?.classList.toggle('hidden', !els.chkRRSP?.checked);
-    els.stockVal?.classList.toggle('hidden', !els.chkStock?.checked);
-    els.otherVal?.classList.toggle('hidden', !els.chkOther?.checked);
-    // RRSP amount/percent mode UI
-    {
-      const rrspOn = !!els.chkRRSP?.checked;
-      els.rrspModeWrap?.classList.toggle('hidden', !rrspOn);
-      const isPct = (els.rrspMode?.value === 'percent');
-      els.rrspVal?.classList.toggle('hidden', !rrspOn || isPct);
-      els.rrspPct?.classList.toggle('hidden', !rrspOn || !isPct);
-    }
-
-
-    
-    // --- job2 UI sync ---
-    const mode2 = Array.from(document.querySelectorAll('input[name="mode2"]')).find(r=>r.checked)?.value || 'hourly';
-    el2('hourlyFields2')?.classList.toggle('hidden', mode2 !== 'hourly');
-    el2('annualField2')?.classList.toggle('hidden', mode2 !== 'annual');
-    el2('paidVacationCustom2')?.classList.toggle('hidden', el2('paidVacationPreset2')?.value !== 'custom');
-    el2('vacPayCustom2')?.classList.toggle('hidden', el2('vacPayPreset2')?.value !== 'custom');
-    el2('bonusVal2')?.classList.toggle('hidden', !el2('chkBonus2')?.checked);
-    el2('allowanceVal2')?.classList.toggle('hidden', !el2('chkAllowance2')?.checked);
-    el2('commissionVal2')?.classList.toggle('hidden', !el2('chkCommission2')?.checked);
-    const br = computeIncomeBreakdown();
-    const annualGross = br.totalGross;
-    els.outAnnualGross.textContent = fmt.format(annualGross);
-    els.outMonthlyGross.textContent = fmt2.format(annualGross / 12);
-    els.outWeeklyGross.textContent = fmt2.format(annualGross / 52);
-
-    const province = els.province.value;
-    const { afterAnnual } = renderTax(province, annualGross);
-    renderExpense(afterAnnual);
-  }
-
-  els.mode.forEach(r => r.addEventListener('change', scheduleUpdate));
-  els.annualSalary?.addEventListener('input', () => {
-    const v = Number(els.annualSalary.value || 0);
-    if (v > 0) {
-      const annualRadio = els.mode.find(m => m.value === 'annual');
-      if (annualRadio && !annualRadio.checked) annualRadio.checked = true;
-    }
-    scheduleUpdate();
-  });
-
-  [
-    'hourlyRate','hoursPerWeek','weeksPerYear','paidVacationPreset','paidVacationCustom','vacPayPreset','vacPayCustom',
-    'bonusVal','allowanceVal','commissionVal','rrspVal','rrspPct','rrspMode','stockVal','otherVal','province',
-    'expRent','expCarIns','expTransit','expInternet','expGrocery','expLoan'
-  ].forEach(id => document.getElementById(id)?.addEventListener('input', scheduleUpdate));
-
-  document.getElementById('chkBonus').addEventListener('change', scheduleUpdate);
-  document.getElementById('chkAllowance').addEventListener('change', scheduleUpdate);
-  document.getElementById('chkCommission').addEventListener('change', scheduleUpdate);
-  document.getElementById('chkRRSP')?.addEventListener('change', scheduleUpdate);
-  document.getElementById('rrspMode')?.addEventListener('change', scheduleUpdate);
-  document.getElementById('chkStock')?.addEventListener('change', scheduleUpdate);
-  document.getElementById('chkOther')?.addEventListener('change', scheduleUpdate);
-  document.getElementById('chkSelfEmp')?.addEventListener('change', scheduleUpdate);
-
-  
-  // Toggle second job
-  document.getElementById('btnToggleJob2')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    const wrap = el2('job2Wrap');
-    if (!wrap) return;
-    const willShow = wrap.classList.contains('hidden');
-    wrap.classList.toggle('hidden', !willShow);
-    const btn = document.getElementById('btnToggleJob2');
-    if (btn) btn.textContent = willShow ? '✓ Second Job Added' : '+ Add a second job';
-    scheduleUpdate();
-  });
-  el2('btnRemoveJob2')?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    el2('job2Wrap')?.classList.add('hidden');
-    const btn = document.getElementById('btnToggleJob2');
-    if (btn) btn.textContent = '+ Add a second job';
-    scheduleUpdate();
-  });
-
-  // job2 inputs
-  Array.from(document.querySelectorAll('input[name="mode2"]')).forEach(r=>r.addEventListener('change', scheduleUpdate));
-  el2('annualSalary2')?.addEventListener('input', () => {
-    const v = Number(el2('annualSalary2')?.value || 0);
-    if (v > 0) {
-      const annualRadio2 = Array.from(document.querySelectorAll('input[name="mode2"]')).find(m=>m.value==='annual');
-      if (annualRadio2 && !annualRadio2.checked) annualRadio2.checked = true;
-    }
-    scheduleUpdate();
-  });
-
-  ;[
-    'hourlyRate2','hoursPerWeek2','weeksPerYear2','paidVacationPreset2','paidVacationCustom2','vacPayPreset2','vacPayCustom2',
-    'bonusVal2','allowanceVal2','commissionVal2'
-  ].forEach(id => el2(id)?.addEventListener('input', scheduleUpdate));
-
-  el2('chkBonus2')?.addEventListener('change', scheduleUpdate);
-  el2('chkAllowance2')?.addEventListener('change', scheduleUpdate);
-  el2('chkCommission2')?.addEventListener('change', scheduleUpdate);
-
-  // Info tooltip for custom expenses
-  const hintBtn = document.getElementById('btnCustomHint');
-  const hintPop = document.getElementById('customHintPop');
-  const hintWrap = document.getElementById('customHintWrap');
-  function showHint(){ hintPop && hintPop.classList.remove('hidden'); }
-  function hideHint(){ hintPop && hintPop.classList.add('hidden'); }
-  hintBtn?.addEventListener('click', (e)=>{ e.preventDefault(); if (hintPop) hintPop.classList.toggle('hidden'); });
-  hintBtn?.addEventListener('mouseenter', showHint);
-  hintWrap?.addEventListener('mouseleave', hideHint);
-  document.addEventListener('click', (e)=>{ if (hintPop && !hintWrap.contains(e.target) && e.target !== hintBtn) hideHint(); });
-document.getElementById('btnAddCustom')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    addCustomRow();
-  });
-
-  window.addEventListener('DOMContentLoaded', () => {
-    ensureTaxChart(); ensureExpChart(); ensureLeftChart();
-    scheduleUpdate();
-  });
+  document.addEventListener('DOMContentLoaded', initialize);
 })();

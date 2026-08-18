@@ -1,0 +1,8 @@
+{
+  "name": "pierre-pz-github-pages",
+  "private": true,
+  "scripts": {
+    "check": "node --check js/tax-engine-2025.js && node --check js/income-calc.js",
+    "test": "node --test tests/tax-engine-2025.test.js"
+  }
+}

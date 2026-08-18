@@ -2,527 +2,203 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Canada Income & Tax Planner (2025)</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>2025 Canadian Employment Income &amp; Disposable Cash Estimate</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
   <style>
-    :root {
-      --accent: #ffd100;
-      --carbon: #0a0a0a
-    }
-
-    body {
-      background: var(--carbon);
-      color: #e5e7eb
-    }
-
-    .text-accent {
-      color: var(--accent)
-    }
-
-    .bg-accent {
-      background: var(--accent)
-    }
-
-    .text-carbon {
-      color: var(--carbon)
-    }
-
-    .focus\:ring-accent:focus {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px
-    }
+    :root { --accent: #ffd100; --carbon: #0a0a0a; }
+    body { background: var(--carbon); color: #e5e7eb; }
+    .text-accent { color: var(--accent); }
+    .bg-accent { background: var(--accent); }
+    .text-carbon { color: var(--carbon); }
+    .focus\:ring-accent:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .deficit-state { border-color: rgba(248, 113, 113, .65); background: rgba(127, 29, 29, .18); }
   </style>
 </head>
 
 <body>
-  <!-- Scroll progress -->
   <div id="progress" class="fixed inset-x-0 top-0 z-[60] h-1 w-0 bg-accent"></div>
-
 
   <header class="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur supports-backdrop-blur:bg-[#0a0a0a]/60">
     <nav aria-label="Primary" class="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
       <a class="text-sm font-black tracking-widest text-accent" href="index.html">Pierre's Website</a>
-      <button aria-controls="nav-menu" aria-expanded="false" aria-label="Toggle navigation"
+      <button aria-controls="nav-drawer" aria-expanded="false" aria-label="Toggle navigation"
         class="md:hidden rounded px-3 py-2 text-accent ring-accent focus:outline-none focus:ring-2" id="nav-toggle">
-        <i class="fa-solid fa-bars"></i>
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
       </button>
-      <ul class="hidden items-center gap-6 text-xs font-semibold tracking-widest uppercase text-accent md:flex"
-        id="nav-menu">
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="zh-CN">中文</a></li>
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="en">English</a></li>
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="fr">Français</a></li>
-        <li><a class="relative rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="hi">हिन्दी</a></li>
+      <ul class="hidden items-center gap-6 text-xs font-semibold tracking-widest uppercase text-accent md:flex" id="nav-menu">
+        <li><a href="#" data-lang="zh-CN">中文</a></li>
+        <li><a href="#" data-lang="en">English</a></li>
+        <li><a href="#" data-lang="fr">Français</a></li>
+        <li><a href="#" data-lang="hi">हिन्दी</a></li>
       </ul>
     </nav>
-    <!-- mobile language drawer -->
     <div class="hidden border-t border-white/5 bg-[#0a0a0a] md:hidden" id="nav-drawer">
       <ul class="mx-auto grid max-w-6xl gap-2 px-4 py-3 text-sm font-medium tracking-wider text-accent">
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="zh-CN">中文</a></li>
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="en">English</a></li>
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="fr">Français</a></li>
-        <li><a class="block rounded px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            href="#" data-lang="hi">हिन्दी</a></li>
+        <li><a class="block rounded px-2 py-2" href="#" data-lang="zh-CN">中文</a></li>
+        <li><a class="block rounded px-2 py-2" href="#" data-lang="en">English</a></li>
+        <li><a class="block rounded px-2 py-2" href="#" data-lang="fr">Français</a></li>
+        <li><a class="block rounded px-2 py-2" href="#" data-lang="hi">हिन्दी</a></li>
       </ul>
     </div>
   </header>
 
+  <main class="pt-10">
+    <section class="mx-auto max-w-6xl px-6 py-14 sm:py-20">
+      <h1 class="mb-2 text-center text-3xl sm:text-4xl font-bold tracking-wide" data-i18n="title">2025 Canadian annual employment-income and disposable-cash estimate</h1>
+      <p class="mb-6 text-center text-zinc-400" data-i18n="subtitle">Fixed to finalized full-year 2025 rules · Basic employee scenarios · All provinces and territories</p>
 
-  <main class="pt-14">
-    <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-      <h2 class="mb-2 text-center text-3xl sm:text-4xl font-bold tracking-wider">Canada Income &amp; Tax Planner</h2>
-      <p class="mb-10 text-center text-zinc-400">Based on 2025 tax rates · Real-time calculation · Covers all 13
-        provinces/territories</p>
+      <aside class="rounded-xl border border-amber-300/30 bg-amber-950/20 p-4 text-sm leading-6 text-zinc-200 mb-10" aria-labelledby="disclaimer-title">
+        <h2 id="disclaimer-title" class="font-semibold text-amber-200" data-i18n="disclaimerTitle">Scope and important limitations</h2>
+        <p data-i18n="disclaimer">This is a simplified 2025 annual estimate for a single employee age 19 to 64, not a tax return, payroll-withholding calculation, or tax, legal, payroll, or financial advice. Actual tax depends on deductions, credits, benefits, residency, payroll frequency, personal circumstances, and CRA or Revenu Québec assessment. Confirm RRSP room on your latest Notice of Assessment or CRA account. Dividends, capital gains, and self-employment are not modeled.</p>
+        <a href="docs/2025-tax-model.md" class="inline-block mt-2 text-accent underline underline-offset-4" data-i18n="methodology">Methodology, assumptions, and official sources</a>
+      </aside>
 
-      <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10">
-        <h3 class="text-xl font-semibold mb-4">🧩 Module 1: Income (incl. benefits)</h3>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm text-zinc-400 mb-1">Pay input method</label>
-              <div class="flex gap-4">
-                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="hourly"
-                    class="accent-[#ffd100]" checked><span>Hourly</span></label>
-                <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="annual"
-                    class="accent-[#ffd100]"><span>Annual</span></label>
-              </div>
-            </div>
-            <div id="hourlyFields" class="grid sm:grid-cols-3 gap-3">
-              <div><label class="block text-sm text-zinc-400 mb-1">Hourly($/h)</label><input id="hourlyRate"
-                  type="number" min="0" step="0.01"
-                  class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                  value="30"></div>
-              <div><label class="block text-sm text-zinc-400 mb-1">Hours per week</label><input id="hoursPerWeek"
-                  type="number" min="0" max="168" step="0.5"
-                  class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                  value="40"></div>
-              <div><label class="block text-sm text-zinc-400 mb-1">Weeks per year</label><input id="weeksPerYear"
-                  type="number" min="0" max="52" step="1"
-                  class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                  value="52"></div>
-            </div>
-            <div id="annualField" class="hidden">
-              <label class="block text-sm text-zinc-400 mb-1">annual($)</label>
-              <input id="annualSalary" type="number" min="0" step="1000"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                value="70000">
-              <p class="mt-1 text-xs text-zinc-500">Hint: Entering a positive value here will switch to Annual mode
-                automatically.</p>
-            </div>
-            <div class="grid sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm text-zinc-400 mb-1">Paid vacation (weeks)</label>
-                <div class="flex gap-2">
-                  <select id="paidVacationPreset"
-                    class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="0">None</option>
-                    <option value="2">2 weeks</option>
-                    <option value="3">3 weeks</option>
-                    <option value="4">4 weeks</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                  <input id="paidVacationCustom" type="number" min="0" step="0.5" placeholder="Custom"
-                    class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
+      <form id="calculator" novalidate>
+        <section class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10" aria-labelledby="income-heading">
+          <h2 id="income-heading" class="text-xl font-semibold mb-5" data-i18n="incomeHeading">1. Annual income and RRSP</h2>
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="space-y-5">
+              <fieldset>
+                <legend class="block text-sm text-zinc-300 mb-2" data-i18n="payMethod">Primary job pay input</legend>
+                <div class="flex gap-5">
+                  <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="hourly" class="accent-[#ffd100]" checked><span data-i18n="hourly">Hourly</span></label>
+                  <label class="inline-flex items-center gap-2"><input type="radio" name="mode" value="annual" class="accent-[#ffd100]"><span data-i18n="annual">Annual salary</span></label>
                 </div>
-                <p class="mt-1 text-xs text-zinc-500">Work weeks are actual working weeks; paid vacation is added on
-                  top. A warning appears if total weeks exceed 52.</p>
+              </fieldset>
+
+              <div id="hourlyFields" class="grid sm:grid-cols-3 gap-3">
+                <div><label for="hourlyRate" class="block text-sm text-zinc-400 mb-1" data-i18n="hourlyRate">Hourly rate ($)</label><input id="hourlyRate" type="number" min="0" step="0.01" value="30" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div><label for="hoursPerWeek" class="block text-sm text-zinc-400 mb-1" data-i18n="hoursPerWeek">Hours per week</label><input id="hoursPerWeek" type="number" min="0" max="168" step="0.5" value="40" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div><label for="weeksPerYear" class="block text-sm text-zinc-400 mb-1" data-i18n="workingWeeks">Working weeks</label><input id="weeksPerYear" type="number" min="0" max="52" step="0.5" value="52" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
               </div>
-              <div>
-                <label class="block text-sm text-zinc-400 mb-1">Vacation Pay(%)</label>
-                <div class="flex gap-2">
-                  <select id="vacPayPreset"
-                    class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="0">None (0%)</option>
-                    <option value="4">4%</option>
-                    <option value="6">6%</option>
-                    <option value="8">8%</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                  <input id="vacPayCustom" type="number" min="0" step="0.1" placeholder="%"
-                    class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
-                </div>
-                <p class="mt-1 text-xs text-zinc-500">Vacation pay is taxable (per CRA).</p>
-              </div>
-            </div>
-            <div class="grid sm:grid-cols-3 gap-3">
-              <label class="flex items-center gap-2"><input id="chkBonus" type="checkbox"
-                  class="accent-[#ffd100]"><span>Bonus</span></label>
-              <label class="flex items-center gap-2"><input id="chkAllowance" type="checkbox"
-                  class="accent-[#ffd100]"><span>Allowance</span></label>
-              <label class="flex items-center gap-2"><input id="chkCommission" type="checkbox"
-                  class="accent-[#ffd100]"><span>Commission</span></label>
-              <input id="bonusVal" type="number" min="0" step="100" placeholder="Bonus (annual) $"
-                class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <input id="allowanceVal" type="number" min="0" step="100" placeholder="Allowance (annual) $"
-                class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <input id="commissionVal" type="number" min="0" step="100" placeholder="Commission (annual) $"
-                class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <div class="sm:col-span-3 grid sm:grid-cols-3 gap-3 mt-2">
-                <label class="flex items-center gap-2"><input id="chkRRSP" type="checkbox"
-                    class="accent-[#ffd100]"><span>RRSP Contribution</span></label>
-                <label class="flex items-center gap-2"><input id="chkStock" type="checkbox"
-                    class="accent-[#ffd100]"><span>Stock (taxable)</span></label>
-                <label class="flex items-center gap-2"><input id="chkOther" type="checkbox"
-                    class="accent-[#ffd100]"><span>Other (taxable)</span></label>
-
-                <div id="rrspModeWrap" class="sm:col-span-3 hidden flex items-center gap-2">
-                  <label for="rrspMode" class="text-sm text-zinc-400">RRSP input mode</label>
-                  <select id="rrspMode"
-                    class="rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="amount" selected>Amount ($)</option>
-                    <option value="percent">Percentage (%)</option>
-                  </select>
-                </div>
-
-
-                <input id="rrspVal" type="number" min="0" step="100" placeholder="RRSP contribution (annual) $"
-                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-
-
-
-                <input id="rrspPct" type="number" min="0" max="100" step="0.1"
-                  placeholder="RRSP contribution (% of pay)"
-                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"><input
-                  id="stockVal" type="number" min="0" step="100" placeholder="Stock (taxable, annual) $"
-                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                <input id="otherVal" type="number" min="0" step="100" placeholder="Other (taxable, annual) $"
-                  class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                <p class="sm:col-span-3 text-xs text-zinc-500">RRSP is a deduction (not part of gross pay) and reduces
-                  taxable income (auto-checked against 2025 limits). Stock/Other are treated as taxable income
-                  (dividend/capital gains rules not detailed here).</p>
+              <div id="annualField" class="hidden">
+                <label for="annualSalary" class="block text-sm text-zinc-400 mb-1" data-i18n="annualSalary">Annual salary ($), including paid vacation</label>
+                <input id="annualSalary" type="number" min="0" step="100" value="70000" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
               </div>
 
-            </div>
-
-            <!-- Toggle for second job -->
-            <div class="pt-2">
-              <div class="pt-2">
-                <label class="inline-flex items-center gap-2"><input id="chkSelfEmp" type="checkbox"
-                    class="accent-[#ffd100]"><span>I'm self-employed</span></label>
-                <span class="ml-2 text-xs text-zinc-500">Self-employed pay both the employee and employer shares
-                  (CPP/QPP doubled); EI not applicable by default.</span>
+              <div id="vacationFields" class="grid sm:grid-cols-2 gap-3">
+                <div><label for="vacationMethod" class="block text-sm text-zinc-400 mb-1" data-i18n="vacationMethod">Vacation compensation method</label><select id="vacationMethod" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"><option value="none" data-i18n="vacationNone">None</option><option value="weeks" data-i18n="vacationWeeksOption">Paid vacation weeks</option><option value="percent" data-i18n="vacationPercentOption">Vacation pay percentage</option></select></div>
+                <div id="paidVacationWrap" class="hidden"><label for="paidVacationWeeks" class="block text-sm text-zinc-400 mb-1" data-i18n="paidVacationWeeks">Paid vacation weeks</label><input id="paidVacationWeeks" type="number" min="0" step="0.5" value="2" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div id="vacationPercentWrap" class="hidden"><label for="vacationPayPercent" class="block text-sm text-zinc-400 mb-1" data-i18n="vacationPayPercent">Vacation pay (%)</label><input id="vacationPayPercent" type="number" min="0" step="0.1" value="4" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <p class="sm:col-span-2 text-xs text-zinc-500" data-i18n="vacationHelp">For hourly pay, working weeks exclude paid vacation. Choose either paid weeks or a percentage; the calculator never applies both. Annual salary is assumed to already include vacation compensation.</p>
               </div>
 
-              <button id="btnToggleJob2"
-                class="rounded-md bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">
-                + Add a second job
-              </button>
-              <span class="ml-2 text-xs text-zinc-500">Optional: for part-time/extra income</span>
-            </div>
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div><label for="bonusVal" class="block text-sm text-zinc-400 mb-1" data-i18n="bonus">Annual bonus ($)</label><input id="bonusVal" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div><label for="allowanceVal" class="block text-sm text-zinc-400 mb-1" data-i18n="allowance">Taxable allowance ($)</label><input id="allowanceVal" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div><label for="commissionVal" class="block text-sm text-zinc-400 mb-1" data-i18n="commission">Commission ($)</label><input id="commissionVal" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+              </div>
 
-            <!-- Second Job (hidden by default; click the button above to expand) -->
-            <div id="job2Wrap" class="hidden mt-4 rounded-xl border border-white/10 bg-zinc-800/40 p-4">
-              <h4 class="text-sm font-semibold mb-3">Second Job</h4>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm text-zinc-400 mb-1">Pay input method</label>
-                  <div class="flex gap-4">
-                    <label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="hourly"
-                        class="accent-[#ffd100]" checked><span>Hourly</span></label>
-                    <label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="annual"
-                        class="accent-[#ffd100]"><span>Annual</span></label>
-                  </div>
-                </div>
-
+              <button type="button" id="btnToggleJob2" aria-expanded="false" aria-controls="job2Wrap" class="rounded-md bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]" data-i18n="addJob">+ Add a second job</button>
+              <div id="job2Wrap" class="hidden rounded-xl border border-white/10 bg-zinc-800/40 p-4 space-y-4">
+                <h3 class="text-sm font-semibold" data-i18n="secondJob">Second job</h3>
+                <fieldset><legend class="text-sm text-zinc-400 mb-2" data-i18n="payMethod2">Second job pay input</legend><div class="flex gap-5"><label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="hourly" class="accent-[#ffd100]" checked><span data-i18n="hourly">Hourly</span></label><label class="inline-flex items-center gap-2"><input type="radio" name="mode2" value="annual" class="accent-[#ffd100]"><span data-i18n="annual">Annual salary</span></label></div></fieldset>
                 <div id="hourlyFields2" class="grid sm:grid-cols-3 gap-3">
-                  <div><label class="block text-sm text-zinc-400 mb-1">Hourly($/h)</label><input id="hourlyRate2"
-                      type="number" min="0" step="0.01"
-                      class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                      value="28"></div>
-                  <div><label class="block text-sm text-zinc-400 mb-1">Hours per week</label><input id="hoursPerWeek2"
-                      type="number" min="0" max="168" step="0.5"
-                      class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                      value="10"></div>
-                  <div><label class="block text-sm text-zinc-400 mb-1">Weeks per year</label><input id="weeksPerYear2"
-                      type="number" min="0" max="52" step="1"
-                      class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                      value="52"></div>
+                  <div><label for="hourlyRate2" class="block text-sm text-zinc-400 mb-1" data-i18n="hourlyRate">Hourly rate ($)</label><input id="hourlyRate2" type="number" min="0" step="0.01" value="28" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                  <div><label for="hoursPerWeek2" class="block text-sm text-zinc-400 mb-1" data-i18n="hoursPerWeek">Hours per week</label><input id="hoursPerWeek2" type="number" min="0" max="168" step="0.5" value="10" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                  <div><label for="weeksPerYear2" class="block text-sm text-zinc-400 mb-1" data-i18n="workingWeeks">Working weeks</label><input id="weeksPerYear2" type="number" min="0" max="52" step="0.5" value="52" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
                 </div>
-
-                <div id="annualField2" class="hidden">
-                  <label class="block text-sm text-zinc-400 mb-1">annual($)</label>
-                  <input id="annualSalary2" type="number" min="0" step="1000"
-                    class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
-                    value="12000">
-                  <p class="mt-1 text-xs text-zinc-500">Hint: Entering a positive value here will switch to Annual mode
-                    automatically.</p>
+                <div id="annualField2" class="hidden"><label for="annualSalary2" class="block text-sm text-zinc-400 mb-1" data-i18n="annualSalary">Annual salary ($), including paid vacation</label><input id="annualSalary2" type="number" min="0" step="100" value="12000" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div id="vacationFields2" class="grid sm:grid-cols-2 gap-3">
+                  <div><label for="vacationMethod2" class="block text-sm text-zinc-400 mb-1" data-i18n="vacationMethod">Vacation compensation method</label><select id="vacationMethod2" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"><option value="none" data-i18n="vacationNone">None</option><option value="weeks" data-i18n="vacationWeeksOption">Paid vacation weeks</option><option value="percent" data-i18n="vacationPercentOption">Vacation pay percentage</option></select></div>
+                  <div id="paidVacationWrap2" class="hidden"><label for="paidVacationWeeks2" class="block text-sm text-zinc-400 mb-1" data-i18n="paidVacationWeeks">Paid vacation weeks</label><input id="paidVacationWeeks2" type="number" min="0" step="0.5" value="2" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                  <div id="vacationPercentWrap2" class="hidden"><label for="vacationPayPercent2" class="block text-sm text-zinc-400 mb-1" data-i18n="vacationPayPercent">Vacation pay (%)</label><input id="vacationPayPercent2" type="number" min="0" step="0.1" value="4" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
                 </div>
-
-                <div class="grid sm:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-sm text-zinc-400 mb-1">Paid vacation (weeks)</label>
-                    <div class="flex gap-2">
-                      <select id="paidVacationPreset2"
-                        class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                        <option value="0">None</option>
-                        <option value="2">2 weeks</option>
-                        <option value="3">3 weeks</option>
-                        <option value="4">4 weeks</option>
-                        <option value="custom">Custom</option>
-                      </select>
-                      <input id="paidVacationCustom2" type="number" min="0" step="0.5" placeholder="Custom"
-                        class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-sm text-zinc-400 mb-1">Vacation Pay(%)</label>
-                    <div class="flex gap-2">
-                      <select id="vacPayPreset2"
-                        class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                        <option value="0">None (0%)</option>
-                        <option value="4">4%</option>
-                        <option value="6">6%</option>
-                        <option value="8">8%</option>
-                        <option value="custom">Custom</option>
-                      </select>
-                      <input id="vacPayCustom2" type="number" min="0" step="0.1" placeholder="%"
-                        class="w-28 rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent hidden">
-                    </div>
-                  </div>
-                </div>
-
                 <div class="grid sm:grid-cols-3 gap-3">
-                  <label class="flex items-center gap-2"><input id="chkBonus2" type="checkbox"
-                      class="accent-[#ffd100]"><span>Bonus</span></label>
-                  <label class="flex items-center gap-2"><input id="chkAllowance2" type="checkbox"
-                      class="accent-[#ffd100]"><span>Allowance</span></label>
-                  <label class="flex items-center gap-2"><input id="chkCommission2" type="checkbox"
-                      class="accent-[#ffd100]"><span>Commission</span></label>
-
-                  <input id="bonusVal2" type="number" min="0" step="100" placeholder="Bonus (annual) $"
-                    class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                  <input id="allowanceVal2" type="number" min="0" step="100" placeholder="Allowance (annual) $"
-                    class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                  <input id="commissionVal2" type="number" min="0" step="100" placeholder="Commission (annual) $"
-                    class="sm:col-span-3 hidden w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                  <div><label for="bonusVal2" class="block text-sm text-zinc-400 mb-1" data-i18n="bonus">Annual bonus ($)</label><input id="bonusVal2" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                  <div><label for="allowanceVal2" class="block text-sm text-zinc-400 mb-1" data-i18n="allowance">Taxable allowance ($)</label><input id="allowanceVal2" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                  <div><label for="commissionVal2" class="block text-sm text-zinc-400 mb-1" data-i18n="commission">Commission ($)</label><input id="commissionVal2" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
                 </div>
+                <button type="button" id="btnRemoveJob2" class="rounded-md bg-white/10 px-3 py-2 text-sm hover:bg-white/20" data-i18n="removeJob">Remove second job</button>
+              </div>
 
-                <p id="weeksCheck2" class="text-xs text-red-400 hidden">⚠️ 'Work weeks + paid vacation weeks' exceed 52.
-                  Please check inputs to avoid double-counting.</p>
+              <div class="grid sm:grid-cols-2 gap-3 border-t border-white/10 pt-5">
+                <div><label for="additionalEmploymentIncome" class="block text-sm text-zinc-400 mb-1" data-i18n="additionalEmployment">Additional taxable employment income ($)</label><input id="additionalEmploymentIncome" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"><p class="mt-1 text-xs text-zinc-500" data-i18n="additionalHelp">Use only additional cash employment compensation not entered above. It is included for CPP/QPP and EI.</p></div>
+                <div><label for="otherOrdinaryIncome" class="block text-sm text-zinc-400 mb-1" data-i18n="otherIncome">Other ordinary taxable income ($)</label><input id="otherOrdinaryIncome" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"><p class="mt-1 text-xs text-zinc-500" data-i18n="otherHelp">Taxed at ordinary rates but excluded from CPP/QPP and EI. Do not enter dividends or capital gains.</p></div>
+              </div>
 
-                <div class="flex gap-2 pt-2">
-                  <button id="btnRemoveJob2" class="rounded-md bg-white/10 px-3 py-2 text-sm hover:bg-white/20">Remove
-                    second job</button>
-                </div>
+              <div class="grid sm:grid-cols-2 gap-3 border-t border-white/10 pt-5">
+                <div><label for="rrspContribution" class="block text-sm text-zinc-400 mb-1" data-i18n="rrspContribution">RRSP contribution funded in 2025 ($)</label><input id="rrspContribution" type="number" min="0" step="100" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"></div>
+                <div><label for="rrspLimit" class="block text-sm text-zinc-400 mb-1" data-i18n="rrspLimit">Available RRSP deduction limit ($)</label><input id="rrspLimit" type="number" min="0" step="100" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent" aria-describedby="rrsp-help"></div>
+                <p id="rrsp-help" class="sm:col-span-2 text-xs text-zinc-500" data-i18n="rrspHelp">Enter the personal limit from your latest Notice of Assessment or CRA account. The $32,490 annual dollar limit is not automatically your available room. If the contribution exceeds the entered limit, the full contribution reduces cash but only the entered limit is deducted. Overcontribution penalties are not modeled.</p>
               </div>
             </div>
-          </div>
-          <div class="grid gap-3 content-start">
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Total annual income (incl. benefits)</div>
-              <div id="outAnnualGross" class="text-3xl font-extrabold text-accent mt-1">—</div>
-            </div>
-            <div class="grid sm:grid-cols-2 gap-3">
-              <div class="rounded-xl bg-zinc-800/70 p-4">
-                <div class="text-sm text-zinc-400">Monthly gross</div>
-                <div id="outMonthlyGross" class="text-2xl font-bold mt-1">—</div>
+
+            <div class="content-start space-y-3">
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="grossCash">Gross cash income</div><div id="outAnnualGross" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="employmentIncome">Employment income</div><div id="outEmploymentIncome" class="text-xl font-bold mt-1">—</div></div>
+                <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="otherOrdinary">Other ordinary income</div><div id="outOtherIncome" class="text-xl font-bold mt-1">—</div></div>
+                <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="rrspDeduction">RRSP deduction used</div><div id="outRrspDeduction" class="text-xl font-bold mt-1">—</div></div>
+                <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="taxableIncome">Federal taxable income</div><div id="outTaxableIncome" class="text-xl font-bold mt-1">—</div></div>
               </div>
-              <div class="rounded-xl bg-zinc-800/70 p-4">
-                <div class="text-sm text-zinc-400">Weekly gross</div>
-                <div id="outWeeklyGross" class="text-2xl font-bold mt-1">—</div>
-              </div>
-            </div>
-            <p id="weeksCheck" class="text-xs text-red-400 hidden">⚠️ 'Work weeks + paid vacation weeks' exceed 52.
-              Please check inputs to avoid double-counting.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10">
-        <h3 class="text-xl font-semibold mb-4">🧩 Module 2: Taxes (2025 latest rates)</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm text-zinc-400 mb-1">Province/Territory</label>
-              <select id="province"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-                <option>Ontario</option>
-                <option>British Columbia</option>
-                <option>Alberta</option>
-                <option>Saskatchewan</option>
-                <option>Manitoba</option>
-                <option>Quebec</option>
-                <option>New Brunswick</option>
-                <option>Nova Scotia</option>
-                <option>Prince Edward Island</option>
-                <option>Newfoundland and Labrador</option>
-                <option>Yukon</option>
-                <option>Northwest Territories</option>
-                <option>Nunavut</option>
-              </select>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Federal tax</div>
-              <div id="outFedTax" class="text-2xl font-bold mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Provincial/Territorial tax</div>
-              <div id="outProvTax" class="text-2xl font-bold mt-1">—</div>
-            </div>
-
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">CPP / QPP</div>
-              <div id="outCPPQPP" class="text-2xl font-bold mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">EI</div>
-              <div id="outEI" class="text-2xl font-bold mt-1">—</div>
-            </div>
-
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Total tax</div>
-              <div id="outTotalTax" class="text-2xl font-bold mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">After-tax income (annual)</div>
-              <div id="outAfterTax" class="text-3xl font-extrabold text-accent mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Average tax rate</div>
-              <div id="outAvgRate" class="text-xl font-semibold mt-1">—</div>
-            </div>
-            <p class="text-xs text-zinc-500">Includes Ontario surtax and Quebec federal tax abatement (16.5%); CPP/QPP
-              and EI computed separately (2025 rules); credits are not included.</p>
-          </div>
-          <div class="md:col-span-2">
-            <canvas id="taxDonut" height="200" class="!max-h-[360px]"></canvas>
-            <div class="mt-6">
-              <div class="text-sm text-zinc-400 mb-2">By tax bands: green = take-home for that segment; red = taxes for
-                that segment</div>
-              <canvas id="bracketBar" height="160" class="!max-h-[260px]"></canvas>
+              <div id="validationWarnings" class="hidden rounded-xl border border-red-400/40 bg-red-950/25 p-4 text-sm text-red-100" role="alert" aria-live="assertive"></div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8">
-        <h3 class="text-xl font-semibold mb-4">🧩 Module 3: Expenses & leftover analysis</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-2">
-              <label class="text-sm text-zinc-400 self-center">Mortgage/Rent (monthly)</label><input id="expRent"
-                type="number" min="0" step="10" value="1800"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">Auto Insurance (monthly)</label><input id="expCarIns"
-                type="number" min="0" step="10" value="180"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">Commuting (monthly)</label><input id="expTransit"
-                type="number" min="0" step="10" value="150"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">Internet/Phone (monthly)</label><input id="expInternet"
-                type="number" min="0" step="5" value="120"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">Groceries (monthly)</label><input id="expGrocery"
-                type="number" min="0" step="10" value="500"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-              <label class="text-sm text-zinc-400 self-center">Insurance/Loans (monthly)</label><input id="expLoan"
-                type="number" min="0" step="10" value="0"
-                class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
-            </div>
-            <div class="mt-3 flex items-center gap-2"><button id="btnAddCustom"
-                class="rounded-lg bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]">+ Add custom
-                expense</button><button id="btnCustomHint"
-                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/80 hover:bg-white/20 ring-1 ring-white/10"
-                aria-label="How to use"><span class="text-[11px] font-semibold">i</span></button>
-              <div id="customHintWrap" class="relative">
-                <div id="customHintPop"
-                  class="absolute left-0 top-8 z-20 hidden w-80 rounded-lg border border-white/10 bg-zinc-800/95 p-3 text-xs text-zinc-200 shadow-xl">
-                  <p class="leading-5">Use this area for discretionary or uncommon expenses (e.g., premium car leases,
-                    pet care, lessons, hobbies). Name it and enter a monthly amount. You can add multiple custom rows
-                    and remove them anytime.</p>
-                </div>
+        <section class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 mb-10" aria-labelledby="tax-heading">
+          <h2 id="tax-heading" class="text-xl font-semibold mb-5" data-i18n="taxHeading">2. 2025 income tax and employee contributions</h2>
+          <div class="grid lg:grid-cols-3 gap-6">
+            <div class="space-y-4">
+              <div><label for="province" class="block text-sm text-zinc-400 mb-1" data-i18n="province">Province or territory of residence and employment</label><select id="province" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent"><option value="ON" data-i18n="provinceON">Ontario</option><option value="BC" data-i18n="provinceBC">British Columbia</option><option value="AB" data-i18n="provinceAB">Alberta</option><option value="SK" data-i18n="provinceSK">Saskatchewan</option><option value="MB" data-i18n="provinceMB">Manitoba</option><option value="QC" data-i18n="provinceQC">Quebec — limited support</option><option value="NB" data-i18n="provinceNB">New Brunswick</option><option value="NS" data-i18n="provinceNS">Nova Scotia</option><option value="PE" data-i18n="provincePE">Prince Edward Island</option><option value="NL" data-i18n="provinceNL">Newfoundland and Labrador</option><option value="YT" data-i18n="provinceYT">Yukon</option><option value="NT" data-i18n="provinceNT">Northwest Territories</option><option value="NU" data-i18n="provinceNU">Nunavut</option></select></div>
+              <p id="provinceSupport" class="text-xs text-zinc-500" data-i18n="provinceHelp">Assumes the same province or territory for residence and employment for all of 2025. Multi-jurisdiction and part-year residency are outside scope.</p>
+              <p class="text-xs text-zinc-500" data-i18n="annualContributionHelp">CPP/QPP and EI use a normalized annual calculation on combined employment income. With multiple employers, actual source deductions can differ; excess contributions may be refunded after assessment.</p>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="federalTax">Federal income tax</div><div id="outFedTax" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="provTax">Provincial or territorial income tax</div><div id="outProvTax" class="text-2xl font-bold mt-1">—</div><div id="outProvDetails" class="mt-1 text-xs text-zinc-500"></div></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-zinc-800/70 p-4"><div id="cppLabel" class="text-sm text-zinc-400">CPP</div><div id="outCPPQPP" class="text-xl font-bold mt-1">—</div></div>
+                <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">EI</div><div id="outEI" class="text-xl font-bold mt-1">—</div></div>
+                <div id="qpipCard" class="hidden rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400">QPIP</div><div id="outQPIP" class="text-xl font-bold mt-1">—</div></div>
               </div>
             </div>
-            <div id="customList" class="mt-2 space-y-2"></div>
-          </div>
-          <div class="space-y-3">
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Monthly after-tax income</div>
-              <div id="outMonthlyNet" class="text-2xl font-bold mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Monthly expenses</div>
-              <div id="outMonthlyExp" class="text-2xl font-bold mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Monthly leftover</div>
-              <div id="outMonthlyLeft" class="text-3xl font-extrabold text-accent mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Leftover share</div>
-              <div id="outLeftPct" class="text-xl font-semibold mt-1">—</div>
-            </div>
-            <div class="rounded-xl bg-zinc-800/70 p-4">
-              <div class="text-sm text-zinc-400">Weekly leftover</div>
-              <div id="outWeeklyLeft" class="text-xl font-semibold mt-1">—</div>
+
+            <div id="resultsLive" class="lg:col-span-2 grid sm:grid-cols-2 gap-3 content-start" aria-live="polite" aria-atomic="true">
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="taxPayroll">Income tax plus payroll contributions</div><div id="outTotalDeductions" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="rrspSaving">Estimated income-tax reduction from RRSP deduction</div><div id="outRrspSaving" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="beforeRrsp">After-tax cash before funding RRSP</div><div id="outAfterTaxBeforeRrsp" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="rrspCash">RRSP contribution</div><div id="outRrspContribution" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="sm:col-span-2 rounded-xl border border-amber-300/20 bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="spendable">Spendable cash after funding RRSP</div><div id="outSpendable" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
+              <div class="sm:col-span-2 mt-2"><canvas id="taxDonut" height="170" class="!max-h-[320px]" aria-label="Annual cash allocation chart" data-i18n-aria-label="taxChartAria" role="img"></canvas><p id="taxChartNote" class="mt-2 text-center text-xs text-zinc-500"></p></div>
             </div>
           </div>
-          <div class="space-y-4">
-            <div>
-              <div class="text-sm text-zinc-400 text-center mb-1">Leftover vs Expenses(monthlyAfter-taxas base)</div>
-              <canvas id="leftDonut" height="200" class="!max-h-[360px]"></canvas>
+        </section>
+
+        <section class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8" aria-labelledby="expense-heading">
+          <h2 id="expense-heading" class="text-xl font-semibold mb-5" data-i18n="expenseHeading">3. Monthly expenses and surplus or deficit</h2>
+          <div class="grid lg:grid-cols-3 gap-6">
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-2">
+                <label for="expRent" class="text-sm text-zinc-400 self-center" data-i18n="rent">Mortgage or rent</label><input id="expRent" type="number" min="0" step="10" value="1800" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
+                <label for="expCarIns" class="text-sm text-zinc-400 self-center" data-i18n="carInsurance">Auto insurance</label><input id="expCarIns" type="number" min="0" step="10" value="180" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
+                <label for="expTransit" class="text-sm text-zinc-400 self-center" data-i18n="commuting">Commuting</label><input id="expTransit" type="number" min="0" step="10" value="150" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
+                <label for="expInternet" class="text-sm text-zinc-400 self-center" data-i18n="phone">Internet and phone</label><input id="expInternet" type="number" min="0" step="5" value="120" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
+                <label for="expGrocery" class="text-sm text-zinc-400 self-center" data-i18n="groceries">Groceries</label><input id="expGrocery" type="number" min="0" step="10" value="500" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
+                <label for="expLoan" class="text-sm text-zinc-400 self-center" data-i18n="loans">Other insurance or loans</label><input id="expLoan" type="number" min="0" step="10" value="0" class="w-full rounded-md bg-zinc-800 px-3 py-2 focus:ring-accent">
+              </div>
+              <button type="button" id="btnAddCustom" class="rounded-lg bg-accent text-carbon font-semibold px-3 py-2 text-sm hover:bg-[#ffdf32]" data-i18n="addExpense">+ Add custom expense</button>
+              <div id="customList" class="space-y-2"></div>
             </div>
-            <div>
-              <div class="text-sm text-zinc-400 text-center mb-1">Monthly expense breakdown</div> <canvas id="expDonut"
-                height="240" class="!max-h-[360px]"></canvas>
+            <div id="cashFlowResults" class="space-y-3 rounded-xl border border-transparent p-1">
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="monthlySpendable">Monthly spendable cash</div><div id="outMonthlyNet" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div class="text-sm text-zinc-400" data-i18n="monthlyExpenses">Monthly expenses</div><div id="outMonthlyExp" class="text-2xl font-bold mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div id="monthlyFlowLabel" class="text-sm text-zinc-400" data-i18n="monthlySurplus">Monthly surplus</div><div id="outMonthlyLeft" class="text-3xl font-extrabold text-accent mt-1">—</div></div>
+              <div class="rounded-xl bg-zinc-800/70 p-4"><div id="weeklyFlowLabel" class="text-sm text-zinc-400" data-i18n="weeklySurplus">Weekly surplus</div><div id="outWeeklyLeft" class="text-xl font-semibold mt-1">—</div></div>
             </div>
+            <div><canvas id="leftDonut" height="210" class="!max-h-[340px]" aria-label="Monthly cash flow chart" data-i18n-aria-label="cashChartAria" role="img"></canvas><p id="cashChartNote" class="mt-2 text-center text-xs text-zinc-500"></p></div>
           </div>
-        </div>
-      </div>
+        </section>
+      </form>
     </section>
   </main>
 
   <footer class="px-6 py-10 text-center text-xs text-zinc-500">© 2025 · Pierre Zhang</footer>
+  <script src="js/tax-engine-2025.js"></script>
   <script src="js/income-calc.js"></script>
-
-  <script>
-    // Toggle mobile language drawer (simple, no translation yet)
-    (function () {
-      const btn = document.getElementById('nav-toggle');
-      const drawer = document.getElementById('nav-drawer');
-      if (btn && drawer) {
-        btn.addEventListener('click', () => {
-          const shown = !drawer.classList.contains('hidden');
-          drawer.classList.toggle('hidden', shown);
-          btn.setAttribute('aria-expanded', String(!shown));
-        });
-      }
-      // (Optional) Stub for switching language later
-      document.querySelectorAll('[data-lang]').forEach(a => {
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          console.log('language switch stub ->', a.getAttribute('data-lang'));
-        });
-      });
-    })();
-  </script>
-  <script>
-    // Scroll progress bar (same behavior as index)
-    (function () {
-      var bar = document.getElementById('progress');
-      if (!bar) return;
-      function update() {
-        var h = document.documentElement;
-        var max = h.scrollHeight - h.clientHeight;
-        var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
-        bar.style.width = pct + '%';
-      }
-      update();
-      window.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-    })();
-  </script>
 </body>
 
 </html>
