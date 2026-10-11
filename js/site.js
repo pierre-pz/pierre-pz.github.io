@@ -1,4 +1,3 @@
-// Homepage enhancements: navigation, section state, progress, and one-time reveals.
 (function () {
   'use strict';
 
@@ -92,6 +91,10 @@
     sections.forEach((section) => {
       if (section.getBoundingClientRect().top <= activationLine) activeId = section.id;
     });
+    // The final section may be too short to reach the activation line.
+    if (sections.length && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+      activeId = sections[sections.length - 1].id;
+    }
     setActiveSection(activeId);
   };
 
@@ -99,7 +102,78 @@
   window.addEventListener('scroll', updateActiveSection, { passive: true });
   window.addEventListener('resize', updateActiveSection);
 
-  const revealItems = selectAll('.metric-item, .timeline-item, .project-card, .skill-group');
+  const track = select('#projects-track');
+  if (track) {
+    const carousel = track.closest('.project-carousel');
+    const controls = select('.carousel-controls', carousel);
+    const previous = select('[data-carousel-prev]', carousel);
+    const next = select('[data-carousel-next]', carousel);
+    const slides = selectAll('.project-slide', track);
+    let carouselFrame = 0;
+    let scrollTarget = null;
+
+    const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+    const slidePositions = () => {
+      const first = slides[0].offsetLeft;
+      return [...new Set(slides.map((slide) => Math.min(maxScroll(), slide.offsetLeft - first)))];
+    };
+    const updateCarousel = () => {
+      const end = maxScroll();
+      previous.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= end - 2;
+      controls.hidden = end <= 2;
+      if (scrollTarget !== null && Math.abs(track.scrollLeft - scrollTarget) <= 2) {
+        scrollTarget = null;
+      }
+      carouselFrame = 0;
+    };
+    const scrollTo = (left) => {
+      scrollTarget = left;
+      track.scrollTo({ left, behavior: reduceMotion.matches ? 'instant' : 'smooth' });
+    };
+    const browse = (direction) => {
+      const positions = slidePositions();
+      // Continue from the requested card when clicks arrive during smooth scrolling.
+      const left = scrollTarget ?? track.scrollLeft;
+      const target = direction > 0
+        ? positions.find((position) => position > left + 2) ?? maxScroll()
+        : positions.reverse().find((position) => position < left - 2) ?? 0;
+      scrollTo(target);
+    };
+
+    previous.addEventListener('click', () => browse(-1));
+    next.addEventListener('click', () => browse(1));
+    track.addEventListener('scroll', () => {
+      if (!carouselFrame) carouselFrame = window.requestAnimationFrame(updateCarousel);
+    }, { passive: true });
+    const resetScrollTarget = () => { scrollTarget = null; };
+    track.addEventListener('wheel', resetScrollTarget, { passive: true });
+    track.addEventListener('pointerdown', resetScrollTarget, { passive: true });
+    track.addEventListener('keydown', (event) => {
+      if (event.target !== track) return;
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        browse(event.key === 'ArrowRight' ? 1 : -1);
+      } else if (event.key === 'Home' || event.key === 'End') {
+        event.preventDefault();
+        scrollTo(event.key === 'Home' ? 0 : maxScroll());
+      }
+    });
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(() => {
+        resetScrollTarget();
+        updateCarousel();
+      }).observe(track);
+    } else {
+      window.addEventListener('resize', () => {
+        resetScrollTarget();
+        updateCarousel();
+      });
+    }
+    updateCarousel();
+  }
+
+  const revealItems = selectAll('.timeline-item');
   if (reduceMotion.matches || !('IntersectionObserver' in window)) {
     revealItems.forEach((item) => item.classList.add('is-visible'));
   } else {

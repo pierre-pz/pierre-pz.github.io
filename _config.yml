@@ -1,0 +1,27 @@
+# GitHub Pages publishes main from the repository root.
+# Keep development material and unused legacy assets out of the public site.
+exclude:
+  - README.md
+  - package.json
+  - tests
+  - .release-local
+  - index1.html
+  - index2.html
+  - docs/hero-earth-review-1440x900.png
+  - docs/hero-webgl-1440x900.png
+  - docs/hero-webgl-1676x941.png
+  - docs/homepage-hero-review.jpg
+  - docs/homepage-mobile-review.jpg
+  - docs/homepage-projects-review.jpg
+  - docs/projects-covers-review.jpg
+  - docs/projects-research-review.jpg
+  - css/pierre-earth.css
+  - js/pierre-earth.js
+  - js/earth-globe.js
+  - js/parallax.js
+  - dep/images/pierre-earth
+  - dep/images/digital-earth.webp
+  - dep/images/digital-earth-americas.webp
+  - dep/images/project2.png
+  - dep/images/Disclosure_Cheater_Logo.png
+  - V.jpg

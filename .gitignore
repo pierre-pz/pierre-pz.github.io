@@ -1,0 +1,18 @@
+# Local release evidence and development artifacts
+.release-local/
+node_modules/
+.env
+.env.*
+*.log
+/index1.html
+/index2.html
+/docs/*-review*.png
+/docs/*-review*.jpg
+/docs/hero-webgl-*.png
+# Unused Earth experiments, retained locally
+/css/pierre-earth.css
+/js/pierre-earth.js
+/js/earth-globe.js
+/dep/images/pierre-earth/
+/dep/images/digital-earth.webp
+/dep/images/digital-earth-americas.webp

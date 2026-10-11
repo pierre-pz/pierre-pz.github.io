@@ -1,0 +1,100 @@
+/* Canada-focused atmosphere, scoped to the decorative hero artwork. */
+.pz-ca-earth {
+  --pz-ca-earth-brightness: .86;
+  --pz-ca-earth-opacity: .74;
+  --pz-ca-earth-x: 0px;
+  --pz-ca-earth-y: 0px;
+  --pz-ca-earth-roll: 0deg;
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  isolation:isolate;
+  mix-blend-mode:screen;
+  pointer-events:none;
+  contain:layout paint;
+  container-type:size;
+}
+.pz-ca-earth__rig {
+  position:absolute;
+  top:53%;
+  left:50%;
+  width:min(98vw,146vh,1536px);
+  aspect-ratio:3 / 2;
+  transform:translate3d(calc(-56.9% + var(--pz-ca-earth-x)),calc(-50% + var(--pz-ca-earth-y)),0) rotate(var(--pz-ca-earth-roll));
+  transform-origin:56.9% 47.2%;
+  will-change:transform;
+  -webkit-mask-image:linear-gradient(145deg,#000 38%,rgba(0,0,0,.94) 54%,rgba(0,0,0,.30) 77%,transparent 98%);
+  mask-image:linear-gradient(145deg,#000 38%,rgba(0,0,0,.94) 54%,rgba(0,0,0,.30) 77%,transparent 98%);
+}
+.pz-ca-earth__rig::before {
+  position:absolute;
+  inset:0;
+  content:"";
+  background:
+    radial-gradient(ellipse 27% 38% at 52% 45%,rgba(37,75,118,.16),transparent 76%),
+    radial-gradient(ellipse 14% 20% at 34% 31%,rgba(190,131,45,.085),transparent 76%);
+}
+.pz-ca-earth__image,
+.pz-ca-earth__image img,
+.pz-ca-earth__particles {
+  display:block;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+.pz-ca-earth__image {
+  opacity:var(--pz-ca-earth-opacity);
+  filter:brightness(var(--pz-ca-earth-brightness)) saturate(.95) contrast(1.025);
+  -webkit-mask-image:radial-gradient(ellipse 28.65% 43.55% at 56.9% 47.2%,#000 65%,rgba(0,0,0,.87) 84%,rgba(0,0,0,.30) 100%,rgba(0,0,0,.46) 112%,rgba(0,0,0,.38) 160%);
+  mask-image:radial-gradient(ellipse 28.65% 43.55% at 56.9% 47.2%,#000 65%,rgba(0,0,0,.87) 84%,rgba(0,0,0,.30) 100%,rgba(0,0,0,.46) 112%,rgba(0,0,0,.38) 160%);
+}
+.pz-ca-earth__image img { object-fit:contain; }
+.pz-ca-earth__particles { z-index:1;mix-blend-mode:screen; }
+.pz-ca-earth--hero {
+  -webkit-mask-image:linear-gradient(90deg,transparent 22%,rgba(0,0,0,.32) 38%,#000 58%),linear-gradient(180deg,transparent,#000 13%,#000 62%,rgba(0,0,0,.64) 83%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,transparent 22%,rgba(0,0,0,.32) 38%,#000 58%),linear-gradient(180deg,transparent,#000 13%,#000 62%,rgba(0,0,0,.64) 83%,transparent 100%);
+  mask-composite:intersect;
+}
+.pz-ca-earth--hero .pz-ca-earth__rig {
+  top:52%;
+  left:auto;
+  right:calc(min(101vw,144vh,1472px) * -.22);
+  width:min(101vw,144vh,1472px);
+  transform:translate3d(var(--pz-ca-earth-x),calc(-50% + var(--pz-ca-earth-y)),0) rotate(var(--pz-ca-earth-roll));
+}
+@supports (width:1cqw) {
+  .pz-ca-earth__rig { width:min(98cqw,146cqh,1536px); }
+  .pz-ca-earth--hero .pz-ca-earth__rig {
+    width:min(101cqw,144cqh,1472px);
+    right:calc(min(101cqw,144cqh,1472px) * -.22);
+  }
+}
+@media(max-width:800px) {
+  .pz-ca-earth__rig { width:min(155vw,110vh,880px); }
+  .pz-ca-earth--hero {
+    --pz-ca-earth-opacity:.9;
+    top:auto;
+    bottom:1rem;
+    height:21.5rem;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 76%,transparent);
+    mask-image:linear-gradient(180deg,transparent,#000 12%,#000 76%,transparent);
+  }
+  .pz-ca-earth--hero .pz-ca-earth__rig {
+    top:52%;
+    right:auto;
+    left:50%;
+    width:min(126vw,600px);
+    transform:translate3d(calc(-56.9% + var(--pz-ca-earth-x)),calc(-50% + var(--pz-ca-earth-y)),0) rotate(var(--pz-ca-earth-roll));
+    -webkit-mask-image:linear-gradient(155deg,#000 46%,rgba(0,0,0,.85) 67%,rgba(0,0,0,.30) 93%);
+    mask-image:linear-gradient(155deg,#000 46%,rgba(0,0,0,.85) 67%,rgba(0,0,0,.30) 93%);
+  }
+}
+@media(max-width:480px) {
+  .pz-ca-earth--hero { bottom:.75rem;height:16rem; }
+  .pz-ca-earth--hero .pz-ca-earth__rig { width:min(126vw,460px); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .pz-ca-earth__rig { will-change:auto; }
+}

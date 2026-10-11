@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
   <title>2025 Canadian Employment Income &amp; Disposable Cash Estimate</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -16,6 +17,8 @@
     .text-carbon { color: var(--carbon); }
     .focus\:ring-accent:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
     .deficit-state { border-color: rgba(248, 113, 113, .65); background: rgba(127, 29, 29, .18); }
+    #customList > div { grid-template-columns: minmax(0, 1fr) minmax(0, 8rem) auto; }
+    #customList input { min-width: 0; width: 100%; }
   </style>
 </head>
 
