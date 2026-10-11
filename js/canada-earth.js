@@ -99,9 +99,9 @@
           if (scattered < .003) continue;
           const rim = .70 * Math.exp(-.5 * Math.pow(distance / 1.45, 2));
           const atmosphere = distance >= 0
-            ? .13 * Math.exp(-distance / 13) + .080 * Math.exp(-distance / 43) +
-              .025 * Math.exp(-.5 * Math.pow(distance / 85, 2))
-            : .18 * Math.exp(distance / 22) + .025 * Math.exp(distance / 46);
+            ? .10 * Math.exp(-distance / 13) + .035 * Math.exp(-distance / 43) +
+              .012 * Math.exp(-.5 * Math.pow(distance / 85, 2))
+            : .12 * Math.exp(distance / 18) + .012 * Math.exp(distance / 40);
           const alpha = Math.min(.86, rim * sunlight + atmosphere * scattered);
           if (alpha < .002) continue;
           const hot = Math.exp(-Math.abs(distance) / 4);
@@ -165,7 +165,7 @@
           const r = pixels.data[i], g = pixels.data[i + 1], b = pixels.data[i + 2];
           if (pixels.data[i + 3] < 160 || b < 28 || g < 23 || b < r * .88) continue;
           const alpha = (.25 + .52 * Math.min(1,b / 100)) * (.35 + .65 * depth);
-          dots.fillStyle = 'rgba(127,154,178,' + alpha.toFixed(3) + ')';
+          dots.fillStyle = 'rgba(78,170,218,' + alpha.toFixed(3) + ')';
           dots.beginPath(); dots.arc(x,y,.38 + .48 * depth,0,TAU); dots.fill();
         }
       }
@@ -217,7 +217,8 @@
       const glow = layer.getContext('2d');
       if (!glow) return;
       glow.globalCompositeOperation = 'lighter';
-      for (const [blur, alpha] of [[15, .30], [5, .42], [1.3, .12]]) {
+      // A compact bloom preserves the individual lights and coastline edges.
+      for (const [blur, alpha] of [[9, .18], [3, .32], [1.3, .12]]) {
         glow.filter = 'blur(' + blur + 'px)';
         glow.globalAlpha = alpha;
         glow.drawImage(source, 0, 0);

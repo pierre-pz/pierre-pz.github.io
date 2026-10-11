@@ -1,7 +1,6 @@
 /* Canada-focused atmosphere, scoped to the decorative hero artwork. */
 .pz-ca-earth {
-  --pz-ca-earth-brightness: .86;
-  --pz-ca-earth-opacity: .74;
+  --pz-ca-earth-opacity: 1;
   --pz-ca-earth-x: 0px;
   --pz-ca-earth-y: 0px;
   --pz-ca-earth-roll: 0deg;
@@ -26,14 +25,6 @@
   -webkit-mask-image:linear-gradient(145deg,#000 38%,rgba(0,0,0,.94) 54%,rgba(0,0,0,.30) 77%,transparent 98%);
   mask-image:linear-gradient(145deg,#000 38%,rgba(0,0,0,.94) 54%,rgba(0,0,0,.30) 77%,transparent 98%);
 }
-.pz-ca-earth__rig::before {
-  position:absolute;
-  inset:0;
-  content:"";
-  background:
-    radial-gradient(ellipse 27% 38% at 52% 45%,rgba(37,75,118,.16),transparent 76%),
-    radial-gradient(ellipse 14% 20% at 34% 31%,rgba(190,131,45,.085),transparent 76%);
-}
 .pz-ca-earth__image,
 .pz-ca-earth__image img,
 .pz-ca-earth__particles {
@@ -45,9 +36,9 @@
 }
 .pz-ca-earth__image {
   opacity:var(--pz-ca-earth-opacity);
-  filter:brightness(var(--pz-ca-earth-brightness)) saturate(.95) contrast(1.025);
-  -webkit-mask-image:radial-gradient(ellipse 28.65% 43.55% at 56.9% 47.2%,#000 65%,rgba(0,0,0,.87) 84%,rgba(0,0,0,.30) 100%,rgba(0,0,0,.46) 112%,rgba(0,0,0,.38) 160%);
-  mask-image:radial-gradient(ellipse 28.65% 43.55% at 56.9% 47.2%,#000 65%,rgba(0,0,0,.87) 84%,rgba(0,0,0,.30) 100%,rgba(0,0,0,.46) 112%,rgba(0,0,0,.38) 160%);
+  /* Keep the detailed hemisphere intact; attenuate only the outer light spill. */
+  -webkit-mask-image:radial-gradient(ellipse 28.65% 43.55% at 56.9% 47.2%,#000 88%,rgba(0,0,0,.90) 97%,rgba(0,0,0,.26) 105%,rgba(0,0,0,.10) 116%,rgba(0,0,0,.08) 160%);
+  mask-image:radial-gradient(ellipse 28.65% 43.55% at 56.9% 47.2%,#000 88%,rgba(0,0,0,.90) 97%,rgba(0,0,0,.26) 105%,rgba(0,0,0,.10) 116%,rgba(0,0,0,.08) 160%);
 }
 .pz-ca-earth__image img { object-fit:contain; }
 .pz-ca-earth__particles { z-index:1;mix-blend-mode:screen; }
@@ -74,7 +65,6 @@
 @media(max-width:800px) {
   .pz-ca-earth__rig { width:min(155vw,110vh,880px); }
   .pz-ca-earth--hero {
-    --pz-ca-earth-opacity:.9;
     top:auto;
     bottom:1rem;
     height:21.5rem;
