@@ -632,6 +632,13 @@ a {
 
 .project-image-taxi { margin-inline: 0; }
 .project-image-tax img { padding: 0.5rem; }
+.project-image-sedans img {
+  height: auto;
+  max-height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.6rem;
+  box-shadow: 0 0.6rem 1.2rem rgba(0, 0, 0, 0.2);
+}
 .project-image-heart {
   color: #f19485;
   background: radial-gradient(ellipse, rgba(241, 148, 133, 0.1), transparent 68%);

@@ -1,4 +1,5 @@
 # Local release evidence and development artifacts
+/public-release.zip
 .release-local/
 node_modules/
 .env

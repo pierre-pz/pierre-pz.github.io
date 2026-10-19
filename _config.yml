@@ -1,6 +1,7 @@
 # GitHub Pages publishes main from the repository root.
 # Keep development material and unused legacy assets out of the public site.
 exclude:
+  - public-release.zip
   - README.md
   - package.json
   - tests

@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "status": "phase_2_review_build_verified_evidence",
+  "checked_on": "2026-10-15",
+  "fleet": {
+    "measure": "registered_light_duty_vehicle_count",
+    "geography": "Canada",
+    "fuel_scope": "all_fuel_types",
+    "unit": "thousand_vehicles",
+    "source_rounding": "one_decimal_thousand_vehicles",
+    "display_millions_divisor": 1000,
+    "gvwr_max_kg": 4536,
+    "source_url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260922/cg-c001-eng.htm",
+    "source_table": "23-10-0308-01",
+    "source_release_date": "2026-09-22",
+    "chart_excludes": [
+      "Other vehicles"
+    ],
+    "administrative_caveat": "Ontario registration revisions and renewal-system changes affect 2022-2025 counts. Fleet registrations are not new sales or a direct census of vehicles physically driving.",
+    "values": [
+      {
+        "year": 2017,
+        "passenger_cars": 10218.5,
+        "multi_purpose_vehicles": 6765.8,
+        "pickup_trucks": 3826.3,
+        "vans": 1910.9
+      },
+      {
+        "year": 2018,
+        "passenger_cars": 10049.6,
+        "multi_purpose_vehicles": 7297.9,
+        "pickup_trucks": 3887.7,
+        "vans": 1860.7
+      },
+      {
+        "year": 2019,
+        "passenger_cars": 9879.9,
+        "multi_purpose_vehicles": 7825.0,
+        "pickup_trucks": 3932.6,
+        "vans": 1803.9
+      },
+      {
+        "year": 2020,
+        "passenger_cars": 9683.0,
+        "multi_purpose_vehicles": 8313.1,
+        "pickup_trucks": 4002.3,
+        "vans": 1754.9
+      },
+      {
+        "year": 2021,
+        "passenger_cars": 9468.1,
+        "multi_purpose_vehicles": 8838.5,
+        "pickup_trucks": 4091.2,
+        "vans": 1721.4
+      },
+      {
+        "year": 2022,
+        "passenger_cars": 8939.9,
+        "multi_purpose_vehicles": 9069.0,
+        "pickup_trucks": 3994.8,
+        "vans": 1613.0
+      },
+      {
+        "year": 2023,
+        "passenger_cars": 8588.3,
+        "multi_purpose_vehicles": 9408.5,
+        "pickup_trucks": 4008.6,
+        "vans": 1541.8
+      },
+      {
+        "year": 2024,
+        "passenger_cars": 8591.6,
+        "multi_purpose_vehicles": 10284.9,
+        "pickup_trucks": 4130.2,
+        "vans": 1539.6
+      },
+      {
+        "year": 2025,
+        "passenger_cars": 8430.8,
+        "multi_purpose_vehicles": 11134.9,
+        "pickup_trucks": 4227.6,
+        "vans": 1525.8
+      }
+    ]
+  },
+  "fleet_share_endpoints": {
+    "measure": "share_of_all_registered_light_duty_vehicles",
+    "unit": "percent",
+    "source_url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260922/dq260922c-eng.htm",
+    "source_release_date": "2026-09-22",
+    "derived_from_rounded_chart": false,
+    "values": [
+      {
+        "year": 2017,
+        "passenger_cars": 45.0,
+        "multi_purpose_vehicles": 29.8
+      },
+      {
+        "year": 2025,
+        "passenger_cars": 33.3,
+        "multi_purpose_vehicles": 44.0
+      }
+    ]
+  },
+  "new_registration_endpoints": {
+    "measure": "multi_purpose_share_of_all_new_motor_vehicle_registrations",
+    "geography": "Canada",
+    "unit": "percent",
+    "source_url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260922/dq260922c-eng.htm",
+    "source_release_date": "2026-09-22",
+    "values": [
+      {
+        "year": 2017,
+        "value": 42.1
+      },
+      {
+        "year": 2025,
+        "value": 63.3
+      }
+    ],
+    "caveat": "Two source-published endpoints only. Earlier March 2026 release reports 63.2% for 2025; discrepancy cause not independently reconciled. Do not splice with fleet or reconstruct counts from mixed vintages."
+  },
+  "autotrader_searches": {
+    "measure": "share_of_canadian_vehicle_searches_on_autotrader",
+    "platform": "AutoTrader.ca",
+    "market_scope": "new_and_used_marketplace_activity_not_a_new_only_series",
+    "observation_start": "2024-01-01",
+    "observation_end": "2024-10-21",
+    "report_label_year": 2024,
+    "unit": "percent",
+    "source_url": "https://go.trader.ca/wp-content/uploads/2024/12/2024-AutoTrader-Top-Vehicles-Infographic.pdf",
+    "values": [
+      {
+        "category": "Cars",
+        "value": 49
+      },
+      {
+        "category": "SUVs",
+        "value": 40
+      }
+    ],
+    "residual": {
+      "label": "Other searches",
+      "value": 11,
+      "derived": true,
+      "approximate": true,
+      "formula": "100 - 49 - 40"
+    },
+    "caveat": "Searches, not unique shoppers, purchases, or nationally representative preferences. Category mapping to StatCan not established."
+  }
+}
