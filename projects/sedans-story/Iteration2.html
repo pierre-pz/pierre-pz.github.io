@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Iteration 2 for MBAI 5400 data story.">
+  <title>Where Did All the Sedans Go? — Iteration 02</title>
+  <style>
+    :root {
+      --paper: #f7f6f2;
+      --ink: #262722;
+      --muted: #656660;
+      --accent: #b7493d;
+      --line: #d6d4cb;
+      --yellow: #f0d65e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.65 Arial, Helvetica, sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    blockquote {
+      font-family: Georgia, 'Times New Roman', serif;
+      line-height: 1.12;
+    }
+
+    h1 {
+      font-size: clamp(3.1rem, 7vw, 6.5rem);
+      letter-spacing: -.055em;
+      margin: 20px 0;
+    }
+
+    h2 {
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      letter-spacing: -.04em;
+      margin: 12px 0 24px;
+    }
+
+    h3 {
+      font-size: clamp(1.45rem, 2.2vw, 2.1rem);
+      margin: 9px 0;
+    }
+
+    p {
+      max-width: 660px;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: auto;
+      padding: 0 28px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font: bold .78rem Arial, sans-serif;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .muted,
+    .intro {
+      color: var(--muted);
+    }
+
+    .mark {
+      box-shadow: inset 0 -.27em var(--yellow);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px max(28px, calc((100vw - 1064px)/2));
+      background: rgba(247, 246, 242, .97);
+      border-bottom: 1px solid var(--line);
+      font-size: .76rem;
+      font-weight: bold;
+    }
+
+    .topbar a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .progress {
+      position: fixed;
+      top: 47px;
+      left: 0;
+      z-index: 11;
+      height: 3px;
+      width: 0;
+      background: var(--accent);
+    }
+
+    section {
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 65px;
+      padding: 90px 0;
+    }
+
+    .hero {
+      min-height: calc(100svh - 48px);
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-grid,
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 55px;
+      align-items: center;
+    }
+
+    .hero .intro {
+      font-size: 1.12rem;
+    }
+
+    .placeholder {
+      min-height: 200px;
+      border: 2px dashed #aaa99f;
+      background: #f0efe9;
+      color: #646660;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+      padding: 24px;
+    }
+
+    .placeholder strong {
+      color: var(--ink);
+      font-size: .85rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .placeholder small {
+      max-width: 310px;
+    }
+
+    .placeholder.tall {
+      min-height: 350px;
+    }
+
+    .placeholder.compact {
+      min-height: 110px;
+    }
+
+    .hero-link {
+      display: inline-block;
+      margin-top: 28px;
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+      font-weight: bold;
+    }
+
+    .chapter-note {
+      max-width: 740px;
+      margin-bottom: 32px;
+      color: var(--muted);
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 38px;
+      align-items: start;
+    }
+
+    .steps {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .step {
+      min-height: 64vh;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      opacity: .45;
+      transition: opacity .2s;
+    }
+
+    .step.active {
+      opacity: 1;
+    }
+
+    .step-inner {
+      padding: 20px 0 20px 20px;
+      border-left: 3px solid transparent;
+    }
+
+    .step.active .step-inner {
+      border-left-color: var(--accent);
+    }
+
+    .visual {
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: 95px;
+      border: 1px solid var(--ink);
+      background: #fffefa;
+      padding: 25px;
+      min-height: 380px;
+    }
+
+    .visual-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: .8rem;
+      font-weight: bold;
+    }
+
+    .visual-head span {
+      color: var(--accent);
+    }
+
+    .stage {
+      display: none;
+      padding-top: 25px;
+    }
+
+    .stage.active {
+      display: block;
+    }
+
+    .category-pair,
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .category-pair .placeholder {
+      min-height: 160px;
+    }
+
+    .compare {
+      margin-top: 40px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: #fffefa;
+      padding: 28px;
+      border: 1px solid var(--ink);
+    }
+
+    .panel p {
+      color: var(--muted);
+    }
+
+    .panel .placeholder {
+      margin-top: 22px;
+    }
+
+    .fineprint {
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    .human .two-col {
+      margin-top: 40px;
+    }
+
+    .human .placeholder {
+      min-height: 320px;
+    }
+
+    .final {
+      text-align: center;
+      padding: 125px 0;
+    }
+
+    .final h2 {
+      font-size: clamp(3.4rem, 8vw, 7.3rem);
+    }
+
+    .final p {
+      margin: 18px auto;
+    }
+
+    .notes {
+      background: #eeede7;
+      padding: 55px 0;
+    }
+
+    .notes h2 {
+      font-size: 2rem;
+    }
+
+    .notes p {
+      font-size: .92rem;
+    }
+
+    footer {
+      padding: 22px 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    @media (max-width:760px) {
+      section {
+        padding: 65px 0;
+      }
+
+      .hero-grid,
+      .two-col,
+      .compare,
+      .category-pair,
+      .market-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-grid,
+      .two-col {
+        gap: 28px;
+      }
+
+      .market-grid {
+        gap: 0;
+      }
+
+      .visual {
+        grid-column: 1;
+        grid-row: 1;
+        top: 60px;
+        min-height: 240px;
+        padding: 15px;
+        z-index: 2;
+      }
+
+      .steps {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .step {
+        min-height: 35vh;
+        opacity: 1;
+        background: var(--paper);
+      }
+
+      .placeholder.tall {
+        min-height: 220px;
+      }
+
+      .category-pair {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .category-pair .placeholder {
+        min-height: 110px;
+        padding: 8px;
+      }
+
+      .stage {
+        padding-top: 13px;
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .step {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <span>MBAI 5400 · ITERATION 02 / HTML MVP</span>
+    <a href="#notes">Design notes ↓</a>
+  </header>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <main>
+    <section class="hero" id="chapter-1">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">01 / Pierre's question · Canada, 2017–2025</div>
+          <h1>Where did all the <span class="mark">sedans</span> go?</h1>
+          <p class="intro">Pierre is looking for a practical new car. He starts with a sedan in mind, then notices how
+            the available choices are changing.</p>
+          <p><strong>Who shapes the cars we buy?</strong></p>
+          <a class="hero-link" href="#chapter-2">Scroll to investigate ↓</a>
+        </div>
+        <div class="placeholder tall" role="img" aria-label="Placeholder for Pierre's opening portrait">
+          <strong>Image placeholder</strong>
+          <span>Pierre's opening portrait / character introduction</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="chapter-2">
+      <div class="wrap">
+        <div class="eyebrow">02 / The market shift</div>
+        <h2>A market that <span class="mark">looks different.</span></h2>
+        <p class="chapter-note">First define the vehicle categories, then show the national trend, then interpret it.
+          The final evidence visuals will be built from verified data.</p>
+        <div class="market-grid">
+          <div class="steps">
+            <article class="step active" data-step="0">
+              <div class="step-inner">
+                <div class="eyebrow">Reveal 01 / Define</div>
+                <h3>What are we comparing?</h3>
+                <p>"Sedan" is Pierre's preferred type. Statistics Canada's broader categories are <strong>passenger
+                    cars</strong> and <strong>multi-purpose vehicles</strong>.</p>
+              </div>
+            </article>
+            <article class="step" data-step="1">
+              <div class="step-inner">
+                <div class="eyebrow">Reveal 02 / Measure</div>
+                <h3>How has the market changed?</h3>
+                <p>Use annual registration evidence to make the shift visible. Distinguish vehicles already registered
+                  from new registrations.</p>
+              </div>
+            </article>
+            <article class="step" data-step="2">
+              <div class="step-inner">
+                <div class="eyebrow">Reveal 03 / Interpret</div>
+                <h3>Does a smaller share mean gone?</h3>
+                <p>No. A changing mix does not mean passenger cars literally disappear. It leads to the question of
+                  demand and supply.</p>
+              </div>
+            </article>
+          </div>
+          <aside class="visual" aria-label="Three states of planned market visualization">
+            <div class="visual-head"><strong>Market evidence / wireframe</strong><span id="state-count">STATE 1 /
+                3</span></div>
+            <div class="stage active" data-stage="0">
+              <p class="fineprint">Official categories, not individual body styles.</p>
+              <div class="category-pair">
+                <div class="placeholder"><strong>Category</strong><span>Passenger cars</span></div>
+                <div class="placeholder"><strong>Category</strong><span>Multi-purpose vehicles</span></div>
+              </div>
+            </div>
+            <div class="stage" data-stage="1">
+              <div class="placeholder tall"><strong>Chart placeholder</strong><span>Canadian vehicle registration
+                  trends, 2017–2025</span><small>Final chart to use verified observations and clearly defined
+                  measures.</small></div>
+            </div>
+            <div class="stage" data-stage="2">
+              <div class="placeholder tall"><strong>Takeaway placeholder</strong><span>Changed market composition ≠
+                  disappearance</span><small>Follow the evidence, not an assumed explanation.</small></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="chapter-3">
+      <div class="wrap">
+        <div class="eyebrow">03 / Demand & supply</div>
+        <h2>Two sides of the same shift.</h2>
+        <p class="chapter-note">Consumer interest and manufacturer offerings may interact. Neither perspective alone
+          proves what caused the national trend.</p>
+        <div class="compare">
+          <article class="panel">
+            <div class="eyebrow">Perspective A / Demand</div>
+            <h3>What do buyers want?</h3>
+            <p>Investigate interest and preferences without treating searches as purchases.</p>
+            <div class="placeholder"><strong>Chart placeholder</strong><span>Consumer interest / search evidence</span>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="eyebrow">Perspective B / Supply</div>
+            <h3>What do automakers offer?</h3>
+            <p>Explore documented model retirements and new SUV introductions.</p>
+            <div class="placeholder"><strong>Image placeholders</strong><span>Sedan and SUV model cards /
+                illustrations</span></div>
+          </article>
+        </div>
+        <p class="fineprint">Evidence and individual model examples will be sourced and qualified in the final
+          iteration.</p>
+      </div>
+    </section>
+
+    <section class="human" id="chapter-4">
+      <div class="wrap">
+        <div class="eyebrow">04 / Back to Pierre</div>
+        <h2>What does it mean <span class="mark">for Pierre?</span></h2>
+        <div class="two-col">
+          <div class="placeholder" role="img" aria-label="Placeholder for the sedan/SUV road-fork image and Pierre">
+            <strong>Image placeholder</strong><span>Pierre at a fork: SEDAN ← / SUV →</span>
+          </div>
+          <div>
+            <h3>Same decision. Bigger question.</h3>
+            <p>Pierre still chooses according to his own budget and needs. Now he also asks how the selection available
+              to him took shape.</p>
+            <p class="fineprint">The story is about the market around an individual choice, not a car-buying
+              recommendation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final" id="chapter-5">
+      <div class="wrap">
+        <div class="eyebrow">05 / The takeaway</div>
+        <h2>Changed.<br><span class="mark">Not gone.</span></h2>
+        <p>Passenger cars have changed position in Canada's market, while SUVs and crossovers have grown in prominence.
+          Explaining why requires evidence on both buyers and automakers.</p>
+        <p><strong>Pierre's question opens the investigation. It does not decide the answer.</strong></p>
+      </div>
+    </section>
+
+    <section class="notes" id="notes">
+      <div class="wrap">
+        <div class="eyebrow">Prototype documentation</div>
+        <h2>Iteration 02 / Design notes</h2>
+        <p><strong>Purpose:</strong> Test how five initial storyboard scenes work as a vertical scrollytelling page,
+          especially the market section's three-step reveal.</p>
+        <p><strong>Author:</strong> Pierre Zhaopeng Zhang</p>
+      </div>
+    </section>
+  </main>
+  <footer></footer>
+  <script>
+    const steps = [...document.querySelectorAll('[data-step]')];
+    const stages = [...document.querySelectorAll('[data-stage]')];
+    const counter = document.getElementById('state-count');
+    const progress = document.getElementById('progress');
+    function update() {
+      let closest = 0, distance = Infinity;
+      steps.forEach((step, i) => {
+        const box = step.getBoundingClientRect();
+        const d = Math.abs(box.top + box.height / 2 - innerHeight * .6);
+        if (d < distance) {closest = i; distance = d;}
+      });
+      steps.forEach((s, i) => s.classList.toggle('active', i === closest));
+      stages.forEach((s, i) => {s.classList.toggle('active', i === closest); s.setAttribute('aria-hidden', String(i !== closest));});
+      counter.textContent = `STATE ${closest + 1} / 3`;
+      const scrollable = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      progress.style.width = Math.min(100, scrollY / scrollable * 100) + '%';
+    }
+    addEventListener('scroll', update, {passive: true});
+    addEventListener('resize', update);
+    update();
+  </script>
+</body>
+
+</html>
