@@ -10,7 +10,7 @@
 .sedans-story button,.sedans-story summary{cursor:pointer}
 .sedans-story img{max-width:100%;height:auto;display:block}
 .sedans-story p{margin:0 0 1.2em}
-.sedans-story h1,.sedans-story h2,.sedans-story h3,.sedans-story h4{font-family:Georgia,"Times New Roman",serif;font-weight:400;line-height:1.08;letter-spacing:-.045em;margin:0}
+.sedans-story h1,.sedans-story h2,.sedans-story h3,.sedans-story h4{font-family:inherit;font-weight:400;line-height:1.08;letter-spacing:-.045em;margin:0}
 .sedans-story h2{font-size:clamp(48px,5.3vw,78px)}
 .sedans-story h3{font-size:34px}
 .sedans-story h4{font-size:36px}
@@ -68,7 +68,7 @@
 .sedans-story .sd-person-label strong{font-weight:600;font-size:16px}
 .sedans-story .sd-person-label span:last-child{color:var(--sd-muted)}
 .sedans-story .sd-small-rule{width:38px;height:2px;background:var(--sd-red);margin-bottom:10px}
-.sedans-story .sd-margin-note{position:absolute;right:0;bottom:0;color:var(--sd-muted);font:italic 16px/1.5 Georgia,serif;text-align:right}
+.sedans-story .sd-margin-note{position:absolute;right:0;bottom:0;color:var(--sd-muted);font:italic 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:right}
 .sedans-story .sd-hook{padding:150px 0 140px;border-bottom:1px solid var(--sd-rule)}
 .sedans-story .sd-hook>p{max-width:590px;margin-bottom:45px}
 .sedans-story .sd-question{font-size:clamp(35px,4.2vw,59px);line-height:1.25;letter-spacing:-.035em}
@@ -88,11 +88,11 @@
 .sedans-story .sd-measure{margin-bottom:9px;font-size:11px;letter-spacing:.1em}
 .sedans-story .sd-chart-heading h3{font-size:26px;letter-spacing:-.03em;max-width:300px;line-height:1.2}
 .sedans-story .sd-chart-unit{font-size:12px;color:var(--sd-muted);margin-top:8px;margin-bottom:14px}
-.sedans-story .sd-chart-year{font:normal 37px/1 Georgia,serif;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.sedans-story .sd-chart-year{font:normal 37px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
 .sedans-story .sd-chart-values{display:flex;gap:32px;margin:17px 0 8px}
 .sedans-story .sd-chart-values>span{font-size:12px;line-height:1.4;flex:1}
 .sedans-story .sd-chart-values .sd-line-key{margin-right:7px;width:18px}
-.sedans-story .sd-chart-values strong{display:block;font:normal 38px/1.25 Georgia,serif;letter-spacing:-.04em;margin-top:5px;font-variant-numeric:tabular-nums}
+.sedans-story .sd-chart-values strong{display:block;font:normal 38px/1.25 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.04em;margin-top:5px;font-variant-numeric:tabular-nums}
 .sedans-story .sd-chart-values strong small{font:12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:0;color:var(--sd-muted)}
 .sedans-story .sd-fleet-svg{width:100%;aspect-ratio:620/320;display:block;overflow:visible}
 .sedans-story .sd-axis{font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#62675F}
@@ -117,7 +117,7 @@
 .sedans-story .sd-endpoint-title{font-size:15px;max-width:650px;margin-bottom:25px}
 .sedans-story .sd-endpoints{display:grid;grid-template-columns:1fr 1fr;gap:75px}
 .sedans-story .sd-endpoint-year{font-size:16px;display:block}
-.sedans-story .sd-endpoint>strong{display:block;font:normal clamp(84px,10vw,140px)/1.16 Georgia,serif;letter-spacing:-.06em;margin:5px 0 10px;font-variant-numeric:tabular-nums}
+.sedans-story .sd-endpoint>strong{display:block;font:normal clamp(84px,10vw,140px)/1.16 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.06em;margin:5px 0 10px;font-variant-numeric:tabular-nums}
 .sedans-story .sd-endpoint>strong>span{font-size:.43em;letter-spacing:-.03em}
 .sedans-story .sd-endpoint-track,.sedans-story .sd-search-track{height:18px;background:#F0F1EC;position:relative}
 .sedans-story .sd-endpoint-track>span,.sedans-story .sd-search-track>span{display:block;width:var(--share);height:100%;background:var(--sd-ink);transform-origin:left}
@@ -127,7 +127,7 @@
 .sedans-story .sd-endpoint-change mark{white-space:nowrap;font-weight:650;font-size:15px}
 .sedans-story .sd-endpoint-change>span{color:var(--sd-muted)}
 .sedans-story .sd-new-market>.sd-source{max-width:780px}
-.sedans-story .sd-transition{font:38px/1.35 Georgia,serif;letter-spacing:-.025em;margin:110px 0 0;padding-bottom:80px;border-bottom:1px solid var(--sd-rule)}
+.sedans-story .sd-transition{font:38px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.025em;margin:110px 0 0;padding-bottom:80px;border-bottom:1px solid var(--sd-rule)}
 .sedans-story .sd-transition em{color:var(--sd-muted)}
 .sedans-story .sd-search-layout{display:grid;grid-template-columns:1fr 1.15fr;gap:110px;margin-top:10px}
 .sedans-story .sd-lens{color:var(--sd-red);margin-bottom:30px}
@@ -137,7 +137,7 @@
 .sedans-story .sd-search-row{margin-top:24px}
 .sedans-story .sd-search-row>div:first-child{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:16px}
 .sedans-story .sd-search-row>div:first-child>strong{font-weight:550}
-.sedans-story .sd-search-row>div:first-child>span{font:normal 34px/1 Georgia,serif;letter-spacing:-.04em}
+.sedans-story .sd-search-row>div:first-child>span{font:normal 34px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.04em}
 .sedans-story .sd-search-row:nth-of-type(2) .sd-search-track>span{background:#797E75}
 .sedans-story .sd-search-chart figcaption{margin-top:18px}
 .sedans-story .sd-lineup-intro{margin-top:130px;padding-top:65px;border-top:1px solid var(--sd-rule)}
@@ -156,7 +156,7 @@
 .sedans-story .sd-lane-arrow{position:absolute;right:0;top:10px;font:normal 35px/1.5 Georgia,serif;color:var(--sd-red)}
 .sedans-story .sd-introduction .sd-lane-heading{border-color:var(--sd-red)}
 .sedans-story .sd-model{position:relative;padding:25px 0 45px;border-bottom:1px solid #E8EAE4;isolation:isolate}
-.sedans-story .sd-model-number{position:absolute;right:15px;top:0;font:normal 142px/.9 Georgia,serif;color:#F1F2EF;letter-spacing:-.06em;z-index:-1}
+.sedans-story .sd-model-number{position:absolute;right:15px;top:0;font:normal 142px/.9 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#F1F2EF;letter-spacing:-.06em;z-index:-1}
 .sedans-story .sd-model-year{font-size:11px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;font-weight:650;margin-bottom:12px}
 .sedans-story .sd-introduction .sd-model-year{color:var(--sd-red)}
 .sedans-story .sd-model h4{position:relative;font-size:35px;letter-spacing:-.035em}
@@ -170,7 +170,7 @@
 .sedans-story .sd-illustration-note{padding-top:20px;margin-bottom:0}
 .sedans-story .sd-interaction{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;padding:100px 0 130px;border-bottom:1px solid var(--sd-rule)}
 .sedans-story .sd-interaction-diagram{display:flex;align-items:center;justify-content:space-around;gap:24px;font-size:14px;text-align:center}
-.sedans-story .sd-interaction-diagram strong{font:normal 36px/1.2 Georgia,serif;letter-spacing:-.03em}
+.sedans-story .sd-interaction-diagram strong{font:normal 36px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.03em}
 .sedans-story .sd-two-arrows{font:normal 66px/1 Georgia,serif;color:var(--sd-red)}
 .sedans-story .sd-interaction>p{font-size:18px;margin-bottom:0}
 .sedans-story .sd-return{padding:130px 0 100px;display:grid;grid-template-columns:1fr 1.3fr;gap:65px;align-items:center}
@@ -184,7 +184,7 @@
 .sedans-story .sd-ending h2{font-size:clamp(60px,7.5vw,106px);line-height:1.04}
 .sedans-story .sd-ending h2 em{color:var(--sd-red)}
 .sedans-story .sd-ending-grid>div>p{font-size:17px}
-.sedans-story .sd-last-line{font:normal clamp(45px,5.5vw,80px)/1.18 Georgia,serif;letter-spacing:-.04em;margin:100px 0 45px;max-width:1000px}
+.sedans-story .sd-last-line{font:normal clamp(45px,5.5vw,80px)/1.18 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.04em;margin:100px 0 45px;max-width:1000px}
 .sedans-story .sd-end-road{display:block;width:130px;height:90px;margin:0 0 0 auto;stroke:#B9C0B1;stroke-width:1.5;fill:none}
 .sedans-story #story-end{display:block;height:1px}
 .sedans-story .sd-footer{border-top:1px solid var(--sd-rule);padding:70px 0 0;margin-top:0;font-size:13px;color:#50564B}
